@@ -7,6 +7,7 @@ import { BloggersModule } from './bloggers/bloggers.module';
 import { CommentsModule } from './comments/comments.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
+import 'dotenv/config'
 
 
 const options = {
