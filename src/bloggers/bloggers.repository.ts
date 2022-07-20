@@ -13,7 +13,7 @@ const modelViewBloggers = {
 @Injectable()
 export class BloggerRepository {
 
-    constructor(@InjectModel('Blogger') private bloggerModel: Model<BloggersType>) {
+    constructor(@InjectModel('Blogger') protected bloggerModel: Model<BloggersType>) {
         
     }
 

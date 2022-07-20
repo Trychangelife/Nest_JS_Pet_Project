@@ -12,7 +12,7 @@ export class BloggerController {
     constructor(
       protected bloggerService: BloggerService, 
       protected postsService: PostsService,
-      @InjectModel('Blogger') private bloggerModel: Model<BloggersType>) {
+      @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>) {
     }
 
     @Delete('/del')

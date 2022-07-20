@@ -10,8 +10,8 @@ export class PostsService {
 
     constructor (
         protected postsRepository: PostRepository, 
-        @InjectModel('Blogger') private bloggerModel: Model<BloggersType>,
-        @InjectModel('Posts') private postsModel: Model<PostsType>) {}
+        @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>,
+        @InjectModel('Posts') protected postsModel: Model<PostsType>) {}
 
     async allPosts(pageSize: number, pageNumber: number,): Promise<object> {
         let skip = 0

@@ -5,7 +5,7 @@ import { CommentsRepository } from "./comments.repository"
 @Injectable()
 export class CommentsService {
 
-    constructor(private commentsRepository: CommentsRepository) {
+    constructor(protected commentsRepository: CommentsRepository) {
     }
 
     async getCommentsById(id: string): Promise<CommentsType | null> {

@@ -8,7 +8,7 @@ import { emailManager } from "./email.manager"
 export class EmailService {
 
     constructor (
-        @InjectModel('Users') private usersModel: Model<UsersType>,
+        @InjectModel('Users') protected usersModel: Model<UsersType>,
     ) {
         
     }

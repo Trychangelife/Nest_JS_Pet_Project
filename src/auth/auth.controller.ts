@@ -3,14 +3,22 @@ import { UsersRepository } from "src/users/users.repository";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res } from "@nestjs/common";
-import { UsersType } from "src/types/types";
+import { RefreshTokenStorageType, UsersType } from "src/types/types";
 import { Injectable, Ip, Request } from "@nestjs/common";
-import { JwtService } from "src/JWT/jwt.service";
+import { JwtServiceClass } from "src/JWT/jwt.service";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 
 @Controller('auth')
 export class AuthController {
 
-    constructor(public usersRepository: UsersRepository, private usersService: UsersService, private authService: AuthService, public emailService: EmailService, private jwtService: JwtService) {
+    constructor(
+        protected usersRepository: UsersRepository, 
+        protected usersService: UsersService, 
+        protected authService: AuthService, 
+        protected emailService: EmailService, 
+        protected jwtService: JwtServiceClass,
+        @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>) {
     }
     @Post('login')
     async authorization(@Request() req: {ip: string}, @Body() DataUser: {password: string, login: string, email: string}, @Res() res) {
@@ -41,30 +49,31 @@ export class AuthController {
             res.sendStatus(429);
         }
     }
-    // async updateAccessToken() {
-    //     const refreshToken = req.cookies["refreshToken"];
-    //     if (!refreshToken) {
-    //         res.status(401).send('Refresh token not found, where you cookie?');
-    //     }
-    //     else if (refreshToken) {
-    //         const newAccessToken: any = await jwtService.getNewAccessToken(refreshToken);
-    //         if (newAccessToken !== null) {
-    //             res
-    //              .cookie("refreshToken", newAccessToken.newRefreshToken, {
-    //                  httpOnly: true,
-    //                  secure: process.env.NODE_ENV === "production"
-    //              })
-    //             .status(200)
-    //             .send({accessToken: newAccessToken.newAccessToken});
-    //         }
-    //         else {
-    //             res.status(401).send('Refresh Token already not valid, repeat authorization');
-    //         }
-    //     } 
-    //     else {
-    //         res.sendStatus(400);
-    //     }
-    // }
+    @Post('refresh-token')
+    async updateAccessToken(@Req() req, @Res() res) {
+        const refreshToken = req.cookies["refreshToken"];
+        if (!refreshToken) {
+            res.status(401).send('Refresh token not found, where you cookie?');
+        }
+        else if (refreshToken) {
+            const newAccessToken: any = await this.jwtService.getNewAccessToken(refreshToken);
+            if (newAccessToken !== null) {
+                res
+                 .cookie("refreshToken", newAccessToken.newRefreshToken, {
+                     httpOnly: true,
+                     secure: process.env.NODE_ENV === "production"
+                 })
+                .status(200)
+                .send({accessToken: newAccessToken.newAccessToken});
+            }
+            else {
+                res.status(401).send('Refresh Token already not valid, repeat authorization');
+            }
+        } 
+        else {
+            res.sendStatus(400);
+        }
+    }
     @Post('registration')
     async registration(@Body() user: {password: string, login: string, email: string},  @Request() req: {ip: string} ) {
         const result: UsersType | null | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
@@ -112,24 +121,24 @@ export class AuthController {
     //         res.sendStatus(429);
     //     }
     // }
-    // async logout() {
-    //     const refreshTokenInCookie = req.cookies.refreshToken
-    //     const checkRefreshToken = await jwtService.checkRefreshToken(refreshTokenInCookie)
-    //     const findTokenInData = await refreshTokenModel.findOne({refreshToken: refreshTokenInCookie})
-    //     if (refreshTokenInCookie && checkRefreshToken !== false && findTokenInData !== null) {
-    //         await refreshTokenModel.findOneAndDelete({refreshToken: refreshTokenInCookie})
-    //         return res.send(204)
-    //     }
-    //     else {
-    //         return res.send(401)
-    //     }
-    // }
-    // async aboutMe() {
-    //     const foundUser = await this.usersRepository.findUserByLoginForMe(req.user!.login);
-    //     res.status(200).send(foundUser)
-
-
-    // }
+    @Post('logout')
+    async logout(@Req() req) {
+        const refreshTokenInCookie = req.cookies.refreshToken
+        const checkRefreshToken = await this.jwtService.checkRefreshToken(refreshTokenInCookie)
+        const findTokenInData = await this.refreshTokenModel.findOne({refreshToken: refreshTokenInCookie})
+        if (refreshTokenInCookie && checkRefreshToken !== false && findTokenInData !== null) {
+            await this.refreshTokenModel.findOneAndDelete({refreshToken: refreshTokenInCookie})
+            throw new HttpException("Logout succefully, bye!", HttpStatus.NO_CONTENT)
+        }
+        else {
+            throw new HttpException("Sorry, you already logout, repeat authorization", HttpStatus.BAD_REQUEST)
+        }
+    }
+    @Get('me')
+    async aboutMe(@Body() user: {password: string, login: string, email: string}) {
+        const foundUser = await this.usersRepository.findUserByLoginForMe(user!.login);
+        return foundUser
+    }
     // async getRegistrationDate() {
     //     const registrationData = await this.usersRepository.getRegistrationDate();
     //     res.send(registrationData);

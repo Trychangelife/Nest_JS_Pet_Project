@@ -27,12 +27,12 @@ const aggregate = usersModel.aggregate([
 export class UsersRepository {
 
     constructor (
-        @InjectModel('Users') private usersModel: Model<UsersType>,
-        @InjectModel('RegistrationData') private registrationDataModel: Model<RegistrationDataType>,
-        @InjectModel('AuthData') private authDataModel: Model<AuthDataType>,
-        @InjectModel('CodeConfirm') private codeConfirmModel: Model<ConfirmedAttemptDataType>,
-        @InjectModel('EmailSend') private emailSendModel: Model<EmailSendDataType>,
-        @InjectModel('RefreshToken') private refreshTokenModel: Model<EmailSendDataType>
+        @InjectModel('Users') protected usersModel: Model<UsersType>,
+        @InjectModel('RegistrationData') protected registrationDataModel: Model<RegistrationDataType>,
+        @InjectModel('AuthData') protected authDataModel: Model<AuthDataType>,
+        @InjectModel('CodeConfirm') protected codeConfirmModel: Model<ConfirmedAttemptDataType>,
+        @InjectModel('EmailSend') protected emailSendModel: Model<EmailSendDataType>,
+        @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>
     ) {
 
     }
@@ -133,7 +133,7 @@ async findUserByLogin(login: string): Promise<UsersType | null> {
 
 async findUserByLoginForMe(login: string): Promise<any[]> {
     const foundUser2 = await this.usersModel.aggregate([
-        {$match: {}},
+        {$match: {login: login}},
         {$project: {_id: 0, userId: "$id", email: 1, login: 1}}
     ])
     return foundUser2[0]

@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid"
 @Injectable()
 export class UsersService {
 
-    constructor(private usersRepository: UsersRepository, public emailService: EmailService){
+    constructor(protected usersRepository: UsersRepository, protected emailService: EmailService){
     }
     async allUsers(pageSize: number, pageNumber: number): Promise<object> {
         let skip = 0

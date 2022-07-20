@@ -2,22 +2,22 @@ import { EmailSendDataType, RefreshTokenStorageType, UsersType } from "../types/
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
-import jwt from "jsonwebtoken";
+import { JwtService} from '@nestjs/jwt'
 
 
 @Injectable()
-export class JwtService {
+export class JwtServiceClass {
 
-    constructor (@InjectModel('RefreshToken') private refreshTokenModel: Model<RefreshTokenStorageType>,) {
 
+    constructor (@InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>, protected jwtService: JwtService) {
     }
     
     async accessToken(user: UsersType) {
-        const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '10 sec' })
+        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '15m'})
         return accessToken
     }
     async refreshToken(user: UsersType): Promise<string> {
-        const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '20 sec' })
+        const refreshToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '1h'})
         const newRefreshToken: RefreshTokenStorageType = {
             userId: user.id,
             refreshToken: refreshToken
@@ -35,7 +35,7 @@ export class JwtService {
     }
     async getUserByToken(token: string) {
         try {
-            const result: any = jwt.verify(token, process.env.JWT_SECRET)
+            const result: any = this.jwtService.verify(token)
             return result.id
         } catch (error) {
             return null
@@ -45,7 +45,7 @@ export class JwtService {
         const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken })
         if (checkToken !== null) {
             try {
-                const result: any = jwt.verify(rToken, process.env.JWT_REFRESH_SECRET)
+                const result: any = this.jwtService.verify(rToken, {secret: process.env.JWT_REFRESH_SECRET})
                 const newAccessToken = await this.accessToken(result)
                 const newRefreshToken =  await this.refreshToken(result)
                 return { newAccessToken, newRefreshToken }
@@ -60,7 +60,7 @@ export class JwtService {
     }
     async checkRefreshToken(refreshToken: string): Promise<boolean | object> {
         try {
-            const result = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
+            const result = this.jwtService.verify(refreshToken, {secret: process.env.JWT_REFRESH_SECRET})
             return {token: result}
         } catch (error) {
             return false

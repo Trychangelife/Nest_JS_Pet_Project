@@ -23,9 +23,9 @@ export const commentsVievModel = {
 export class PostRepository {
 
     constructor (
-    @InjectModel('Posts') private postsModel: Model<PostsType>, 
-    @InjectModel('Blogger') private bloggerModel: Model<BloggersType>, 
-    @InjectModel('Comments') private commentsModel: Model<CommentsType>) {
+    @InjectModel('Posts') protected postsModel: Model<PostsType>, 
+    @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>, 
+    @InjectModel('Comments') protected commentsModel: Model<CommentsType>) {
 
     }
 async allPosts(skip: number, limit: number, page?: number): Promise<object> {

@@ -8,7 +8,7 @@ import { uuid } from "uuidv4"
 @Injectable()
 export class AuthService {
 
-    constructor (private usersRepository: UsersRepository) {
+    constructor (protected usersRepository: UsersRepository) {
 
     }
 

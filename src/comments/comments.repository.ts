@@ -8,7 +8,7 @@ import { CommentsType } from "src/types/types"
 export class CommentsRepository {
 
     constructor (
-        @InjectModel('Comments') private commentsModel: Model<CommentsType>
+        @InjectModel('Comments') protected commentsModel: Model<CommentsType>
     ) {
 
     }

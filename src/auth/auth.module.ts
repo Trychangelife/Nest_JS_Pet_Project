@@ -6,7 +6,8 @@ import { authDataSchema, bloggerSchema, codeConfirmSchema, commentsSchema, email
 import { MongooseModule } from "@nestjs/mongoose";
 import { UsersService } from "src/users/users.service";
 import { EmailService } from "src/email/email.service";
-import { JwtService } from "src/JWT/jwt.service";
+import { JwtServiceClass } from "src/JWT/jwt.service";
+import { JwtModule } from "@nestjs/jwt"
 
 @Module({
     imports: [MongooseModule.forFeature([
@@ -15,8 +16,14 @@ import { JwtService } from "src/JWT/jwt.service";
         {name: 'AuthData', schema: authDataSchema},
         {name: 'CodeConfirm', schema: codeConfirmSchema},
         {name: 'EmailSend', schema: emailSendSchema},
-        {name: 'RefreshToken', schema: refreshTokenSchema},])],
+        {name: 'RefreshToken', schema: refreshTokenSchema},]),
+        JwtModule.register({
+            secret: process.env.JWT_SECRET,
+            signOptions: {
+                expiresIn: '24h'
+            }
+        })],
     controllers: [AuthController],
-    providers: [AuthService, UsersRepository, UsersService, EmailService, JwtService],
+    providers: [AuthService, UsersRepository, UsersService, EmailService, JwtServiceClass],
   })
   export class AuthModule {}
