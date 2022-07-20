@@ -8,6 +8,8 @@ import { CommentsModule } from './comments/comments.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import 'dotenv/config'
+import { AuthModule } from './auth/auth.module';
+import { FullDeleteModule } from './Full delete/full_delete.module';
 
 
 const options = {
@@ -18,7 +20,7 @@ const options = {
 const uri:string = process.env.mongoURI
 
 @Module({
-  imports: [BloggersModule,PostsModule,CommentsModule, UsersModule,MongooseModule.forRoot(uri, options)],
+  imports: [BloggersModule,PostsModule,CommentsModule, UsersModule, AuthModule , FullDeleteModule,MongooseModule.forRoot(uri, options)],
   controllers: [AppController],
   providers: [AppService],
 })

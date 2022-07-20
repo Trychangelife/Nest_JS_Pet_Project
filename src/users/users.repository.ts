@@ -126,7 +126,7 @@ async findUserById(id: string): Promise<UsersType | null> {
     return result
 }
 async findUserByLogin(login: string): Promise<UsersType | null> {
-    const foundUser = await this.usersModel.findOne({ login: login })
+    const foundUser: UsersType = await this.usersModel.findOne({ login: login }).lean()
     return foundUser
 }
 
