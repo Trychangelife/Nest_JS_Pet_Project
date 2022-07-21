@@ -3,7 +3,7 @@ import { UsersRepository } from "src/users/users.repository";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res } from "@nestjs/common";
-import { RefreshTokenStorageType, UsersType } from "src/types/types";
+import { CreateUser, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { Injectable, Ip, Request } from "@nestjs/common";
 import { JwtServiceClass } from "src/JWT/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
@@ -21,7 +21,7 @@ export class AuthController {
         @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>) {
     }
     @Post('login')
-    async authorization(@Request() req: {ip: string}, @Body() DataUser: {password: string, login: string, email: string}, @Res() res) {
+    async authorization(@Request() req: {ip: string}, @Body() DataUser: CreateUser, @Res() res) {
         await this.authService.informationAboutAuth(req.ip, DataUser.login);
         const checkIP = await this.authService.counterAttemptAuth(req.ip, DataUser.login);
         if (checkIP) {
@@ -42,18 +42,18 @@ export class AuthController {
                 .send({ accessToken });
             }
             else {
-                res.sendStatus(400);
+                throw new HttpException("Something wrong", HttpStatus.BAD_REQUEST);
             }
         }
         else {
-            res.sendStatus(429);
+            throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS);
         }
     }
     @Post('refresh-token')
     async updateAccessToken(@Req() req, @Res() res) {
         const refreshToken = req.cookies["refreshToken"];
         if (!refreshToken) {
-            res.status(401).send('Refresh token not found, where you cookie?');
+            throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)
         }
         else if (refreshToken) {
             const newAccessToken: any = await this.jwtService.getNewAccessToken(refreshToken);
@@ -67,11 +67,11 @@ export class AuthController {
                 .send({accessToken: newAccessToken.newAccessToken});
             }
             else {
-                res.status(401).send('Refresh Token already not valid, repeat authorization');
+                throw new HttpException('Refresh Token already not valid, repeat authorization', HttpStatus.UNAUTHORIZED)
             }
         } 
         else {
-            res.sendStatus(400);
+            throw new HttpException("Something wrong", HttpStatus.BAD_REQUEST)
         }
     }
     @Post('registration')
@@ -104,23 +104,24 @@ export class AuthController {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
         }
     }
-    // async registrationEmailResending() {
-    //     await this.authService.informationAboutEmailSend(req.ip, req.body.email);
-    //     const checkAttemptEmail = await this.authService.counterAttemptEmail(req.ip, req.body.email);
-    //     if (checkAttemptEmail) {
-    //         await this.authService.refreshActivationCode(req.body.email);
-    //         const emailResending = await this.emailService.emailConfirmation(req.body.email);
-    //         if (emailResending) {
-    //             res.sendStatus(204);
-    //         }
-    //         else {
-    //             res.status(400).send({ errorsMessages: [{ message: "account already activated", field: "email" }] });
-    //         }
-    //     }
-    //     else {
-    //         res.sendStatus(429);
-    //     }
-    // }
+    @Post('registration-email-resending')
+    async registrationEmailResending(@Body() user: {password: string, login: string, email: string},  @Request() req: {ip: string}) {
+        await this.authService.informationAboutEmailSend(req.ip, user.email);
+        const checkAttemptEmail = await this.authService.counterAttemptEmail(req.ip, user.email);
+        if (checkAttemptEmail) {
+            await this.authService.refreshActivationCode(user.email);
+            const emailResending = await this.emailService.emailConfirmation(user.email);
+            if (emailResending) {
+                throw new HttpException("Email send succefully", HttpStatus.ACCEPTED);
+            }
+            else {
+                throw new HttpException({ message: "account already activated", field: "email" }, HttpStatus.BAD_REQUEST)
+            }
+        }
+        else {
+            throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
+        }
+    }
     @Post('logout')
     async logout(@Req() req) {
         const refreshTokenInCookie = req.cookies.refreshToken
@@ -139,24 +140,29 @@ export class AuthController {
         const foundUser = await this.usersRepository.findUserByLoginForMe(user!.login);
         return foundUser
     }
-    // async getRegistrationDate() {
-    //     const registrationData = await this.usersRepository.getRegistrationDate();
-    //     res.send(registrationData);
-    // }
-    // async getAuthDate() {
-    //     const authData = await this.usersRepository.getAuthDate();
-    //     res.send(authData);
-    // }
-    // async getConfirmDate() {
-    //     const confrimData = await this.usersRepository.getConfirmAttemptDate();
-    //     res.send(confrimData);
-    // }
-    // async getEmailDate() {
-    //     const emailSendData = await this.usersRepository.getEmailSendDate();
-    //     res.send(emailSendData);
-    // }
-    // async getTokenDate() {
-    //     const TokenData = await this.usersRepository.getTokenDate();
-    //     res.send(TokenData);
-    // }
+    @Get('get-registration-date')
+    async getRegistrationDate() {
+        const registrationData = await this.usersRepository.getRegistrationDate();
+        return registrationData
+    }
+    @Get('get-auth-date')
+    async getAuthDate() {
+        const authData = await this.usersRepository.getAuthDate();
+        return authData;
+    }
+    @Get('get-confirm-date')
+    async getConfirmDate() {
+        const confrimData = await this.usersRepository.getConfirmAttemptDate();
+        return confrimData;
+    }
+    @Get('get-email-date')
+    async getEmailDate() {
+        const emailSendData = await this.usersRepository.getEmailSendDate();
+        return emailSendData;
+    }
+    @Get('get-token-date')
+    async getTokenDate() {
+        const TokenData = await this.usersRepository.getTokenDate();
+        return TokenData;
+    }
 }

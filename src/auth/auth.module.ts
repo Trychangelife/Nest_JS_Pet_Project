@@ -8,6 +8,8 @@ import { UsersService } from "src/users/users.service";
 import { EmailService } from "src/email/email.service";
 import { JwtServiceClass } from "src/JWT/jwt.service";
 import { JwtModule } from "@nestjs/jwt"
+import { EmailManager } from "src/email/email.manager";
+import { EmailAdapter } from "src/email/email.adapter";
 
 @Module({
     imports: [MongooseModule.forFeature([
@@ -24,6 +26,6 @@ import { JwtModule } from "@nestjs/jwt"
             }
         })],
     controllers: [AuthController],
-    providers: [AuthService, UsersRepository, UsersService, EmailService, JwtServiceClass],
+    providers: [AuthService, UsersRepository, UsersService, EmailService, JwtServiceClass, EmailManager, EmailAdapter],
   })
   export class AuthModule {}

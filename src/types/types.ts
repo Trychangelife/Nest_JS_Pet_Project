@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { IsEmail, IsString, MaxLength, min, MinLength } from "class-validator";
 import { ObjectId } from "mongodb";
 @Schema()
 export class BloggerClass {
@@ -37,6 +38,17 @@ export type PostsType = {
     bloggerId: string;
     bloggerName: string;
 };
+export class CreateUser {
+    @IsEmail()
+    email: string
+    @MinLength(5)
+    @MaxLength(10)
+    login: string
+    @IsString()
+    id: string
+    @MinLength(3)
+    password: string
+}
 
 export class User { 
     constructor(
