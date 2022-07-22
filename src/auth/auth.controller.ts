@@ -2,12 +2,13 @@ import { EmailService } from "src/email/email.service";
 import { UsersRepository } from "src/users/users.repository";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { CreateUser, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { Injectable, Ip, Request } from "@nestjs/common";
 import { JwtServiceClass } from "src/JWT/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { JwtAuthGuard } from "src/JWT/jwt-auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +50,7 @@ export class AuthController {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS);
         }
     }
+    @UseGuards(JwtAuthGuard)
     @Post('refresh-token')
     async updateAccessToken(@Req() req, @Res() res) {
         const refreshToken = req.cookies["refreshToken"];

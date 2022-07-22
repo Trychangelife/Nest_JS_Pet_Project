@@ -10,17 +10,10 @@ import { UsersModule } from './users/users.module';
 import 'dotenv/config'
 import { AuthModule } from './auth/auth.module';
 import { FullDeleteModule } from './Full delete/full_delete.module';
-import nodemailer from "nodemailer"
 import { MailerModule } from '@nest-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
-// let transport = nodemailer.createTransport({
-//   service: 'gmail',
-//   auth: {
-//     user: "jenbka999@gmail.com",
-//     pass: process.env.PASSWORD_GMAIL
-//   },
-// })
 
 const options = {
   useNewUrlParser: true,
@@ -30,7 +23,8 @@ const options = {
 const uri:string = process.env.mongoURI
 
 @Module({
-  imports: [MailerModule.forRootAsync({
+  imports: [
+  MailerModule.forRootAsync({
     imports: [ConfigModule],
     useFactory: async (config: ConfigService) => ({
       transport: {
@@ -43,7 +37,21 @@ const uri:string = process.env.mongoURI
             },
       },
     }), inject: [ConfigService]
-  }), ConfigModule.forRoot(),BloggersModule,PostsModule,CommentsModule, UsersModule, AuthModule , FullDeleteModule,MongooseModule.forRoot(uri, options)],
+  }), 
+  ConfigModule.forRoot(),
+  BloggersModule,
+  PostsModule,
+  CommentsModule, 
+  UsersModule, 
+  AuthModule , 
+  FullDeleteModule,
+  MongooseModule.forRoot(uri, options),
+  JwtModule.register({
+    secret: process.env.JWT_SECRET,
+    signOptions: {
+        expiresIn: '24h'
+    }
+})],
   controllers: [AppController],
   providers: [AppService],
 })

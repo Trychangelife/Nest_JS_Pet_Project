@@ -1,4 +1,4 @@
-import { EmailSendDataType, RefreshTokenStorageType, UsersType } from "../types/Types";
+import { RefreshTokenStorageType, UsersType } from "../types/Types";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
@@ -35,7 +35,7 @@ export class JwtServiceClass {
     }
     async getUserByToken(token: string) {
         try {
-            const result: any = this.jwtService.verify(token)
+            const result: any = this.jwtService.verify(token, {secret: process.env.JWT_SECRET})
             return result.id
         } catch (error) {
             return null

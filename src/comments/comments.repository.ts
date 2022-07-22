@@ -24,7 +24,7 @@ export class CommentsRepository {
         
     }
     async updateCommentByCommentId(commentId: string, content: string, userId: string): Promise<boolean | null> {
-        const findTargetComment = await this.commentsModel.findOne({ commentId: commentId }, commentsVievModel)
+        const findTargetComment = await this.commentsModel.findOne({ commentId: commentId }, commentsVievModel).lean()
         if (findTargetComment !== null && findTargetComment.userId === userId) {
             await this.commentsModel.updateOne({ commentId: commentId }, { $set: { content: content } })
             return true

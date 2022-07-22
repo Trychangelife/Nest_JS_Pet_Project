@@ -7,7 +7,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UsersService } from "src/users/users.service";
 import { EmailService } from "src/email/email.service";
 import { JwtServiceClass } from "src/JWT/jwt.service";
-import { JwtModule } from "@nestjs/jwt"
+import { JwtModule, JwtService } from "@nestjs/jwt"
 import { EmailManager } from "src/email/email.manager";
 import { EmailAdapter } from "src/email/email.adapter";
 
@@ -27,5 +27,6 @@ import { EmailAdapter } from "src/email/email.adapter";
         })],
     controllers: [AuthController],
     providers: [AuthService, UsersRepository, UsersService, EmailService, JwtServiceClass, EmailManager, EmailAdapter],
+    exports: [JwtServiceClass, JwtModule]
   })
   export class AuthModule {}

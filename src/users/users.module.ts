@@ -21,5 +21,6 @@ import { UsersService } from "./users.service";
     {name: 'RefreshToken', schema: refreshTokenSchema},])],
     controllers: [UsersController],
     providers: [UsersService, UsersRepository, EmailService, EmailManager, EmailAdapter],
+    exports: [UsersService]
   })
   export class UsersModule {}

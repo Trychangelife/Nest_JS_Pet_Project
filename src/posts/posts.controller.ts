@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/JWT/jwt-auth.guard";
 import { constructorPagination } from "src/pagination.constructor";
 import { PostsType, UsersType } from "src/types/types";
 import { PostsService } from "./posts.service";
@@ -25,6 +26,7 @@ export class PostController {
             throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
         }
     }
+    @UseGuards(JwtAuthGuard)
     @Post()
     async createPost(@Body() post: PostsType) {
         const giveMePost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.bloggerId);
@@ -36,6 +38,7 @@ export class PostController {
             throw new HttpException(giveMePost ,HttpStatus.CREATED);
         }
     }
+    @UseGuards(JwtAuthGuard)
     @Put(':postId')
     async updatePost(@Param() params, @Body() post: PostsType) {
         const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.bloggerId);
@@ -51,6 +54,7 @@ export class PostController {
         }
 
     }
+    @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async deletePostById(@Param() params,) {
         const deleteObj: boolean = await this.postsService.deletePost(params.id);
@@ -62,9 +66,10 @@ export class PostController {
         }
     }
     // Здесь не хватает юзера (проверить после занесения юзера в nestjs)
+    @UseGuards(JwtAuthGuard)
     @Post(':postId/comments')
-    async createCommentForPost(@Param() params, @Body() post: PostsType, user: UsersType) {
-        const newComment = await this.postsService.createCommentForSpecificPost(params.postId, post.content, user!.id, user!.login);
+    async createCommentForPost(@Param('postId') postId: string, @Body() post: PostsType, @Req() req) {
+        const newComment = await this.postsService.createCommentForSpecificPost(postId, post.content, req.user!.id, req.user!.login);
         if (newComment) {
             return newComment
         }
@@ -73,15 +78,16 @@ export class PostController {
         }
 
     }
-    // async getCommentsByPostId() {
-    //     const paginationData = constructorPagination(req.query.PageSize as string, req.query.PageNumber as string);
-    //     const newComment = await this.postsService.takeCommentByIdPost(req.params.postId, paginationData.pageNumber, paginationData.pageSize);
-    //     if (newComment) {
-    //         res.status(200).send(newComment);
-    //     }
-    //     else {
-    //         res.status(404).send("Post doesn't exists");
-    //     }
+    @Get(':postId/comments')
+    async getCommentsByPostId(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params,) {
+        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+        const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize);
+        if (newComment) {
+            return newComment
+        }
+        else {
+            throw new HttpException("Post doesn't exists",HttpStatus.NOT_FOUND)
+        }
 
-    // }
+    }
 }

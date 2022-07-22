@@ -1,4 +1,6 @@
-import { Controller, Injectable } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Put, Req, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/JWT/jwt-auth.guard";
+import { CommentsType } from "src/types/types";
 import { CommentsService } from "./comments.service";
 
 @Controller('comments')
@@ -6,38 +8,42 @@ export class CommentsController {
 
     constructor(protected commentsService: CommentsService) {
     }
-
-    // async getCommentById(req: Request, res: Response) {
-    //     const result = await this.commentsService.getCommentsById(req.params.id);
-    //     if (result !== null) {
-    //         res.status(200).send(result);
-    //     }
-    //     else {
-    //         res.send(404);
-    //     }
-    // }
-    // async updateCommentByCommentId(req: Request, res: Response) {
-    //     const result = await this.commentsService.updateCommentByCommentId(req.params.commentId, req.body.content, req.user!.id);
-    //     if (result) {
-    //         res.send(204);
-    //     }
-    //     else if (result == null) {
-    //         res.send(404);
-    //     }
-    //     else {
-    //         res.send(403);
-    //     }
-    // }
-    // async deleteCommentById(req: Request, res: Response) {
-    //     const resultDelete = await this.commentsService.deleteCommentByCommentId(req.params.commentId, req.user!.id);
-    //     if (resultDelete) {
-    //         res.send(204);
-    //     }
-    //     else if (resultDelete == null) {
-    //         res.send(404);
-    //     }
-    //     else {
-    //         res.send(403);
-    //     }
-    // }
+    @Get(':id')
+    async getCommentById(@Param('id') params) {
+        const result = await this.commentsService.getCommentsById(params.id);
+        if (result !== null) {
+            return HttpStatus.NO_CONTENT
+        }
+        else {
+            throw new HttpException('Comments NOT FOUND',HttpStatus.NOT_FOUND)
+        }
+    }
+    @UseGuards(JwtAuthGuard)
+    @Put(':commentId')
+    async updateCommentByCommentId(@Param() params, @Body() comment: CommentsType, @Req() req) {
+        const result = await this.commentsService.updateCommentByCommentId(params.commentId, comment.content, req.user!.id);
+        if (result) {
+            return HttpStatus.NO_CONTENT
+        }
+        else if (result == null) {
+            throw new HttpException('Comments NOT FOUND',HttpStatus.NOT_FOUND)
+        }
+        else {
+            throw new HttpException('FORBIDDEN',HttpStatus.FORBIDDEN)
+        }
+    }
+    @UseGuards(JwtAuthGuard)
+    @Delete(':commentId')
+    async deleteCommentById(@Param('commentId') params, @Req() req) {
+        const resultDelete = await this.commentsService.deleteCommentByCommentId(params.commentId, req.user!.id);
+        if (resultDelete) {
+            return HttpStatus.NO_CONTENT
+        }
+        else if (resultDelete == null) {
+            throw new HttpException('Comments NOT FOUND',HttpStatus.NOT_FOUND)
+        }
+        else {
+            throw new HttpException('FORBIDDEN',HttpStatus.FORBIDDEN)
+        }
+    }
 }
