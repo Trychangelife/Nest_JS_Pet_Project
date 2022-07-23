@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Put, Req, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "src/JWT/jwt-auth.guard";
+import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { CommentsType } from "src/types/types";
 import { CommentsService } from "./comments.service";
 

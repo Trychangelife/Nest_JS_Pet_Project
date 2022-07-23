@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtModule, JwtSecretRequestType, JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 import { UsersType } from "src/types/types";
 import { UsersService } from "src/users/users.service";
 import { JwtServiceClass } from "./jwt.service";

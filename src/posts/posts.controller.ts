@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "src/JWT/jwt-auth.guard";
+import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { constructorPagination } from "src/pagination.constructor";
 import { PostsType, UsersType } from "src/types/types";
 import { PostsService } from "./posts.service";

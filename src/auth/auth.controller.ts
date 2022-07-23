@@ -5,10 +5,10 @@ import { AuthService } from "./auth.service";
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { CreateUser, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { Injectable, Ip, Request } from "@nestjs/common";
-import { JwtServiceClass } from "src/JWT/jwt.service";
+import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { JwtAuthGuard } from "src/JWT/jwt-auth.guard";
+import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -50,7 +50,6 @@ export class AuthController {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS);
         }
     }
-    @UseGuards(JwtAuthGuard)
     @Post('refresh-token')
     async updateAccessToken(@Req() req, @Res() res) {
         const refreshToken = req.cookies["refreshToken"];
@@ -137,9 +136,10 @@ export class AuthController {
             throw new HttpException("Sorry, you already logout, repeat authorization", HttpStatus.BAD_REQUEST)
         }
     }
+    @UseGuards(JwtAuthGuard)
     @Get('me')
-    async aboutMe(@Body() user: {password: string, login: string, email: string}) {
-        const foundUser = await this.usersRepository.findUserByLoginForMe(user!.login);
+    async aboutMe(@Body() @Request() req) {
+        const foundUser = await this.usersRepository.findUserByLoginForMe(req.user.login);
         return foundUser
     }
     @Get('get-registration-date')

@@ -11,12 +11,6 @@ export class UsersController {
 
     constructor(protected usersService: UsersService) {
     }
-
-    // @Delete('/del')
-    // async deleteAllUsers() {
-    //     const afterDelete = await this.usersModel.deleteMany({});
-    //     res.send(afterDelete);
-    // }
     @Get()
     async getAllUsers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
         const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);

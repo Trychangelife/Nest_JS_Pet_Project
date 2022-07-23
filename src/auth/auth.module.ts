@@ -6,7 +6,7 @@ import { authDataSchema, bloggerSchema, codeConfirmSchema, commentsSchema, email
 import { MongooseModule } from "@nestjs/mongoose";
 import { UsersService } from "src/users/users.service";
 import { EmailService } from "src/email/email.service";
-import { JwtServiceClass } from "src/JWT/jwt.service";
+import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { JwtModule, JwtService } from "@nestjs/jwt"
 import { EmailManager } from "src/email/email.manager";
 import { EmailAdapter } from "src/email/email.adapter";

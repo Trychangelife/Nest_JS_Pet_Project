@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { constructorPagination } from "src/pagination.constructor";
 import { PostsService } from "src/posts/posts.service";
 import { BloggersType, PostsType } from "src/types/types";
@@ -51,9 +52,8 @@ export class BloggerController {
         throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
       }
     }
-
+    @UseGuards(BasicAuthGuard)
     @Post()
-    @HttpCode(400)
     async createBlogger(@Body() bloggersType: BloggersType) {
   
       const createrPerson: BloggersType | null = await this.bloggerService.createBlogger(bloggersType.name, bloggersType.youtubeUrl);
@@ -76,7 +76,6 @@ export class BloggerController {
     }
 
     @Put(':id')
-    @HttpCode(404)
     async updateBlogger(@Param() params, @Body() bloggersType: BloggersType) {
       const alreadyChanges: string = await this.bloggerService.changeBlogger(params.id, bloggersType.name, bloggersType.youtubeUrl);
       if (alreadyChanges === 'update') {
