@@ -7,7 +7,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(cookieParser())
   //app.useGlobalPipes(new ValidationPipe({transform: false}))
-  await app.listen(5000);
+  await app.listen(process.env.PORT);
   console.log(`Server listening on port: 5000`)
 }
 bootstrap();
