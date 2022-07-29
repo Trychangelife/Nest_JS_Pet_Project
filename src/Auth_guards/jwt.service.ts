@@ -1,8 +1,9 @@
-import { RefreshTokenStorageType, UsersType } from "../types/Types";
+
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { JwtService} from '@nestjs/jwt'
+import { RefreshTokenStorageType, UsersType } from "src/types/types";
 
 
 @Injectable()
