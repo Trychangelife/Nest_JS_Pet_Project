@@ -90,4 +90,19 @@ export class PostController {
         }
 
     }
+    @UseGuards(JwtAuthGuard)
+    @Put(':postId/like-status')
+    async like_dislike(@Param() params, @Body() post: PostsType) {
+        const like_dislike: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.bloggerId);
+        if (like_dislike !== "404" && like_dislike !== '400') {
+            throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
+        }
+        else if (like_dislike === "400") {
+            throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
+            //res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 });
+        }
+        else {
+            throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+        }
+}
 }

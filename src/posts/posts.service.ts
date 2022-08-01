@@ -74,4 +74,11 @@ export class PostsService {
         }
         return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page,)
     }
+    async like_dislike (postId: string, page: number, pageSize: number): Promise<object | boolean> {
+        let skip = 0
+        if (page && pageSize) {
+            skip = (page - 1) * pageSize
+        }
+        return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page,)
+    }
 }

@@ -106,4 +106,20 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: findComments }}
     else { return false}
 }
+
+async like_dislike(postId: string, title: string, shortDescription: string, content: string, bloggerId: string): Promise<string | object> {
+
+    const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel)
+    const foundBlogger = await this.bloggerModel.findOne({ id: bloggerId })
+    if (foundPost !== null && foundBlogger !== null) {
+        await this.postsModel.updateOne({ id: postId }, { $set: { title: title, shortDescription: shortDescription, content: content, } })
+        return foundPost
+    }
+    else if (foundBlogger == null) {
+        return '400'
+    }
+    else {
+        return "404"
+    }
+}
 }
