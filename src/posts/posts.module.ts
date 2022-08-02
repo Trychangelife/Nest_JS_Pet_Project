@@ -5,7 +5,7 @@ import { AuthModule } from "src/auth/auth.module";
 import { BloggersModule } from "src/bloggers/bloggers.module";
 import { BloggerRepository } from "src/bloggers/bloggers.repository";
 import { BloggerService } from "src/bloggers/bloggers.service";
-import { bloggerSchema, commentsSchema, postSchema, refreshTokenSchema } from "src/db";
+import { bloggerSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema } from "src/db";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { UsersModule } from "src/users/users.module";
@@ -20,7 +20,8 @@ import { PostsService } from "./posts.service";
     {name: 'Posts', schema: postSchema},
     {name: 'Blogger', schema: bloggerSchema}, 
     {name: 'Comments', schema: commentsSchema},
-    {name: 'RefreshToken', schema: refreshTokenSchema}])],
+    {name: 'RefreshToken', schema: refreshTokenSchema},
+    {name: 'Users', schema: usersSchema}])],
     controllers: [PostController],
     providers: [PostRepository, PostsService, BloggerRepository, BloggerService, JwtService],
   })

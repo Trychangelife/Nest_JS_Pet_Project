@@ -1,6 +1,27 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsString, MaxLength, min, MinLength } from "class-validator";
 import { ObjectId } from "mongodb";
+
+
+export enum LIKES {
+    LIKE = "Like",
+    DISLIKE = "Dislike",
+    NONE = "None"
+}
+
+export type NewestLikes = {
+    addedAt: string,
+    userId: string,
+    login: string
+}
+
+export type extendedLikesInfo = {
+    likesCount: number,
+    dislikesCount: number,
+    myStatus: LIKES,
+    newestLikes: NewestLikes
+}
+
 @Schema()
 export class BloggerClass {
     constructor(public  id: string, public name: string, public youtubeUrl: string ) {
@@ -27,7 +48,19 @@ export type CommentsType = {
 
 @Schema()
 export class Post {
-    constructor(public id: string, public title: string, public shortDescription: string, public content: string, public bloggerId: string,public bloggerName: string ) {
+    constructor(
+        public id: string, 
+        public title: string, 
+        public shortDescription: string, 
+        public content: string, 
+        public bloggerId: string,
+        public bloggerName: string,
+        public addedAt: Date,
+        public extendedLikesInfo: {
+            likesCount: number,
+            dislikesCount: number,
+            myStatus: LIKES
+        }) {
     }
 }
 export type PostsType = {
@@ -37,6 +70,13 @@ export type PostsType = {
     content: string;
     bloggerId: string;
     bloggerName: string;
+    addedAt: Date;
+    extendedLikesInfo: {
+        likesCount: number;
+        dislikesCount: number;
+        myStatus: LIKES
+    }
+    
 };
 export class CreateUser {
     @IsEmail()

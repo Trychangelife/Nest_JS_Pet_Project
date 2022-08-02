@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { constructorPagination } from "src/pagination.constructor";
-import { PostsType, UsersType } from "src/types/types";
+import { LIKES, PostsType, UsersType } from "src/types/types";
 import { PostsService } from "./posts.service";
 
 @Controller('posts')
@@ -92,8 +92,8 @@ export class PostController {
     }
     @UseGuards(JwtAuthGuard)
     @Put(':postId/like-status')
-    async like_dislike(@Param() params, @Body() post: PostsType) {
-        const like_dislike: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.bloggerId);
+    async like_dislike(@Param() params, @Body() likeStatus: LIKES, @Req() req) {
+        const like_dislike: object | string = await this.postsService.like_dislike(params.postId, likeStatus, req.user!.id);
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
         }

@@ -2,7 +2,7 @@
 import { Schema } from "@nestjs/mongoose";
 import { ObjectId, ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
-import { BloggersType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType,  } from "./types/types";
+import { BloggersType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES,  } from "./types/types";
 
 
 
@@ -18,7 +18,13 @@ export const postSchema = new mongoose.Schema<PostsType>({
     shortDescription: {type:String},
     content: {type:String},
     bloggerId: {type:String, required:true},
-    bloggerName: {type:String, required:true}
+    bloggerName: {type:String, required:true},
+    addedAt: {type: Date, required: true},
+    extendedLikesInfo: {
+        likesCount: {type: Number, required:true, default: 0},
+        dislikesCount: {type: Number, required:true, default: 0},
+        myStatus: {type: String}
+    }
 })
 export const commentsSchema = new mongoose.Schema<CommentsType>({
     commentId: {type:String, required:true},
