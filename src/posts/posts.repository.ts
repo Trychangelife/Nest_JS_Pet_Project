@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { BloggersType, CommentsType, Post, PostsType, UsersType } from "src/types/types"
+import { BloggersType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
 
 export const postViewModel = {
     _id: 0,
@@ -110,12 +110,24 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     else { return false}
 }
 
-async like_dislike(postId: string, likeStatus: string, userId: string): Promise<string | object> {
+async like_dislike(postId: string, likeStatus: LIKES, userId: string): Promise<string | object> {
 
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
     const foundUser = await this.usersModel.findOne({ id: userId }).lean()
+    const likesCountPlusLike = foundPost.extendedLikesInfo.likesCount + 1
+    const likesCountMinusDislike = foundPost.extendedLikesInfo.dislikesCount - 1
+    console.log(likeStatus)
+    // Почему-то Likestatus !== Like (хз почему)
     if (foundPost !== null && foundUser !== null) {
-        await this.postsModel.updateOne({ id: postId }, { $set: {extendedLikesInfo: {likeStatus: likeStatus} } })
+        await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
+        return foundPost
+    }
+    else if (foundPost !== null && foundUser !== null) {
+        await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": likesCountMinusDislike } })
+        return foundPost
+    }
+    else if (foundPost !== null && foundUser !== null && likeStatus === "None") {
+        await this.postsModel.updateOne({ id: postId }, { $set: {extendedLikesInfo: {dislikeCount: +1,myStatus: likeStatus} } })
         return foundPost
     }
     else if (foundUser == null) {
