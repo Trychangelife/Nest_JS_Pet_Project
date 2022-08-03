@@ -118,11 +118,11 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string): Promise<s
     const likesCountMinusDislike = foundPost.extendedLikesInfo.dislikesCount - 1
     console.log(likeStatus)
     // Почему-то Likestatus !== Like (хз почему)
-    if (foundPost !== null && foundUser !== null) {
+    if (foundPost !== null && foundUser !== null && likeStatus === 'Like') {
         await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
         return foundPost
     }
-    else if (foundPost !== null && foundUser !== null) {
+    else if (foundPost !== null && foundUser !== null && likeStatus === 'Dislike') {
         await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": likesCountMinusDislike } })
         return foundPost
     }
