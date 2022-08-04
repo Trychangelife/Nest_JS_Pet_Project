@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { constructorPagination } from "src/pagination.constructor";
 import { LIKES, PostsType, UsersType } from "src/types/types";
@@ -26,7 +27,7 @@ export class PostController {
             throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
         }
     }
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(BasicAuthGuard)
     @Post()
     async createPost(@Body() post: PostsType) {
         const giveMePost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.bloggerId);
@@ -38,7 +39,7 @@ export class PostController {
             throw new HttpException(giveMePost ,HttpStatus.CREATED);
         }
     }
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(BasicAuthGuard)
     @Put(':postId')
     async updatePost(@Param() params, @Body() post: PostsType) {
         const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.bloggerId);
@@ -54,7 +55,7 @@ export class PostController {
         }
 
     }
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(BasicAuthGuard)
     @Delete(':id')
     async deletePostById(@Param() params,) {
         const deleteObj: boolean = await this.postsService.deletePost(params.id);
