@@ -30,6 +30,6 @@ export class FullData {
         await this.codeConfirmModel.deleteMany({})
         await this.emailSendModel.deleteMany({})
         await this.refreshTokenModel.deleteMany({})
-        throw new HttpException("Data base is clear", HttpStatus.ACCEPTED)
+        throw new HttpException("Date is clear",HttpStatus.NO_CONTENT)
         }
 }
