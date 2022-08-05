@@ -24,8 +24,12 @@ export const postSchema = new mongoose.Schema<PostsType>({
         likesCount: {type: Number, required:true, default: 0},
         dislikesCount: {type: Number, required:true, default: 0},
         myStatus: {type: String}
-    }
-})
+    },
+    likeStorage: [String],
+    dislikeStorage: []
+}
+    
+    )
 export const commentsSchema = new mongoose.Schema<CommentsType>({
     commentId: {type:String, required:true},
     content: {type:String, required:true},

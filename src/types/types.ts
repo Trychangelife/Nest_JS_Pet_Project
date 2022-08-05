@@ -60,7 +60,10 @@ export class Post {
             likesCount: number,
             dislikesCount: number,
             myStatus: LIKES
-        }) {
+        },
+        public likeStorage: [string],
+        public dislikeStorage: []
+        ) {
     }
 }
 export type PostsType = {
@@ -76,6 +79,8 @@ export type PostsType = {
         dislikesCount: number;
         myStatus: LIKES
     }
+    likeStorage: [string]
+    dislikeStorage: []
     
 };
 export class CreateUser {

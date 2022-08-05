@@ -111,25 +111,33 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
 }
 
 async like_dislike(postId: string, likeStatus: LIKES, userId: string): Promise<string | object> {
-
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
     const foundUser = await this.usersModel.findOne({ id: userId }).lean()
     const likesCountPlusLike = foundPost.extendedLikesInfo.likesCount + 1
     const likesCountMinusDislike = foundPost.extendedLikesInfo.dislikesCount - 1
-    console.log(likeStatus)
-    // Почему-то Likestatus !== Like (хз почему)
-    if (foundPost !== null && foundUser !== null && likeStatus === 'Like') {
-        await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
-        return foundPost
+    const keys = Object.keys(likeStatus)
+    if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "Like") {
+        const checkOnLike = await this.postsModel.find({$and: [{likeStorage: userId}, {id: postId}] } ).lean()
+        if (checkOnLike.length > 0) {
+            await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusDislike } })
+            await this.postsModel.updateOne({id: postId}, {$pull: {likeStorage: userId}})
+            return foundPost
+        }
+        else {
+            await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {likeStorage: userId}})
+            return foundPost
+        }
     }
-    else if (foundPost !== null && foundUser !== null && likeStatus === 'Dislike') {
+    else if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "Dislike") {
         await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": likesCountMinusDislike } })
+        await this.postsModel.findOneAndUpdate({id: postId}, {$push: {dislikeStorage: userId}})
         return foundPost
-    }
-    else if (foundPost !== null && foundUser !== null && likeStatus === "None") {
-        await this.postsModel.updateOne({ id: postId }, { $set: {extendedLikesInfo: {dislikeCount: +1,myStatus: likeStatus} } })
-        return foundPost
-    }
+    } 
+    // else if (foundPost !== null && foundUser !== null && likeStatus === "None") {
+    //     await this.postsModel.updateOne({ id: postId }, { $set: {extendedLikesInfo: {dislikeCount: +1,myStatus: likeStatus} } })
+    //     return foundPost
+    // }
     else if (foundUser == null) {
         return '400'
     }
