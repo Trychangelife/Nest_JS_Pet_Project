@@ -12,7 +12,7 @@ export const postViewModel = {
     bloggerId: 1,
     bloggerName: 1,
     addedAt: 1,
-    extendedLikesInfo: 1
+    extendedLikesInfo: 1,
 }
 
 export const commentsVievModel = {
@@ -110,7 +110,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     else { return false}
 }
 
-async like_dislike(postId: string, likeStatus: LIKES, userId: string): Promise<string | object> {
+async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
     const foundUser = await this.usersModel.findOne({ id: userId }).lean()
     const likesCountPlusLike = foundPost.extendedLikesInfo.likesCount + 1
@@ -121,15 +121,16 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string): Promise<s
 
     // WHEN WE HAVE LIKE
     if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "Like") {
-        const checkOnLike = await this.postsModel.find({$and: [{likeStorage: userId}, {id: postId}] } ).lean()
+        const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
         if (checkOnLike.length > 0) {
+            // Тут сделано шикарно, проверяй ниже
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusDislike } })
-            await this.postsModel.updateOne({id: postId}, {$pull: {likeStorage: userId}})
+            await this.postsModel.updateOne({id: postId}, {$pull: {"extendedLikesInfo.newestLikes": {userId}}})
             return foundPost
         }
         else {
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {likeStorage: userId}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {"extendedLikesInfo.newestLikes": {addedAt: new Date(), userId: userId, login: login}}})
             return foundPost
         }
     }

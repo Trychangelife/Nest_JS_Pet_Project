@@ -59,10 +59,17 @@ export class Post {
         public extendedLikesInfo: {
             likesCount: number,
             dislikesCount: number,
-            myStatus: LIKES
+            myStatus: LIKES,
+            newestLikes?: [
+                {
+                    addedAt: Date,
+                    userId: string,
+                    login: string
+                }
+            ]
         },
-        public likeStorage: [string],
-        public dislikeStorage: [string]
+        public likeStorage?: [string],
+        public dislikeStorage?: [string]
         ) {
     }
 }
@@ -78,9 +85,16 @@ export type PostsType = {
         likesCount: number;
         dislikesCount: number;
         myStatus: LIKES;
+        newestLikes?: [
+            {
+                addedAt: Date
+                userId: string
+                login: string
+            }
+        ]
     }
-    likeStorage: [string]
-    dislikeStorage: [string]
+    likeStorage?: [string]
+    dislikeStorage?: [string]
     
 };
 export class CreateUser {

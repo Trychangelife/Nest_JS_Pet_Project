@@ -94,7 +94,7 @@ export class PostController {
     @UseGuards(JwtAuthGuard)
     @Put(':postId/like-status')
     async like_dislike(@Param() params, @Body() likeStatus: LIKES, @Req() req) {
-        const like_dislike: object | string = await this.postsService.like_dislike(params.postId, likeStatus, req.user!.id);
+        const like_dislike: object | string = await this.postsService.like_dislike(params.postId, likeStatus, req.user!.id, req.user!.login);
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
         }

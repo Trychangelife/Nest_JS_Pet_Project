@@ -36,13 +36,13 @@ export class PostsService {
         const foundBloggerW = await this.bloggerModel.findOne({ id: bloggerIdUrl }).lean()
         if (bloggerIdUrl && foundBloggerW !== null) {
             // Построено на классе
-            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerIdUrl, foundBloggerW.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE}, [''], [''])
+            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerIdUrl, foundBloggerW.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
             console.log(newPost)
             return await this.postsRepository.releasePost(newPost, bloggerIdUrl)
         }
         else if (foundBlogger !== null && bloggerId) {
             // Построено на классе
-            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE}, [''], [''])
+            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
             console.log(newPost)
             return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
         }
@@ -76,8 +76,7 @@ export class PostsService {
         }
         return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page,)
     }
-    async like_dislike (postId: string, likeStatus: LIKES, userId: string): Promise<string | object> {
-        const foundPost = await this.postsModel.findOne({ id: postId })
-        return await this.postsRepository.like_dislike(postId, likeStatus, userId)
+    async like_dislike (postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
+        return await this.postsRepository.like_dislike(postId, likeStatus, userId, login)
     }
 }

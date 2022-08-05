@@ -23,7 +23,14 @@ export const postSchema = new mongoose.Schema<PostsType>({
     extendedLikesInfo: {
         likesCount: {type: Number, required:true, default: 0},
         dislikesCount: {type: Number, required:true, default: 0},
-        myStatus: {type: String}
+        myStatus: {type: String},
+        newestLikes: [
+            {
+                addedAt: {type: Date, required:false},
+                userId: {type: String, required:false},
+                login: {type: String, required:false}
+            }
+        ]
     },
     likeStorage: [String],
     dislikeStorage: [String]
