@@ -62,7 +62,7 @@ export class Post {
             myStatus: LIKES
         },
         public likeStorage: [string],
-        public dislikeStorage: []
+        public dislikeStorage: [string]
         ) {
     }
 }
@@ -77,10 +77,10 @@ export type PostsType = {
     extendedLikesInfo: {
         likesCount: number;
         dislikesCount: number;
-        myStatus: LIKES
+        myStatus: LIKES;
     }
     likeStorage: [string]
-    dislikeStorage: []
+    dislikeStorage: [string]
     
 };
 export class CreateUser {

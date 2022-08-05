@@ -99,7 +99,7 @@ export class PostController {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
         }
         else if (like_dislike === "400") {
-            throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
+            throw new HttpException({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 },HttpStatus.BAD_REQUEST)
             //res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 });
         }
         else {

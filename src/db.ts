@@ -26,7 +26,7 @@ export const postSchema = new mongoose.Schema<PostsType>({
         myStatus: {type: String}
     },
     likeStorage: [String],
-    dislikeStorage: []
+    dislikeStorage: [String]
 }
     
     )
