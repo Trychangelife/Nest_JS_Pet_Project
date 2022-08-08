@@ -30,7 +30,7 @@ export class PostController {
             else {
                 throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
             }
-        } catch (error) {
+        } finally {
             const takePost: object | undefined = await this.postsService.targetPosts(params.id);
             if (takePost !== undefined) {
                 return takePost
