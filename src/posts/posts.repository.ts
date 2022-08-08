@@ -43,11 +43,21 @@ async allPosts(skip: number, limit: number, page?: number): Promise<object> {
 }
 async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
-    const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
-    const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
-    const myStatusLike = await this.postsModel.find({id: postId}, )
+    const checkOnDislike = (await this.postsModel.findOne({$and: [{id: postId}, {"dislikeStorage.userId": userId}]}).lean())
+    const checkOnLike = (await this.postsModel.findOne({$and: [{id: postId}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean())
+    let myStatus = ''
+    if (checkOnLike) {
+        myStatus = "Like"
+    }
+    else if (checkOnDislike) {
+        myStatus = "Dislike"
+    }
+    else {
+        myStatus = "None"
+    }
+    
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ]).match({id: postId})
     if (targetPost == null) {
         return undefined

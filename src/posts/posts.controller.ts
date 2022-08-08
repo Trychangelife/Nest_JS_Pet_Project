@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
+import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { constructorPagination } from "src/pagination.constructor";
 import { LIKES, PostsType, UsersType } from "src/types/types";
 import { PostsService } from "./posts.service";
@@ -8,7 +9,7 @@ import { PostsService } from "./posts.service";
 @Controller('posts')
 export class PostController {
 
-    constructor(protected postsService: PostsService) {
+    constructor(protected postsService: PostsService, protected jwtServiceClass: JwtServiceClass) {
     }
     @Get()
     async getAllPosts(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
@@ -18,8 +19,10 @@ export class PostController {
     }
 
     @Get(':id')
-    async getPostByID(@Param() params) {
-        const takePost: object | undefined = await this.postsService.targetPosts(params.id);
+    async getPostByID(@Param() params, @Req() req) {
+        const token = req.headers.authorization.split(' ')[1]
+        const userId = await this.jwtServiceClass.getUserByToken(token)
+        const takePost: object | undefined = await this.postsService.targetPosts(params.id, userId);
         if (takePost !== undefined) {
             return takePost
         }

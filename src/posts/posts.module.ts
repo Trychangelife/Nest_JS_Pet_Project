@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AuthModule } from "src/auth/auth.module";
+import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { BloggersModule } from "src/bloggers/bloggers.module";
 import { BloggerRepository } from "src/bloggers/bloggers.repository";
 import { BloggerService } from "src/bloggers/bloggers.service";
@@ -21,6 +22,6 @@ import { PostsService } from "./posts.service";
     {name: 'RefreshToken', schema: refreshTokenSchema},
     {name: 'Users', schema: usersSchema}])],
     controllers: [PostController],
-    providers: [PostRepository, PostsService, BloggerRepository, BloggerService, JwtService],
+    providers: [PostRepository, PostsService, BloggerRepository, BloggerService, JwtService, JwtServiceClass],
   })
   export class PostsModule {}
