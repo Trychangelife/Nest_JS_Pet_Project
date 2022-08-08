@@ -37,7 +37,7 @@ async allPosts(skip: number, limit: number, page?: number): Promise<object> {
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
 
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 'SomeStatus', newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ])
     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: targetPostWithAggregation }
 }
@@ -47,7 +47,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
     const myStatusLike = await this.postsModel.find({id: postId}, )
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 'SomeStatus', newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ])
     if (targetPost == null) {
         return undefined
