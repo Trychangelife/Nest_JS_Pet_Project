@@ -53,7 +53,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
         return undefined
     }
     else {
-        return targetPostWithAggregation; 
+        return targetPostWithAggregation[0]; 
     }
 }
 async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number, page?: number): Promise<object | undefined> {
@@ -123,10 +123,13 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
 async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
     const foundUser = await this.usersModel.findOne({ id: userId }).lean()
-    const likesCountPlusLike = foundPost.extendedLikesInfo.likesCount + 1
-    const likesCountMinusLike = foundPost.extendedLikesInfo.likesCount - 1
-    const dislikesCountPlusLike = foundPost.extendedLikesInfo.dislikesCount + 1
-    const dislikesCountMinusDislike = foundPost.extendedLikesInfo.dislikesCount - 1
+    try {
+        const likesCountPlusLike = foundPost.extendedLikesInfo.likesCount + 1
+        const likesCountMinusLike = foundPost.extendedLikesInfo.likesCount - 1
+        const dislikesCountPlusLike = foundPost.extendedLikesInfo.dislikesCount + 1
+        const dislikesCountMinusDislike = foundPost.extendedLikesInfo.dislikesCount - 1
+    
+    
     const keys = Object.keys(likeStatus)
 
     // WHEN WE HAVE LIKE
@@ -195,6 +198,7 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
             await this.postsModel.updateOne({id: postId}, {$pull: {dislikeStorage: {userId}}})
             return foundPost
        }
+       
     }
     else if (foundUser == null) {
         return '400'
@@ -202,5 +206,8 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
     else {
         return "404"
     }
+    } catch (error) {
+    return "404"
+}
 }
 }
