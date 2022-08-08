@@ -68,8 +68,16 @@ export class Post {
                 }
             ]
         },
-        public likeStorage?: [string],
-        public dislikeStorage?: [string]
+        public likeStorage?: [{
+            addedAt: Date,
+            userId: string,
+            login: string
+        }],
+        public dislikeStorage?: [{
+            addedAt: Date,
+            userId: string,
+            login: string
+        }]
         ) {
     }
 }
@@ -93,8 +101,16 @@ export type PostsType = {
             }
         ]
     }
-    likeStorage?: [string]
-    dislikeStorage?: [string]
+    likeStorage?: [{
+        addedAt: Date
+        userId: string
+        login: string
+    }]
+    dislikeStorage?: [{
+        addedAt: Date
+        userId: string
+        login: string
+    }]
     
 };
 export class CreateUser {

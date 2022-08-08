@@ -32,8 +32,19 @@ export const postSchema = new mongoose.Schema<PostsType>({
             }
         ]
     },
-    likeStorage: [String],
-    dislikeStorage: [String]
+    likeStorage: [
+        {
+        addedAt: {type: Date, required:false},
+        userId: {type: String, required:false},
+        login: {type: String, required:false}
+}  ],
+    dislikeStorage: [
+        {
+        addedAt: {type: Date, required:false},
+        userId: {type: String, required:false},
+        login: {type: String, required:false}
+    }
+]
 }
     
     )

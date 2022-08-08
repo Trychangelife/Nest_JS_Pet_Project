@@ -14,7 +14,7 @@ export class JwtServiceClass {
     }
     
     async accessToken(user: UsersType) {
-        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '15m'})
+        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '40m'})
         return accessToken
     }
     async refreshToken(user: UsersType): Promise<string> {
