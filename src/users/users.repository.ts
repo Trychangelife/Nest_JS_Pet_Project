@@ -118,12 +118,12 @@ async counterAttemptEmail(ip: string, email?: string): Promise<boolean> {
 
 // Эндпоинты для поиска по определенным условиям
 async findUserByEmail(email: string): Promise<UsersType | null> {
-    const foundUser = await this.usersModel.findOne({ email: email })
+    const foundUser = await this.usersModel.findOne({ email: email }).lean()
     return foundUser
 }
-async findUserById(id: string): Promise<UsersType | null> {
-    const result = await this.usersModel.findOne({ id: id })
-    return result
+async findUserById(userId: string): Promise<UsersType | null> {
+    const foundUserById = await this.usersModel.findOne({id: userId}).lean()
+    return foundUserById
 }
 async findUserByLogin(login: string): Promise<UsersType | null> {
     const foundUser: UsersType = await this.usersModel.findOne({ login: login }).lean()

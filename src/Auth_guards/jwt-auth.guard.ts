@@ -16,13 +16,16 @@ export class JwtAuthGuard implements CanActivate {
             const bearer = req.headers.authorization.split(' ')[0]
             const token = req.headers.authorization.split(' ')[1]
             if (bearer !== "Bearer" || !token) {
-                throw new UnauthorizedException({message: "Пользователь не авторизован"})
+                throw new UnauthorizedException(401)
             }
             const userId = await this.jwtServiceClass.getUserByToken(token)
             if (userId) {
                 const user =  await this.usersService.findUserById(userId)
                 req.user = user;
                 return true
+            }
+            else {
+                throw new UnauthorizedException(401)
             }
         }
         catch (e) {
