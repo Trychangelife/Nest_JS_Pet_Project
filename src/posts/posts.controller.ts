@@ -20,15 +20,26 @@ export class PostController {
 
     @Get(':id')
     async getPostByID(@Param() params, @Req() req) {
-        const token = req.headers.authorization.split(' ')[1]
-        const userId = await this.jwtServiceClass.getUserByToken(token)
-        const takePost: object | undefined = await this.postsService.targetPosts(params.id, userId);
-        if (takePost !== undefined) {
-            return takePost
+        try {
+            const token = req.headers.authorization.split(' ')[1]
+            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const takePost: object | undefined = await this.postsService.targetPosts(params.id, userId);
+            if (takePost !== undefined) {
+                return takePost
+            }
+            else {
+                throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+            }
+        } catch (error) {
+            const takePost: object | undefined = await this.postsService.targetPosts(params.id);
+            if (takePost !== undefined) {
+                return takePost
+            }
+            else {
+                throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+            }
         }
-        else {
-            throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
-        }
+        
     }
     @UseGuards(BasicAuthGuard)
     @Post()
