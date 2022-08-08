@@ -20,8 +20,8 @@ export class PostsService {
         }
         return this.postsRepository.allPosts(skip, pageSize, pageNumber)
     }
-    async targetPosts(postId: string): Promise<object | undefined> {
-        return await this.postsRepository.targetPosts(postId)
+    async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
+        return await this.postsRepository.targetPosts(postId, userId)
     }
     async allPostsSpecificBlogger(bloggerId: string, page?: number, pageSize?: number): Promise<object | undefined> {
         let skip = 0

@@ -35,15 +35,25 @@ async allPosts(skip: number, limit: number, page?: number): Promise<object> {
     const totalCount = await this.postsModel.count({})
     const pagesCount = Math.ceil(totalCount / limit)
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: cursor }
+
+    const targetPostWithAggregation = await this.postsModel.aggregate([{
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 'SomeStatus', newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+    ])
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: targetPostWithAggregation }
 }
-async targetPosts(postId: string): Promise<object | undefined> {
+async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
+    const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
+    const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
+    const myStatusLike = await this.postsModel.find({id: postId}, )
+    const targetPostWithAggregation = await this.postsModel.aggregate([{
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 'SomeStatus', newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+    ])
     if (targetPost == null) {
         return undefined
     }
     else {
-        return targetPost; 
+        return targetPostWithAggregation; 
     }
 }
 async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number, page?: number): Promise<object | undefined> {
@@ -126,6 +136,7 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
         console.log(howMuchLikes)
         if (checkOnDislike.length > 0) {
+            // Проверяем, вдруг уже есть дизлайк, нужно его убрать (одновременно два статуса быть не может)
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
             await this.postsModel.updateOne({id: postId}, {$pull: {dislikeStorage: {userId}}})
         }
@@ -149,16 +160,19 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
         const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
         if (checkOnLike.length > 0) {
+            // Проверяем, вдруг уже есть лайк, нужно его убрать (одновременно два статуса быть не может)
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
             await this.postsModel.updateOne({id: postId}, {$pull: {"extendedLikesInfo.newestLikes": {userId}}})
             await this.postsModel.updateOne({id: postId}, {$pull: {likeStorage: {userId}}})
         }
         if (checkOnDislike.length > 0) {
+            // Дизлайк уже стоит, значит убираем из всех storage упоминания о этом Дизлайке
         await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
         await this.postsModel.updateOne({id: postId}, {$pull: {dislikeStorage: {userId}}})
         return foundPost
         }
         else {
+            // Дизлайка нет, добавляем информацию о оставленном Дизлайке в storage 
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountPlusLike } })
             await this.postsModel.findOneAndUpdate({id: postId}, {$push: {dislikeStorage: {addedAt: new Date(), userId: userId, login: login}}})
             return foundPost
@@ -168,6 +182,8 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
     else if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "None") {
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
         const checkOnLike = await this.postsModel.find({$and: [{"likeStorage.userId": userId}, {id: postId}] } ).lean()
+
+        // Проверяем наличие лайков/дизлайков, если что-то есть, убираем, так как статус NONE
         if (checkOnLike.length > 0) {
             await this.postsModel.updateOne({id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
             await this.postsModel.updateOne({id: postId}, {$pull: {"extendedLikesInfo.newestLikes": {userId}}})
