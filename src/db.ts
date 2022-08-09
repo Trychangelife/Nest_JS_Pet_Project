@@ -49,12 +49,30 @@ export const postSchema = new mongoose.Schema<PostsType>({
     
     )
 export const commentsSchema = new mongoose.Schema<CommentsType>({
-    commentId: {type:String, required:true},
+    id: {type:String, required:true},
     content: {type:String, required:true},
     userId: {type:String, required:true},
     userLogin: {type:String, required:true},
     addedAt: {type:String, required:true},
-    postId: {type:String, required:true}
+    postId: {type:String, required:true},
+    extendedLikesInfo: {
+        likesCount: {type: Number, required:true, default: 0},
+        dislikesCount: {type: Number, required:true, default: 0},
+        myStatus: {type: String},
+    },
+    likeStorage: [
+        {
+        addedAt: {type: Date, required:false},
+        userId: {type: String, required:false},
+        login: {type: String, required:false}
+}  ],
+    dislikeStorage: [
+        {
+        addedAt: {type: Date, required:false},
+        userId: {type: String, required:false},
+        login: {type: String, required:false}
+    }
+]
 })
 
 export const usersSchema = new mongoose.Schema<UsersType>({

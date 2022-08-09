@@ -34,16 +34,52 @@ export type BloggersType = {
 }
 
 export class Comments {
-    constructor(public commentId: string, public content: string, public userId: string, public userLogin: string, public addedAt: string,public postId: string ) {
+    constructor(
+        public id: string, 
+        public content: string, 
+        public userId: string, 
+        public userLogin: string, 
+        public addedAt: string,
+        public postId: string,
+        public extendedLikesInfo: {
+            likesCount: number,
+            dislikesCount: number,
+            myStatus: LIKES,
+        },
+        public likeStorage?: [{
+            addedAt: Date,
+            userId: string,
+            login: string
+        }],
+        public dislikeStorage?: [{
+            addedAt: Date,
+            userId: string,
+            login: string
+        }]) {
     }
 }
 export type CommentsType = {
-    commentId: string;
+    id: string;
     content: string;
     userId: string;
     userLogin: string;
     addedAt: string;
     postId: string;
+    extendedLikesInfo: {
+        likesCount: number;
+        dislikesCount: number;
+        myStatus: LIKES;
+    }
+    likeStorage?: [{
+        addedAt: Date
+        userId: string
+        login: string
+    }]
+    dislikeStorage?: [{
+        addedAt: Date
+        userId: string
+        login: string
+    }]
 };
 
 @Schema()

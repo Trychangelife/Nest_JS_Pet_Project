@@ -60,7 +60,7 @@ export class PostsService {
         const foundPost = await this.postsModel.findOne({ id: postId })
         if(foundPost) {
         // Построено на классе
-        const createdComment = new Comments(uuidv4(), content, userId, userLogin, (new Date()).toString(), postId)
+        const createdComment = new Comments(uuidv4(), content, userId, userLogin, (new Date()).toString(), postId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
         return this.postsRepository.createCommentForSpecificPost(createdComment)
     }
         if (foundPost == null) {
