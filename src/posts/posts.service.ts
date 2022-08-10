@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { BloggersType, Comments, CommentsType, LIKES, Post, PostsType } from "src/types/types"
+import { BloggersType, Comments, CommentsType, LIKES, LikesDTO, Post, PostsType } from "src/types/types"
 import { PostRepository } from "./posts.repository"
 import { v4 as uuidv4 } from "uuid"
 
@@ -76,7 +76,7 @@ export class PostsService {
         }
         return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page,)
     }
-    async like_dislike (postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
+    async like_dislike (postId: string, likeStatus: LikesDTO, userId: string, login: string): Promise<string | object> {
         return await this.postsRepository.like_dislike(postId, likeStatus, userId, login)
     }
 }

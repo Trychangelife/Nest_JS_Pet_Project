@@ -1,7 +1,7 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Aggregate, Model } from "mongoose"
-import { BloggersType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
+import { BloggersType, CommentsType, LIKES, LikesDTO, Post, PostsType, UsersType } from "src/types/types"
 
 export const postViewModel = {
     _id: 0,
@@ -130,7 +130,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     else { return false}
 }
 
-async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
+async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: string): Promise<string | object> {
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
     const foundUser = await this.usersModel.findOne({ id: userId }).lean()
     try {

@@ -3,7 +3,7 @@ import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { constructorPagination } from "src/pagination.constructor";
-import { LIKES, PostsType, UsersType } from "src/types/types";
+import { LIKES, LikesDTO, PostsType, UsersType } from "src/types/types";
 import { PostsService } from "./posts.service";
 
 @Controller('posts')
@@ -107,7 +107,7 @@ export class PostController {
     }
     @UseGuards(JwtAuthGuard)
     @Put(':postId/like-status')
-    async like_dislike(@Param() params, @Body() likeStatus: LIKES, @Req() req) {
+    async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req) {
         const like_dislike: object | string = await this.postsService.like_dislike(params.postId, likeStatus, req.user!.id, req.user!.login);
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
