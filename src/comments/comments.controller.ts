@@ -1,8 +1,15 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Put, Req, UseGuards } from "@nestjs/common";
+import { IsNotEmpty } from "class-validator";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { CommentsType, LIKES } from "src/types/types";
 import { CommentsService } from "./comments.service";
+
+
+export class LikesDTO {
+    @IsNotEmpty()
+    likeStatus: string
+}
 
 @Controller('comments')
 export class CommentsController {
@@ -62,7 +69,7 @@ export class CommentsController {
     }
     @UseGuards(JwtAuthGuard)
     @Put(':commentId/like-status')
-    async like_dislike(@Param() params, @Body() likeStatus: LIKES, @Req() req) {
+    async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req) {
         const like_dislike: object | string = await this.commentsService.like_dislike(params.commentId, likeStatus, req.user!.id, req.user!.login);
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)

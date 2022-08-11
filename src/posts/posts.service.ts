@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { BloggersType, Comments, CommentsType, LIKES, LikesDTO, Post, PostsType } from "src/types/types"
+import { BloggersType, Comments, CommentsType, LIKES, Post, PostsType } from "src/types/types"
 import { PostRepository } from "./posts.repository"
 import { v4 as uuidv4 } from "uuid"
+import { LikesDTO } from "src/comments/comments.controller"
 
 @Injectable()
 export class PostsService {

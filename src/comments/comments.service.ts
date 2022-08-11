@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { CommentsType, LIKES } from "src/types/types"
+import { LikesDTO } from "./comments.controller"
 import { CommentsRepository } from "./comments.repository"
 
 @Injectable()
@@ -17,7 +18,7 @@ export class CommentsService {
     async deleteCommentByCommentId(commentId: string, userId: string): Promise<boolean | null> {
         return await this.commentsRepository.deleteCommentByCommentId(commentId, userId)
     }
-    async like_dislike (commmentId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
+    async like_dislike (commmentId: string, likeStatus: LikesDTO, userId: string, login: string): Promise<string | object> {
         return await this.commentsRepository.like_dislike(commmentId, likeStatus, userId, login)
     }
 }

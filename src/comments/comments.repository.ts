@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { commentsVievModel } from "src/posts/posts.repository"
 import { CommentsType, LIKES, UsersType } from "src/types/types"
+import { LikesDTO } from "./comments.controller"
 
 @Injectable()
 export class CommentsRepository {
@@ -65,7 +66,7 @@ export class CommentsRepository {
             return false
         }
     }
-    async like_dislike(commentId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
+    async like_dislike(commentId: string, likeStatus: LikesDTO, userId: string, login: string): Promise<string | object> {
         const foundComment = await this.commentsModel.findOne({ id: commentId }, commentsVievModel).lean()
         const foundUser = await this.usersModel.findOne({ id: userId }).lean()
         try {

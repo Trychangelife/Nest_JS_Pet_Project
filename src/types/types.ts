@@ -3,15 +3,7 @@ import { IsEmail, IsNotEmpty, IsString, MaxLength, min, MinLength } from "class-
 import { ObjectId } from "mongodb";
 
 
-export class LikesDTO {
-    @IsNotEmpty({
-        message: 'Likestatus to short, should be: $property: $value',
-        context: {
-            errorCode: 400 
-        }
-    })
-    likeStatus: string
-}
+
 
 export enum LIKES {
     LIKE = "Like",

@@ -2,8 +2,9 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
+import { LikesDTO } from "src/comments/comments.controller";
 import { constructorPagination } from "src/pagination.constructor";
-import { LIKES, LikesDTO, PostsType, UsersType } from "src/types/types";
+import { LIKES, PostsType, UsersType } from "src/types/types";
 import { PostsService } from "./posts.service";
 
 @Controller('posts')

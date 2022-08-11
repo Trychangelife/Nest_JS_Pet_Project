@@ -1,16 +1,27 @@
-import { Injectable, Ip, Request } from "@nestjs/common";
+import { BadRequestException, Injectable, Ip, Request } from "@nestjs/common";
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 import { constructorPagination } from "src/pagination.constructor";
 import { UsersType } from "src/types/types";
 import { UsersService } from "./users.service";
 
-
+class CreateUser {
+  @IsEmail()
+  email: string
+  @MinLength(5)
+  @MaxLength(10)
+  login: string
+  @MinLength(3)
+  password: string
+}
 
 @Controller('users')
 export class UsersController {
 
     constructor(protected usersService: UsersService) {
     }
+
+    
     @Get()
     async getAllUsers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
         const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
@@ -19,10 +30,10 @@ export class UsersController {
     }
     @Post()
     // Проверить, IP скорее всего не работает
-    async createUser(@Body() user: {password: string, login: string, email: string},  @Request() req: {ip: string}) {
+    async createUser(@Body() user: CreateUser,  @Request() req: {ip: string}) {
         const result: UsersType | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
-          throw new HttpException("Login or email already use", HttpStatus.BAD_REQUEST)
+          throw new BadRequestException([{message: 'Bad email', field: 'Email'}])
         }
         else {
           return result
