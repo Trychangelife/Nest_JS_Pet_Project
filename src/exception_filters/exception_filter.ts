@@ -21,6 +21,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         });
         response.status(status).json(errorResponse)
     }
+    else if (status === 401) {
+        response.status(status).json({message: "check input data or JWT Token"})
+    }
     else {
         response
         .status(status)

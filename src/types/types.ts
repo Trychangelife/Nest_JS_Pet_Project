@@ -152,14 +152,10 @@ export type PostsType = {
     
 };
 export class CreateUser {
-    @IsEmail()
+ 
     email: string
-    @MinLength(5)
-    @MaxLength(10)
     login: string
-    @IsString()
     id: string
-    @MinLength(3)
     password: string
 }
 

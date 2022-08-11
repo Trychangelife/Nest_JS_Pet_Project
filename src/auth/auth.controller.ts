@@ -9,6 +9,16 @@ import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
+import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
+
+
+class AuthForm {
+    @IsNotEmpty()
+    login: string
+    @MinLength(6)
+    @MaxLength(20)
+    password: string
+}
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +32,7 @@ export class AuthController {
         @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>) {
     }
     @Post('login')
-    async authorization(@Request() req: {ip: string}, @Body() DataUser: CreateUser, @Res() res) {
+    async authorization(@Request() req: {ip: string}, @Body() DataUser: AuthForm, @Res() res) {
         await this.authService.informationAboutAuth(req.ip, DataUser.login);
         const checkIP = await this.authService.counterAttemptAuth(req.ip, DataUser.login);
         if (checkIP) {
