@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseUUIDPipe, Post, Put, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
@@ -106,10 +106,15 @@ export class PostController {
         }
 
     }
+
     @UseGuards(JwtAuthGuard)
+    @UsePipes(ParseUUIDPipe)
     @Put(':postId/like-status')
-    async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req) {
-        const like_dislike: object | string = await this.postsService.like_dislike(params.postId, likeStatus, req.user!.id, req.user!.login);
+    async like_dislike(
+        @Param('postId', ParseUUIDPipe) postId: string, 
+        @Body() likeStatus: LikesDTO, @Req() req) {
+        //await this.postsService.targetPosts()
+        const like_dislike: object | string = await this.postsService.like_dislike(postId, likeStatus, req.user!.id, req.user!.login);
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
         }
