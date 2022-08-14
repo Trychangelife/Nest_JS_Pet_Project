@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseUUIDPipe, Post, Put, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadGatewayException, Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseEnumPipe, ParseUUIDPipe, Post, Put, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
@@ -108,10 +108,9 @@ export class PostController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @UsePipes(ParseUUIDPipe)
     @Put(':postId/like-status')
     async like_dislike(
-        @Param('postId', ParseUUIDPipe) postId: string, 
+        @Param('postId') postId: string, 
         @Body() likeStatus: LikesDTO, @Req() req) {
         //await this.postsService.targetPosts()
         const like_dislike: object | string = await this.postsService.like_dislike(postId, likeStatus, req.user!.id, req.user!.login);
