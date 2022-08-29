@@ -59,7 +59,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     
     const targetPostWithAggregation = await this.postsModel.aggregate([{
         $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
-    ]).match({id: postId})
+    ]).match({id: postId}).sort({})
     if (targetPostWithAggregation == null) {
         return undefined
     }
@@ -164,8 +164,8 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         else {
             // Лайка нет, добавляем информацию о оставленном лайке в storage 
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {"extendedLikesInfo.newestLikes": {$each: {addedAt: new Date(), userId: userId, login: login}, $position: 0}}})
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {likeStorage: {$each: [{addedAt: new Date(), userId: userId, login: login}], $position: 0}}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {"extendedLikesInfo.newestLikes": {addedAt: new Date(), userId: userId, login: login}}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {likeStorage: {addedAt: new Date(), userId: userId, login: login}}})
             return foundPost
         }
     }
@@ -188,7 +188,7 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         else {
             // Дизлайка нет, добавляем информацию о оставленном Дизлайке в storage 
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountPlusLike } })
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {dislikeStorage: {$each: [{addedAt: new Date(), userId: userId, login: login}], $position: 0}}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {dislikeStorage: {addedAt: new Date(), userId: userId, login: login}}})
             return foundPost
     }
     } 
