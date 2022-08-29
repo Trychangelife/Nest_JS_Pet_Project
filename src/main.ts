@@ -21,7 +21,7 @@ async function bootstrap() {
   //     })
   //   }
   // }))
-  app.useGlobalFilters(new HttpExceptionFilter())
+  // app.useGlobalFilters(new HttpExceptionFilter())
   await app.listen(process.env.PORT);
   console.log(`Server listening on port: 5000`);
 }
