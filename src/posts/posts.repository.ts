@@ -59,7 +59,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     
     const targetPostWithAggregation = await this.postsModel.aggregate([{
         $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
-    ]).match({id: postId}).sort({})
+    ]).match({id: postId})
     if (targetPostWithAggregation == null) {
         return undefined
     }
