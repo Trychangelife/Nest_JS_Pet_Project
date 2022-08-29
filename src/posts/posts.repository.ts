@@ -148,7 +148,7 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
         const howMuchLikes = await this.postsModel.find({"extendedLikesInfo.newestLikes": []}).count()
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
-        console.log(howMuchLikes)
+        console.log(checkOnLike)
         if (checkOnDislike.length > 0) {
             // Проверяем, вдруг уже есть дизлайк, нужно его убрать (одновременно два статуса быть не может)
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
@@ -164,8 +164,8 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         else {
             // Лайка нет, добавляем информацию о оставленном лайке в storage 
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {"extendedLikesInfo.newestLikes": {addedAt: new Date(), userId: userId, login: login}}})
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {likeStorage: {addedAt: new Date(), userId: userId, login: login}}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {"extendedLikesInfo.newestLikes": {$each: {addedAt: new Date(), userId: userId, login: login}, $position: 0}}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {likeStorage: {$each: [{addedAt: new Date(), userId: userId, login: login}], $position: 0}}})
             return foundPost
         }
     }
@@ -188,7 +188,7 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         else {
             // Дизлайка нет, добавляем информацию о оставленном Дизлайке в storage 
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountPlusLike } })
-            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {dislikeStorage: {addedAt: new Date(), userId: userId, login: login}}})
+            await this.postsModel.findOneAndUpdate({id: postId}, {$push: {dislikeStorage: {$each: [{addedAt: new Date(), userId: userId, login: login}], $position: 0}}})
             return foundPost
     }
     } 
