@@ -65,7 +65,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
         return undefined
     }
     else {
-        return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.slice(0,3).reverse()
+        return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.slice(0,3)
             //.sort((a,b) => a.addedAt.getTime() - b.addedAt.getTime())
         }}; 
         try {
