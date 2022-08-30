@@ -12,7 +12,7 @@ export enum LIKES {
 }
 
 export type NewestLikes = {
-    addedAt: string,
+    addedAt: Date,
     userId: string,
     login: string
 }
