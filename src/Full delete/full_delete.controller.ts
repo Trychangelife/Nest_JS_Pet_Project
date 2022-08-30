@@ -21,15 +21,15 @@ export class FullData {
     }
     @Delete('all-data')
     async deleteAllData () {
-        await this.postsModel.remove()
-        await this.bloggerModel.remove()
-        await this.usersModel.remove()
-        await this.commentsModel.remove()
-        await this.registrationDataModel.remove()
-        await this.authDataModel.remove()
-        await this.codeConfirmModel.remove()
-        await this.emailSendModel.remove()
-        await this.refreshTokenModel.remove()
+        // await this.postsModel.remove()
+        // await this.bloggerModel.remove()
+        // await this.usersModel.remove()
+        // await this.commentsModel.remove()
+        // await this.registrationDataModel.remove()
+        // await this.authDataModel.remove()
+        // await this.codeConfirmModel.remove()
+        // await this.emailSendModel.remove()
+        // await this.refreshTokenModel.remove()
         throw new HttpException("Date is clear",HttpStatus.NO_CONTENT)
         }
 }
