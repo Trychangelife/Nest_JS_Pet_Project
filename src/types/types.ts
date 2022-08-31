@@ -43,7 +43,7 @@ export class Comments {
         public userLogin: string, 
         public addedAt: string,
         public postId: string,
-        public extendedLikesInfo: {
+        public likesInfo: {
             likesCount: number,
             dislikesCount: number,
             myStatus: LIKES,
@@ -67,7 +67,7 @@ export type CommentsType = {
     userLogin: string;
     addedAt: string;
     postId: string;
-    extendedLikesInfo: {
+    likesInfo: {
         likesCount: number;
         dislikesCount: number;
         myStatus: LIKES;

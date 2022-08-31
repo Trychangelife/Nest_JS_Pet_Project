@@ -55,7 +55,7 @@ export const commentsSchema = new mongoose.Schema<CommentsType>({
     userLogin: {type:String, required:true},
     addedAt: {type:String, required:true},
     postId: {type:String, required:true},
-    extendedLikesInfo: {
+    likesInfo: {
         likesCount: {type: Number, required:true, default: 0},
         dislikesCount: {type: Number, required:true, default: 0},
         myStatus: {type: String},

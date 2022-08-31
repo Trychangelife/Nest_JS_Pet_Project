@@ -30,7 +30,7 @@ export class CommentsRepository {
         myStatus = "None"
     }
     const targetCommentWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}}}
+        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}}}
     ]).match({id: commentId})
     if (targetCommentWithAggregation == null) {
         return undefined
@@ -70,10 +70,10 @@ export class CommentsRepository {
         const foundComment = await this.commentsModel.findOne({ id: commentId }, commentsVievModel).lean()
         const foundUser = await this.usersModel.findOne({ id: userId }).lean()
         try {
-            const likesCountPlusLike = foundComment.extendedLikesInfo.likesCount + 1
-            const likesCountMinusLike = foundComment.extendedLikesInfo.likesCount - 1
-            const dislikesCountPlusLike = foundComment.extendedLikesInfo.dislikesCount + 1
-            const dislikesCountMinusDislike = foundComment.extendedLikesInfo.dislikesCount - 1
+            const likesCountPlusLike = foundComment.likesInfo.likesCount + 1
+            const likesCountMinusLike = foundComment.likesInfo.likesCount - 1
+            const dislikesCountPlusLike = foundComment.likesInfo.dislikesCount + 1
+            const dislikesCountMinusDislike = foundComment.likesInfo.dislikesCount - 1
         
         
         const keys = Object.keys(likeStatus)
@@ -86,18 +86,18 @@ export class CommentsRepository {
             console.log(howMuchLikes)
             if (checkOnDislike.length > 0) {
                 // Проверяем, вдруг уже есть дизлайк, нужно его убрать (одновременно два статуса быть не может)
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
+                await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountMinusDislike } })
                 await this.commentsModel.updateOne({id: commentId}, {$pull: {dislikeStorage: {userId}}})
             }
             if (checkOnLike.length > 0) {
                 // Лайк уже стоит, значит убираем из всех storage упоминания о этом лайке
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
-                await this.commentsModel.updateOne({id: commentId}, {$pull: {likeStorage: {userId}}})
+                //await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.likesCount": likesCountMinusLike } })
+                //await this.commentsModel.updateOne({id: commentId}, {$pull: {likeStorage: {userId}}})
                 return foundComment
             }
             else {
                 // Лайка нет, добавляем информацию о оставленном лайке в storage 
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.likesCount": likesCountPlusLike } })
+                await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.likesCount": likesCountPlusLike } })
                 await this.commentsModel.findOneAndUpdate({id: commentId}, {$push: {likeStorage: {addedAt: new Date(), userId: userId, login: login}}})
                 return foundComment
             }
@@ -108,18 +108,18 @@ export class CommentsRepository {
             const checkOnLike = await this.commentsModel.find({$and: [{"likeStorage.userId": userId}, {id: commentId}] } ).lean()
             if (checkOnLike.length > 0) {
                 // Проверяем, вдруг уже есть лайк, нужно его убрать (одновременно два статуса быть не может)
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
+                await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.likesCount": likesCountMinusLike } })
                 await this.commentsModel.updateOne({id: commentId}, {$pull: {likeStorage: {userId}}})
             }
             if (checkOnDislike.length > 0) {
                 // Дизлайк уже стоит, значит убираем из всех storage упоминания о этом Дизлайке
-            await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
-            await this.commentsModel.updateOne({id: commentId}, {$pull: {dislikeStorage: {userId}}})
+            //await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountMinusDislike } })
+            //await this.commentsModel.updateOne({id: commentId}, {$pull: {dislikeStorage: {userId}}})
             return foundComment
             }
             else {
                 // Дизлайка нет, добавляем информацию о оставленном Дизлайке в storage 
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountPlusLike } })
+                await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountPlusLike } })
                 await this.commentsModel.findOneAndUpdate({id: commentId}, {$push: {dislikeStorage: {addedAt: new Date(), userId: userId, login: login}}})
                 return foundComment
         }
@@ -131,12 +131,12 @@ export class CommentsRepository {
     
             // Проверяем наличие лайков/дизлайков, если что-то есть, убираем, так как статус NONE
             if (checkOnLike.length > 0) {
-                await this.commentsModel.updateOne({id: commentId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
+                await this.commentsModel.updateOne({id: commentId }, { $set: {"likesInfo.likesCount": likesCountMinusLike } })
                 await this.commentsModel.updateOne({id: commentId}, {$pull: {likeStorage: {userId}}})
                 return foundComment
             }
            else if (checkOnDislike.length > 0) {
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
+                await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountMinusDislike } })
                 await this.commentsModel.updateOne({id: commentId}, {$pull: {dislikeStorage: {userId}}})
                 return foundComment
            }
