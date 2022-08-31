@@ -30,7 +30,7 @@ export class CommentsRepository {
         myStatus = "None"
     }
     const targetCommentWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}, likeStorage: 0, dislikeStorage: 0}}
+        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}, likeStorage: {addedAt: 0, userId: 0, login: 0}, dislikeStorage: {addedAt: 0, userId: 0, login: 0}}}
     ]).match({id: commentId})
     if (targetCommentWithAggregation == null) {
         return undefined
