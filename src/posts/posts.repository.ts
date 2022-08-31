@@ -165,9 +165,9 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         }
         if (checkOnLike.length > 0) {
             // Лайк уже стоит, значит убираем из всех storage упоминания о этом лайке
-            await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
-            await this.postsModel.updateOne({id: postId}, {$pull: {"extendedLikesInfo.newestLikes": {userId}}})
-            await this.postsModel.updateOne({id: postId}, {$pull: {likeStorage: {userId}}})
+            //await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.likesCount": likesCountMinusLike } })
+            //await this.postsModel.updateOne({id: postId}, {$pull: {"extendedLikesInfo.newestLikes": {userId}}})
+            //await this.postsModel.updateOne({id: postId}, {$pull: {likeStorage: {userId}}})
             return foundPost
         }
         else {
@@ -190,8 +190,8 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         }
         if (checkOnDislike.length > 0) {
             // Дизлайк уже стоит, значит убираем из всех storage упоминания о этом Дизлайке
-        await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
-        await this.postsModel.updateOne({id: postId}, {$pull: {dislikeStorage: {userId}}})
+        //await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })
+        //await this.postsModel.updateOne({id: postId}, {$pull: {dislikeStorage: {userId}}})
         return foundPost
         }
         else {
