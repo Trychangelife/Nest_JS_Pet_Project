@@ -20,8 +20,16 @@ export const commentsVievModel = {
     _id: 0,
     postId: 0,
     __v: 0,
-    likeStorage: 0,
-    dislikeStorage: 0
+    likeStorage: {
+        addedAt: 0,
+        userId: 0,
+        login: 0
+    },
+    dislikeStorage: {
+        addedAt: 0,
+        userId: 0,
+        login: 0
+    }
 }
 
 @Injectable()
