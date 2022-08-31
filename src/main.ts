@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
-import { HttpExceptionFilter } from './exception_filters/exception_filter';
+// import { HttpExceptionFilter } from './exception_filters/exception_filter';
 import { BadRequestException, HttpStatus, NotFoundException, ParseUUIDPipe, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -20,7 +20,7 @@ async function bootstrap() {
       })
     }
   }))
-  app.useGlobalFilters(new HttpExceptionFilter())
+//app.useGlobalFilters(new HttpExceptionFilter())
   await app.listen(process.env.PORT);
   console.log(`Server listening on port: 5000`);
 }
