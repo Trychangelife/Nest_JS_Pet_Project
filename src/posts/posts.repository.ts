@@ -127,7 +127,7 @@ async deletePost(deleteId: string): Promise<boolean> {
 async createCommentForSpecificPost(createdComment: CommentsType): Promise<CommentsType | boolean> {
 
     await this.commentsModel.create(createdComment)
-    const foundNewPost: CommentsType = await this.commentsModel.findOne({commentId: createdComment.id}, commentsVievModel).lean()
+    const foundNewPost: CommentsType = await this.commentsModel.findOne({id: createdComment.id}, commentsVievModel).lean()
     if (foundNewPost !== null) {
     return foundNewPost}
     else {return false}
