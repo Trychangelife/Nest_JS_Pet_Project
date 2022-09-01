@@ -131,13 +131,13 @@ export class CommentsRepository {
     
             // Проверяем наличие лайков/дизлайков, если что-то есть, убираем, так как статус NONE
             if (checkOnLike.length > 0) {
-                await this.commentsModel.updateOne({id: commentId }, { $set: {"likesInfo.likesCount": likesCountMinusLike } })
-                await this.commentsModel.updateOne({id: commentId}, {$pull: {likeStorage: {userId}}})
+                //await this.commentsModel.updateOne({id: commentId }, { $set: {"likesInfo.likesCount": likesCountMinusLike } })
+                //await this.commentsModel.updateOne({id: commentId}, {$pull: {likeStorage: {userId}}})
                 return foundComment
             }
            else if (checkOnDislike.length > 0) {
-                await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountMinusDislike } })
-                await this.commentsModel.updateOne({id: commentId}, {$pull: {dislikeStorage: {userId}}})
+                //await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountMinusDislike } })
+                //await this.commentsModel.updateOne({id: commentId}, {$pull: {dislikeStorage: {userId}}})
                 return foundComment
            }
            
