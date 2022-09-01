@@ -207,7 +207,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     }
     comment.likesInfo.myStatus = myStatus
     delete comment.postId
-        arrayForReturn.unshift(comment)
+        arrayForReturn.push(comment)
     }
 
 
