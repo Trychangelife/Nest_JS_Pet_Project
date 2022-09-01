@@ -77,7 +77,7 @@ export class PostsService {
         }
         return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page, userId)
     }
-    async like_dislike (postId: string, likeStatus: LikesDTO, userId: string, login: string): Promise<string | object> {
+    async like_dislike (postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
         return await this.postsRepository.like_dislike(postId, likeStatus, userId, login)
     }
 }

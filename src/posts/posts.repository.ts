@@ -217,7 +217,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     else { return false}
 }
 
-async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: string): Promise<string | object> {
+async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
     const foundUser = await this.usersModel.findOne({ id: userId }).lean()
     try {
@@ -230,7 +230,7 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
     const keys = Object.keys(likeStatus)
 
     // WHEN WE HAVE LIKE
-    if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "Like") {
+    if (foundPost !== null && foundUser !== null && likeStatus === "Like") {
         const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
         const howMuchLikes = await this.postsModel.find({"extendedLikesInfo.newestLikes": []}).count()
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
@@ -256,7 +256,7 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
         }
     }
     // WHEN WE HAVE DISLIKE
-    else if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "Dislike") {
+    else if (foundPost !== null && foundUser !== null && likeStatus === "Dislike") {
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
         const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
         if (checkOnLike.length > 0) {
@@ -279,7 +279,7 @@ async like_dislike(postId: string, likeStatus: LikesDTO, userId: string, login: 
     }
     } 
     // WHEN WE HAVE NONE
-    else if (foundPost !== null && foundUser !== null && (likeStatus[keys[0]]) === "None") {
+    else if (foundPost !== null && foundUser !== null && likeStatus === "None") {
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
         const checkOnLike = await this.postsModel.find({$and: [{"likeStorage.userId": userId}, {id: postId}] } ).lean()
 
