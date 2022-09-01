@@ -206,12 +206,13 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
         myStatus = "None"
     }
     comment.likesInfo.myStatus = myStatus
+    delete comment.postId
         arrayForReturn.push(comment)
     }
 
 
 
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn }}
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn.reverse() }}
     else { return false}
 }
 
