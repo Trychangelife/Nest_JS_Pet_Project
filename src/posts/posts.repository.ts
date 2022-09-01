@@ -183,7 +183,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     if (findPosts !== null) {
     const findComments = await this.commentsModel.find({postId: postId}, commentsVievModel).skip(skip).limit(limit).lean()
     const commentsWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, postId: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1}}}
+        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, postId: 1, likesInfo: 1}}
     ]).match({postId: postId})
     const arrayForReturn = []
     for (let index = 0; index < commentsWithAggregation.length; index++) {
@@ -191,8 +191,8 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
         // {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)
         // }}; 
 
-        let comment = {...commentsWithAggregation[index], likesInfo: {...commentsWithAggregation[index].likesInfo, likesInfo: Object.keys(commentsWithAggregation[index].likesInfo).reverse().slice(0,3)
-        }};
+        let comment = {...commentsWithAggregation[index], likesInfo: {...commentsWithAggregation[index].likesInfo
+             }};
         const checkOnDislike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"dislikeStorage.userId": userId}]}).lean()
         const checkOnLike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"likeStorage.userId": userId}]}).lean()
         let myStatus = ''
