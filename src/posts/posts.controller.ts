@@ -103,8 +103,20 @@ export class PostController {
 
     }
     @Get(':postId/comments')
-    async getCommentsByPostId(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params,) {
-        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+    async getCommentsByPostId(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params, @Req() req) {
+        try {
+            const token = req.headers.authorization.split(' ')[1]
+            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize,userId);
+                if (newComment) {
+                    return newComment
+            }
+                else {
+                     throw new HttpException("Post doesn't exists",HttpStatus.NOT_FOUND)
+        }
+        } catch (error) {
+            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
         const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize);
         if (newComment) {
             return newComment
@@ -112,7 +124,7 @@ export class PostController {
         else {
             throw new HttpException("Post doesn't exists",HttpStatus.NOT_FOUND)
         }
-
+        }
     }
 
     @UseGuards(JwtAuthGuard)

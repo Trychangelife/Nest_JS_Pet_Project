@@ -175,13 +175,39 @@ async createCommentForSpecificPost(createdComment: CommentsType): Promise<Commen
     return foundNewPost}
     else {return false}
 }
-async takeCommentByIdPost (postId: string, skip: number, limit: number, page: number): Promise<object | boolean> {
+async takeCommentByIdPost (postId: string, skip: number, limit: number, page: number, userId?: string): Promise<object | boolean> {
     const findPosts = await this.postsModel.findOne({id: postId}).lean()
     const totalCount = await this.commentsModel.count({postId: postId})
     const pagesCount = Math.ceil(totalCount / limit)
+    
     if (findPosts !== null) {
     const findComments = await this.commentsModel.find({postId: postId}, commentsVievModel).skip(skip).limit(limit).lean()
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: findComments }}
+    const commentsWithAggregation = await this.commentsModel.aggregate([{
+        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1}}}
+    ]).match({postId: postId})
+    const arrayForReturn = []
+    for (let index = 0; index < commentsWithAggregation.length; index++) {
+        let comment = {...commentsWithAggregation[index], likesInfo: {...commentsWithAggregation[index].likesInfo.reverse().slice(0,3)
+        }};
+        const checkOnDislike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"dislikeStorage.userId": userId}]}).lean()
+        const checkOnLike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"likeStorage.userId": userId}]}).lean()
+        let myStatus = ''
+         if (checkOnLike) {
+        myStatus = "Like"
+    }
+            else if (checkOnDislike) {
+        myStatus = "Dislike"
+    }
+            else {
+        myStatus = "None"
+    }
+    comment.likesInfo.myStatus = myStatus
+        arrayForReturn.push(comment)
+    }
+
+
+
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn }}
     else { return false}
 }
 
