@@ -13,10 +13,18 @@ export class PostController {
     constructor(protected postsService: PostsService, protected jwtServiceClass: JwtServiceClass) {
     }
     @Get()
-    async getAllPosts(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
-        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
-        const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber);
-        return getAllPosts;
+    async getAllPosts(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Req() req) {
+        try {
+            const token = req.headers.authorization.split(' ')[1]
+            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+            const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber, userId);
+            return getAllPosts;
+        } catch (error) {
+            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+            const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber);
+            return getAllPosts;
+        }
     }
 
     @Get(':id')

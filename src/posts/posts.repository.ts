@@ -34,15 +34,36 @@ export class PostRepository {
     @InjectModel('Users') protected usersModel: Model<UsersType>) {
 
     }
-async allPosts(skip: number, limit: number, page?: number): Promise<object> {
+async allPosts(skip: number, limit: number, page?: number, userId?: string): Promise<object> {
     const totalCount = await this.postsModel.count({})
     const pagesCount = Math.ceil(totalCount / limit)
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
-
+    const arrayForReturn = []
     const targetPostWithAggregation = await this.postsModel.aggregate([{
         $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ])
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: targetPostWithAggregation }
+    for (let index = 0; index < targetPostWithAggregation.length; index++) {
+        let post = targetPostWithAggregation[index]
+        const checkOnDislike = await this.postsModel.findOne({$and: [{id: post.id}, {"dislikeStorage.userId": userId}]}).lean()
+        const checkOnLike = await this.postsModel.findOne({$and: [{id: post.id}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean()
+        let myStatus = ''
+         if (checkOnLike) {
+        myStatus = "Like"
+    }
+            else if (checkOnDislike) {
+        myStatus = "Dislike"
+    }
+            else {
+        myStatus = "None"
+    }
+        post.extendedLikesInfo.myStatus = myStatus
+        arrayForReturn.push(post)
+    }
+    
+    
+
+    
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn }
 }
 async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)

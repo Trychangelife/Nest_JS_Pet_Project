@@ -14,12 +14,12 @@ export class PostsService {
         @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>,
         @InjectModel('Posts') protected postsModel: Model<PostsType>) {}
 
-    async allPosts(pageSize: number, pageNumber: number,): Promise<object> {
+    async allPosts(pageSize: number, pageNumber: number, userId?: string): Promise<object> {
         let skip = 0
         if (pageNumber && pageSize) {
             skip = (pageNumber - 1) * pageSize
         }
-        return this.postsRepository.allPosts(skip, pageSize, pageNumber)
+        return this.postsRepository.allPosts(skip, pageSize, pageNumber, userId)
     }
     async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
         return await this.postsRepository.targetPosts(postId, userId)
