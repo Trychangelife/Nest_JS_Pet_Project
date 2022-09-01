@@ -24,13 +24,13 @@ export class PostsService {
     async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
         return await this.postsRepository.targetPosts(postId, userId)
     }
-    async allPostsSpecificBlogger(bloggerId: string, page?: number, pageSize?: number): Promise<object | undefined> {
+    async allPostsSpecificBlogger(bloggerId: string, page?: number, pageSize?: number, userId?: string): Promise<object | undefined> {
         let skip = 0
         if (page && pageSize) {
             skip = (page - 1) * pageSize
         }
 
-        return await this.postsRepository.allPostsSpecificBlogger(bloggerId, skip, pageSize, page)
+        return await this.postsRepository.allPostsSpecificBlogger(bloggerId, skip, pageSize, page, userId)
     }
     async releasePost(title: string, content: string, shortDescription: string, bloggerId?: string, bloggerIdUrl?: string): Promise<object | string | null> {
         const foundBlogger = await this.bloggerModel.findOne({ id: bloggerId }).lean()

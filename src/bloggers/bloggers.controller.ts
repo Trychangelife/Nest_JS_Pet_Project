@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Par
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
+import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { constructorPagination } from "src/pagination.constructor";
 import { PostsService } from "src/posts/posts.service";
 import { BloggersType, PostsType } from "src/types/types";
@@ -13,6 +14,7 @@ export class BloggerController {
     constructor(
       protected bloggerService: BloggerService, 
       protected postsService: PostsService,
+      protected jwtServiceClass: JwtServiceClass,
       @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>) {
     }
 
@@ -42,8 +44,20 @@ export class BloggerController {
     }
 
     @Get(':bloggerId/posts')
-    async getPostByBloggerID(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params) {
-      const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+    async getPostByBloggerID(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params, @Req() req) {
+      try {
+        const token = req.headers.authorization.split(' ')[1]
+        const userId = await this.jwtServiceClass.getUserByToken(token)
+        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+        const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize, userId);
+       if (findBlogger !== undefined) {
+        return findBlogger
+      }
+        else {
+        throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+      }
+      } catch (error) {
+        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
       const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize);
       if (findBlogger !== undefined) {
         return findBlogger
@@ -51,6 +65,8 @@ export class BloggerController {
       else {
         throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
       }
+      }
+      
     }
     @UseGuards(BasicAuthGuard)
     @Post()

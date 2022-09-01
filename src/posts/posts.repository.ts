@@ -99,7 +99,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
         
     }
 }
-async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number, page?: number): Promise<object | undefined> {
+async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number, page?: number, userId?: string): Promise<object | undefined> {
 
 
     const totalCount = await this.postsModel.count({ bloggerId: bloggerId })
@@ -108,8 +108,29 @@ async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number
     if (page !== undefined && pageSize !== undefined) {
         const postsBloggerWithPaginator = await this.postsModel.find({ bloggerId: bloggerId }, postViewModel).skip(skip).limit(pageSize).lean()
         const pagesCount = Math.ceil(totalCount / pageSize)
+        const arrayForReturn = []
+        const targetPostWithAggregation = await this.postsModel.aggregate([{
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+    ])
+    for (let index = 0; index < targetPostWithAggregation.length; index++) {
+        let post = targetPostWithAggregation[index]
+        const checkOnDislike = await this.postsModel.findOne({$and: [{id: post.id}, {"dislikeStorage.userId": userId}]}).lean()
+        const checkOnLike = await this.postsModel.findOne({$and: [{id: post.id}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean()
+        let myStatus = ''
+         if (checkOnLike) {
+        myStatus = "Like"
+    }
+            else if (checkOnDislike) {
+        myStatus = "Dislike"
+    }
+            else {
+        myStatus = "None"
+    }
+        post.extendedLikesInfo.myStatus = myStatus
+        arrayForReturn.push(post)
+    }
         if (page > 0 || pageSize > 0) {
-            return { pagesCount, page: page, pageSize: pageSize, totalCount, items: postsBloggerWithPaginator }
+            return { pagesCount, page: page, pageSize: pageSize, totalCount, items: arrayForReturn }
         }
         else {
             const postsBloggerWithOutPaginator = await this.postsModel.find({ bloggerId: bloggerId }).lean()
