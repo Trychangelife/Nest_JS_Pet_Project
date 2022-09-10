@@ -13,6 +13,7 @@ import { FullDeleteModule } from './Full delete/full_delete.module';
 import { MailerModule } from '@nest-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 
 const options = {
@@ -38,6 +39,16 @@ const uri:string = process.env.mongoURI
       },
     }), inject: [ConfigService]
   }), 
+  TypeOrmModule.forRoot({
+    type: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    username: 'nodejs',
+    password: 'nodejs',
+    database: 'SocialMedia',
+    autoLoadEntities: false,
+    synchronize: false,
+  }),
   ConfigModule.forRoot(),
   BloggersModule,
   PostsModule,

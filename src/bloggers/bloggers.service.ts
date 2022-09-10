@@ -2,13 +2,14 @@ import { BloggerClass, BloggersType } from "src/types/types"
 import { BloggerRepository } from "./bloggers.repository"
 import { v4 as uuidv4 } from "uuid"
 import { Injectable } from "@nestjs/common"
+import { BloggerRepositorySql } from "./bloggers.sql.repository"
 
 
 @Injectable()
 export class BloggerService { 
 
     
-    constructor (protected bloggerRepository: BloggerRepository) {
+    constructor (protected bloggerRepository: BloggerRepository, protected bloggerSqlRepository: BloggerRepositorySql) {
     }
 
     async allBloggers(pageSize: number, pageNumber: number, searchNameTerm?: string | null): Promise<object> {
@@ -21,7 +22,7 @@ export class BloggerService {
     }
     async targetBloggers(id: string): Promise<object | undefined> {
 
-        return this.bloggerRepository.targetBloggers(id)
+        return this.bloggerSqlRepository.targetBloggers(id)
     }
     async createBlogger(name: string, youtubeUrl: string): Promise<BloggersType | null> {
         // Построено на классе

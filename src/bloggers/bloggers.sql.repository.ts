@@ -1,11 +1,13 @@
 import { Injectable } from "@nestjs/common"
+import { InjectDataSource } from "@nestjs/typeorm"
 import { BloggersType } from "src/types/types"
+import { DataSource } from "typeorm"
 
 
 @Injectable()
 export class BloggerRepositorySql {
 
-    constructor() {
+    constructor(@InjectDataSource() protected dataSource: DataSource) {
         
     }
 
@@ -32,15 +34,19 @@ export class BloggerRepositorySql {
     //     }
 
     // }
-    // async targetBloggers(id: string): Promise<object | undefined> {
-    //     const blogger: BloggersType | null = await this.bloggerModel.findOne({ id: id }, modelViewBloggers)
-    //     if (blogger !== null) {
-    //         return blogger
-    //     }
-    //     else {
-    //         return
-    //     }
-    // }
+    async targetBloggers(id: string): Promise<object | undefined> {
+
+        const blogger = await this.dataSource.query(`
+        SELECT * FROM "Bloggers" WHERE id = ${id}
+        `)
+        //const blogger: BloggersType | null = await this.bloggerModel.findOne({ id: id }, modelViewBloggers)
+        if (blogger !== null) {
+            return blogger
+        }
+        else {
+            return
+        }
+    }
     // async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
     //     await this.bloggerModel.create(newBlogger)
     //     return await this.bloggerModel.findOne({ id: newBlogger.id }, modelViewBloggers)
