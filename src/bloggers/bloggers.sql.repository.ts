@@ -37,8 +37,8 @@ export class BloggerRepositorySql {
     async targetBloggers(id: string): Promise<object | undefined> {
 
         const blogger = await this.dataSource.query(`
-        SELECT * FROM "Bloggers" WHERE id = ${id}
-        `)
+        SELECT * FROM "Bloggers" WHERE id = $1
+        `, [id])
         //const blogger: BloggersType | null = await this.bloggerModel.findOne({ id: id }, modelViewBloggers)
         if (blogger !== null) {
             return blogger
