@@ -1,13 +1,8 @@
 import { Module } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
-import { bloggerSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema } from "src/db";
-import { PostRepository } from "src/posts/posts.repository";
-import { PostsService } from "src/posts/posts.service";
+import { bloggerSchema } from "src/db";
 import { BloggerController } from "./bloggers.controller";
 import { BloggerRepository } from "./bloggers.repository";
-import { BloggerRepositorySql } from "./bloggers.sql.repository";
 import { BloggerService } from "./bloggers.service";
 
 
