@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { InjectDataSource } from "@nestjs/typeorm"
+import { BloggersType } from "src/types/types"
 import { DataSource } from "typeorm"
 
 
@@ -73,18 +74,30 @@ export class BloggerRepositorySql {
             return
         }
     }
-    // async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
-    //     await this.bloggerModel.create(newBlogger)
-    //     return await this.bloggerModel.findOne({ id: newBlogger.id }, modelViewBloggers)
-    // }
+    async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
+        await this.dataSource.query(`
+        INSERT INTO "Bloggers" (name, "youtubeUrl")
+        VALUES ($1, $2)
+        `, [newBlogger.name, newBlogger.youtubeUrl])
+        const bloggerAfterCreate = await this.dataSource.query(`
+        SELECT *
+        FROM "Bloggers"
+        WHERE name = $1
+        `,[newBlogger.name])
+        return bloggerAfterCreate
+    }
     // async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
     //     const result = await this.bloggerModel.updateOne({ id: id }, { $set: { name: name, youtubeUrl: youtubeUrl } })
     //     return result.matchedCount === 1
     // }
-    // async deleteBlogger(id: string): Promise<boolean> {
-    //     const result = await this.bloggerModel.deleteOne({ id: id })
-    //     return result.deletedCount === 1
-    // }
+    async deleteBlogger(id: string): Promise<boolean> {
+        const result = await this.dataSource.query(`
+        DELETE FROM "Bloggers"
+        WHERE id = $1
+        `, [id])
+        //УДАЛЕНИЕ ПРОИСХОДИТ, но ошибка 404 падает. (НУЖНО РАЗОБРАТЬСЯ)
+        return result
+    }
     // async deleteAllBlogger(): Promise<boolean> {
     //     const afterDelete = await this.bloggerModel.deleteMany({})
     //     return afterDelete.acknowledged
