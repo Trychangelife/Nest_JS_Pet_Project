@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common"
 import { InjectDataSource } from "@nestjs/typeorm"
-import { BloggersType } from "src/types/types"
 import { DataSource } from "typeorm"
 
 
