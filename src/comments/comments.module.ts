@@ -10,8 +10,12 @@ import { CommentsRepository } from "./comments.repository";
 import { CommentsService } from "./comments.service";
 
 @Module({
-    imports: [UsersModule ,MongooseModule.forFeature([{name: 'Comments', schema: commentsSchema}, {name: 'RefreshToken', schema: refreshTokenSchema}, {name: 'Users', schema: usersSchema}])],
+    imports: [UsersModule ,MongooseModule.forFeature([{name: 'Comments', schema: commentsSchema}, 
+    //{name: 'RefreshToken', schema: refreshTokenSchema}, {name: 'Users', schema: usersSchema}
+  ])],
     controllers: [CommentsController],
-    providers: [CommentsRepository, CommentsService, JwtServiceClass, JwtAuthGuard, JwtService, UsersModule],
+    providers: [CommentsRepository, CommentsService, 
+      //JwtServiceClass, JwtAuthGuard, JwtService, UsersModule
+    ],
   })
   export class CommentsModule {}

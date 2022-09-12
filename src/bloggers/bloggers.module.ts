@@ -14,8 +14,12 @@ import { BloggerService } from "./bloggers.service";
 
 
 @Module({
-    imports: [MongooseModule.forFeature([{name: 'Blogger', schema: bloggerSchema}, {name: 'Posts', schema: postSchema}, {name: 'Comments', schema: commentsSchema}, {name: 'Users', schema: usersSchema}, {name: 'RefreshToken', schema: refreshTokenSchema}])],
+    imports: [MongooseModule.forFeature([{name: 'Blogger', schema: bloggerSchema}, 
+    //{name: 'Posts', schema: postSchema}, {name: 'Comments', schema: commentsSchema}, {name: 'Users', schema: usersSchema}, {name: 'RefreshToken', schema: refreshTokenSchema}
+  ])],
     controllers: [BloggerController],
-    providers: [BloggerRepository, BloggerRepositorySql ,BloggerService, PostsService, PostRepository, JwtServiceClass, JwtService],
+    providers: [BloggerRepository, BloggerService
+      //, PostsService, PostRepository, JwtServiceClass, JwtService
+    ]
   })
   export class BloggersModule {}

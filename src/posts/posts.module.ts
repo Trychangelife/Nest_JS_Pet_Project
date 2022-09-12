@@ -17,12 +17,15 @@ import { PostsService } from "./posts.service";
 
 @Module({
     imports: [UsersModule, AuthModule, BloggersModule, MongooseModule.forFeature([
-    {name: 'Posts', schema: postSchema},
-    {name: 'Blogger', schema: bloggerSchema}, 
-    {name: 'Comments', schema: commentsSchema},
-    {name: 'RefreshToken', schema: refreshTokenSchema},
-    {name: 'Users', schema: usersSchema}])],
+    //{name: 'Posts', schema: postSchema},
+    //{name: 'Blogger', schema: bloggerSchema}, 
+    //{name: 'Comments', schema: commentsSchema},
+    //{name: 'RefreshToken', schema: refreshTokenSchema},
+    //{name: 'Users', schema: usersSchema}
+  ])],
     controllers: [PostController],
-    providers: [PostRepository, PostsService, BloggerRepository, BloggerRepositorySql,BloggerService, JwtService, JwtServiceClass],
+    providers: [PostRepository, PostsService, 
+      //BloggerRepository,BloggerService, JwtService, JwtServiceClass
+    ],
   })
   export class PostsModule {}
