@@ -11,29 +11,55 @@ export class BloggerRepositorySql {
         
     }
 
-    // async allBloggers(skip: number, limit?: number, searchNameTerm?: string | null, page?: number): Promise<object> {
-    //     if (page !== undefined && limit !== undefined) {
-    //         const cursor = await this.bloggerModel.find({}, modelViewBloggers).skip(skip).limit(limit)
-    //         const totalCount = await this.bloggerModel.count({})
-    //         const pagesCount = Math.ceil(totalCount / limit)
-    //         const fullData = await this.bloggerModel.find({}, modelViewBloggers)
+    async allBloggers(skip: number, limit?: number, searchNameTerm?: string | null, page?: number): Promise<object> {
+        const totalCount = await this.dataSource.query(`SELECT COUNT(*) FROM "Bloggers"`)
+        const keys = Object.keys(totalCount)
+        const pagesCount = Math.ceil(totalCount[keys[0]].count / limit)
+        if (searchNameTerm !== null) {
+            const getAllBloggers = await this.dataSource.query(
+                `
+                SELECT * 
+                FROM "Bloggers"
+                WHERE name LIKE '${'%'+ searchNameTerm + '%'}'
+                ORDER BY id
+                LIMIT $1 OFFSET $2
+                `
+            , [limit, skip])
+            return { pagesCount, page: page, pageSize: limit, totalCount: parseInt(totalCount[keys[0]].count) , items: getAllBloggers }
+        }
+        else {
+        const getAllBloggers = await this.dataSource.query(
+            `
+            SELECT * 
+            FROM "Bloggers"
+            ORDER BY id
+            LIMIT $1 OFFSET $2
+            `
+        , [limit, skip])
+        return { pagesCount, page: page, pageSize: limit, totalCount: parseInt(totalCount[keys[0]].count) , items: getAllBloggers }
+    }
+        // if (page !== undefined && limit !== undefined) {
+        //     const cursor = await this.bloggerModel.find({}, modelViewBloggers).skip(skip).limit(limit)
+        //     const totalCount = await this.bloggerModel.count({})
+        //     const pagesCount = Math.ceil(totalCount / limit)
+        //     const fullData = await this.bloggerModel.find({}, modelViewBloggers)
 
-    //         if (searchNameTerm !== null) {
-    //             const cursorWithRegEx = await this.bloggerModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers).skip(skip).limit(limit)
-    //             const totalCountWithRegex = cursorWithRegEx.length
-    //             const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
-    //             return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
-    //         }
-    //         if (skip > 0 || limit > 0) {
-    //             return { pagesCount, page: page, pageSize: limit, totalCount, items: cursor }
-    //         }
-    //         else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
-    //     }
-    //     else {
-    //         return await this.bloggerModel.find({}, modelViewBloggers)
-    //     }
+        //     if (searchNameTerm !== null) {
+        //         const cursorWithRegEx = await this.bloggerModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers).skip(skip).limit(limit)
+        //         const totalCountWithRegex = cursorWithRegEx.length
+        //         const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
+        //         return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
+        //     }
+        //     if (skip > 0 || limit > 0) {
+        //         return { pagesCount, page: page, pageSize: limit, totalCount, items: cursor }
+        //     }
+        //     else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
+        // }
+        // else {
+        //     return await this.bloggerModel.find({}, modelViewBloggers)
+        // }
 
-    // }
+    }
     async targetBloggers(id: string): Promise<object | undefined> {
 
         const blogger = await this.dataSource.query(
