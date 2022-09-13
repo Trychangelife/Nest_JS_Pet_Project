@@ -38,28 +38,7 @@ export class BloggerRepositorySql {
         , [limit, skip])
         return { pagesCount, page: page, pageSize: limit, totalCount: parseInt(totalCount[keys[0]].count) , items: getAllBloggers }
     }
-        // if (page !== undefined && limit !== undefined) {
-        //     const cursor = await this.bloggerModel.find({}, modelViewBloggers).skip(skip).limit(limit)
-        //     const totalCount = await this.bloggerModel.count({})
-        //     const pagesCount = Math.ceil(totalCount / limit)
-        //     const fullData = await this.bloggerModel.find({}, modelViewBloggers)
-
-        //     if (searchNameTerm !== null) {
-        //         const cursorWithRegEx = await this.bloggerModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers).skip(skip).limit(limit)
-        //         const totalCountWithRegex = cursorWithRegEx.length
-        //         const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
-        //         return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
-        //     }
-        //     if (skip > 0 || limit > 0) {
-        //         return { pagesCount, page: page, pageSize: limit, totalCount, items: cursor }
-        //     }
-        //     else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
-        // }
-        // else {
-        //     return await this.bloggerModel.find({}, modelViewBloggers)
-        // }
-
-    }
+     }
     async targetBloggers(id: string): Promise<object | undefined> {
 
         const blogger = await this.dataSource.query(
@@ -75,31 +54,49 @@ export class BloggerRepositorySql {
         }
     }
     async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
-        await this.dataSource.query(`
+        const bloggerAfterCreate = await this.dataSource.query(`
         INSERT INTO "Bloggers" (name, "youtubeUrl")
         VALUES ($1, $2)
+        RETURNING *
         `, [newBlogger.name, newBlogger.youtubeUrl])
-        const bloggerAfterCreate = await this.dataSource.query(`
-        SELECT *
-        FROM "Bloggers"
-        WHERE name = $1
-        `,[newBlogger.name])
         return bloggerAfterCreate
     }
-    // async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
-    //     const result = await this.bloggerModel.updateOne({ id: id }, { $set: { name: name, youtubeUrl: youtubeUrl } })
-    //     return result.matchedCount === 1
-    // }
-    async deleteBlogger(id: string): Promise<boolean> {
-        const result = await this.dataSource.query(`
-        DELETE FROM "Bloggers"
+    async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
+
+        const update = await this.dataSource.query(`
+        UPDATE "Bloggers"
+        SET name = $2, "youtubeUrl" = $3
         WHERE id = $1
-        `, [id])
-        //УДАЛЕНИЕ ПРОИСХОДИТ, но ошибка 404 падает. (НУЖНО РАЗОБРАТЬСЯ)
-        return result
+        RETURNING *
+        `,[id, name,youtubeUrl])
+
+        if (update[0][0].name === name && update[0][0].youtubeUrl === youtubeUrl) {
+            return true
+        }
+        else {
+            return false
+        }
+        
     }
-    // async deleteAllBlogger(): Promise<boolean> {
-    //     const afterDelete = await this.bloggerModel.deleteMany({})
-    //     return afterDelete.acknowledged
-    // }
+    async deleteBlogger(id: string): Promise<boolean> {
+        const findUserAfterDelete = await this.dataSource.query(`SELECT id, name, "youtubeUrl" FROM "Bloggers" WHERE id = $1`,[id])
+        if (findUserAfterDelete.length < 1) {
+            return false
+        }
+        else {
+            await this.dataSource.query(`DELETE FROM "Bloggers" WHERE id = $1`, [id])
+            return true
+        }
+    }
+    async deleteAllBlogger(): Promise<boolean> {
+        await this.dataSource.query(`TRUNCATE TABLE "Bloggers"`)
+        const checkTableAfterFullClear = await this.dataSource.query(`SELECT COUNT(*) FROM "Bloggers"`)
+        if (checkTableAfterFullClear > 1) {
+            return false
+        }
+        else {
+            return true
+        }
+        
+    }
 }

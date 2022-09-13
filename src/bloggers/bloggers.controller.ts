@@ -21,7 +21,12 @@ export class BloggerController {
     @Delete('/del')
     async deleteAllBlogger() {
       const afterDelete = await this.bloggerService.deleteAllBlogger();
-      return afterDelete
+      if (afterDelete) {
+        return HttpStatus.OK
+      }
+      else {
+        return HttpStatus.BAD_REQUEST
+      }
     }
 
     @Get()
