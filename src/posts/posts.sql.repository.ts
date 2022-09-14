@@ -1,8 +1,10 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
+import { InjectDataSource } from "@nestjs/typeorm"
 import { Aggregate, Model } from "mongoose"
 import { LikesDTO } from "src/comments/comments.controller"
 import { BloggersType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
+import { DataSource } from "typeorm"
 
 export const postViewModel = {
     _id: 0,
@@ -27,10 +29,16 @@ export const commentsVievModel = {
 @Injectable()
 export class PostsRepositorySql {
 
-    constructor () {
+    constructor (@InjectDataSource() protected dataSource: DataSource) {
 
     }
-// async allPosts(skip: number, limit: number, page?: number, userId?: string): Promise<object> {
+async allPosts(skip: number, limit: number, page?: number, userId?: string): Promise<object> {
+    const totalCount = await this.dataSource.query(`SELECT COUNT (*) FROM "Posts"`)
+    const keys = Object.keys(totalCount)
+    const pagesCount = Math.ceil(totalCount[keys[0]].count / limit)
+    const getAllPosts = await this.dataSource.query(`SELECT * FROM "Posts" ORDER BY id LIMIT $1 OFFSET $2`, [limit, skip])
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: parseInt(totalCount[keys[0]].count), items: getAllPosts }
+}
 //     const totalCount = await this.postsModel.count({})
 //     const pagesCount = Math.ceil(totalCount / limit)
 //     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
@@ -55,13 +63,11 @@ export class PostsRepositorySql {
 //     }
 //         post.extendedLikesInfo.myStatus = myStatus
 //         arrayForReturn.push(post)
-//     }
-    
-    
-
-    
+//     }    
 //     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn }
 // }
+
+
 // async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
 //     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
 //     const checkOnDislike = (await this.postsModel.findOne({$and: [{id: postId}, {"dislikeStorage.userId": userId}]}).lean())
@@ -137,14 +143,17 @@ export class PostsRepositorySql {
 
 //     }
 // }
-// async releasePost(newPosts: PostsType, bloggerId: string, bloggerIdUrl?: string): Promise<object | string> {
-//     const findBlogger = await this.bloggerModel.count({ id: bloggerId })
-//     if (findBlogger < 1) { return "400" }
-//     await this.postsModel.create(newPosts)
-//     const result: PostsType | null = await this.postsModel.findOne({ id: newPosts.id }, postViewModel).lean()
-//     if (result !== null) { return result }
-//     else { return "400" }
-// }
+async releasePost(newPosts: PostsType, bloggerId: string, bloggerIdUrl?: string): Promise<object | string> {
+    const findBlogger = await this.dataSource.query(`SELECT id FROM "Bloggers" WHERE id = $1`, [bloggerId])
+    if (findBlogger.length < 1) { return "400" }
+    const result = await this.dataSource.query(`
+    INSERT INTO "Posts" (title, "shortDescription", content, "bloggerId", "bloggerName")
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+    `,[newPosts.title, newPosts.shortDescription, newPosts.content, bloggerId, newPosts.bloggerName])
+    if (result !== null) { return result }
+    else { return "400" }
+}
 // async changePost(postId: string, title: string, shortDescription: string, content: string, bloggerId: string): Promise<string | object> {
 
 //     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()

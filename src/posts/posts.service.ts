@@ -1,10 +1,13 @@
+import 'dotenv/config'
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { BloggersType, Comments, CommentsType, LIKES, Post, PostsType } from "src/types/types"
 import { PostRepository } from "./posts.repository"
 import { v4 as uuidv4 } from "uuid"
-import { LikesDTO } from "src/comments/comments.controller"
+import { DataSource } from 'typeorm'
+import { InjectDataSource } from '@nestjs/typeorm'
+
 
 @Injectable()
 export class PostsService {
@@ -12,7 +15,8 @@ export class PostsService {
     constructor (
         protected postsRepository: PostRepository, 
         @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>,
-        @InjectModel('Posts') protected postsModel: Model<PostsType>) {}
+        @InjectModel('Posts') protected postsModel: Model<PostsType>,
+        @InjectDataSource() protected dataSource: DataSource) {}
 
     async allPosts(pageSize: number, pageNumber: number, userId?: string): Promise<object> {
         let skip = 0
@@ -33,6 +37,19 @@ export class PostsService {
         return await this.postsRepository.allPostsSpecificBlogger(bloggerId, skip, pageSize, page, userId)
     }
     async releasePost(title: string, content: string, shortDescription: string, bloggerId?: string, bloggerIdUrl?: string): Promise<object | string | null> {
+        //ДЛЯ БАЗЫ SQL
+        if (process.env.USE_DATABASE === "SQL") {
+            const foundBlogger = await this.dataSource.query(`SELECT * FROM "Bloggers" WHERE id = $1`, [bloggerId])
+        if (foundBlogger.length >= 1 && bloggerId) {
+            // Построено на классе
+            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger[0].name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            console.log(newPost)
+            return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
+        }
+        else { return null }
+        }
+        // ДЛЯ БАЗЫ MONGO
+        else {
         const foundBlogger = await this.bloggerModel.findOne({ id: bloggerId }).lean()
         const foundBloggerW = await this.bloggerModel.findOne({ id: bloggerIdUrl }).lean()
         if (bloggerIdUrl && foundBloggerW !== null) {
@@ -48,6 +65,7 @@ export class PostsService {
             return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
         }
         else { return null }
+    }
     }
     async changePost(postId: string, title: string, shortDescription: string, content: string, bloggerId: string): Promise<string | object> {
 
