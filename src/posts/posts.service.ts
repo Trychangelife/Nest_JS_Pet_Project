@@ -37,18 +37,18 @@ export class PostsService {
         return await this.postsRepository.allPostsSpecificBlogger(bloggerId, skip, pageSize, page, userId)
     }
     async releasePost(title: string, content: string, shortDescription: string, bloggerId?: string, bloggerIdUrl?: string): Promise<object | string | null> {
-        //ДЛЯ БАЗЫ SQL
+        //FOR SQL DATABASE
         if (process.env.USE_DATABASE === "SQL") {
             const foundBlogger = await this.dataSource.query(`SELECT * FROM "Bloggers" WHERE id = $1`, [bloggerId])
         if (foundBlogger.length >= 1 && bloggerId) {
-            // Построено на классе
+            // CREATE ON CLASS
             const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger[0].name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
             console.log(newPost)
             return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
         }
         else { return null }
         }
-        // ДЛЯ БАЗЫ MONGO
+        // FOR MONGO DATABASE
         else {
         const foundBlogger = await this.bloggerModel.findOne({ id: bloggerId }).lean()
         const foundBloggerW = await this.bloggerModel.findOne({ id: bloggerIdUrl }).lean()
@@ -78,7 +78,7 @@ export class PostsService {
     async createCommentForSpecificPost(postId: string, content: string, userId: string, userLogin: string): Promise<CommentsType | boolean> {
         const foundPost = await this.postsModel.findOne({ id: postId })
         if(foundPost) {
-        // Построено на классе
+        // CREATE ON CLASS
         const createdComment = new Comments(uuidv4(), content, userId, userLogin, (new Date()).toString(), postId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
         return this.postsRepository.createCommentForSpecificPost(createdComment)
     }
