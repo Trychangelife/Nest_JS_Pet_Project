@@ -1,7 +1,7 @@
 require('dotenv').config({ path: `../${process.env.NODE_ENV}.env` })
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
+import  cookieParser from 'cookie-parser';
 // import { HttpExceptionFilter } from './exception_filters/exception_filter';
 import { BadRequestException, HttpStatus, NotFoundException, ParseUUIDPipe, ValidationPipe } from '@nestjs/common';
 
