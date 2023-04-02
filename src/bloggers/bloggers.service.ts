@@ -1,8 +1,8 @@
-import { BloggerClass, BloggersType } from "src/types/types"
+import { BloggerClass, BloggersType } from "../types/types"
 import { BloggerRepository } from "./bloggers.repository"
 import { v4 as uuidv4 } from "uuid"
 import { Injectable, Scope } from "@nestjs/common"
-import { BloggerRepositorySql } from "./bloggers.sql.repository"
+
 
 
 @Injectable({ scope: Scope.TRANSIENT })

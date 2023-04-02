@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { BloggersType } from "src/types/types"
+import { BloggersType } from "../types/types"
 
 const modelViewBloggers = {
     _id: 0,

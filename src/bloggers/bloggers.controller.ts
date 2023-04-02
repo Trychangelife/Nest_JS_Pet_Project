@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
-import { PostsService } from "src/posts/posts.service";
+import { JwtServiceClass } from "../Auth_guards/jwt.service";
+import { PostsService } from "../posts/posts.service";
 import { BloggerService } from "./bloggers.service";
-import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
-import { constructorPagination } from "src/pagination.constructor";
+import { BasicAuthGuard } from "../Auth_guards/basic_auth_guard";
+import { constructorPagination } from "../pagination.constructor";
 import { BloggersType, PostsType } from "../types/types";
 
 @Controller('bloggers')
