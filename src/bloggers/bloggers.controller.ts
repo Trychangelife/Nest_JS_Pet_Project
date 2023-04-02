@@ -6,7 +6,7 @@ import { PostsService } from "src/posts/posts.service";
 import { BloggerService } from "./bloggers.service";
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 import { constructorPagination } from "src/pagination.constructor";
-import { BloggersType, PostsType } from "src/types/types";
+import { BloggersType, PostsType } from "../types/types";
 
 @Controller('bloggers')
 export class BloggerController {
