@@ -2,11 +2,11 @@ import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Par
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
-import { constructorPagination } from "src/pagination.constructor";
 import { PostsService } from "src/posts/posts.service";
 import { BloggersType, PostsType } from "src/types/types";
 import { BloggerService } from "./bloggers.service";
 import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
+import { constructorPagination } from "src/pagination.constructor";
 
 @Controller('bloggers')
 export class BloggerController {
