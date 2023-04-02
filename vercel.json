@@ -1,6 +1,5 @@
 {
     "version": 2,
-    "name": "nest-js-pet-project2",
     "builds": [
       {
         "src": "src/main.ts",
