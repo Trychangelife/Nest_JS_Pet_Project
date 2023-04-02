@@ -64,5 +64,5 @@ export class BloggerRepository {
     async deleteAllBlogger(): Promise<boolean> {
         const afterDelete = await this.bloggerModel.deleteMany({})
         return afterDelete.acknowledged
-    }
+    } 
 }
