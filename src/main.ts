@@ -5,7 +5,7 @@ import  cookieParser from 'cookie-parser';
 // import { HttpExceptionFilter } from './exception_filters/exception_filter';
 import { BadRequestException, HttpStatus, NotFoundException, ParseUUIDPipe, ValidationPipe } from '@nestjs/common';
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.use(cookieParser());
