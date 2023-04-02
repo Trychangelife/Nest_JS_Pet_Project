@@ -16,7 +16,8 @@ export class PostsService {
         protected postsRepository: PostRepository, 
         @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>,
         @InjectModel('Posts') protected postsModel: Model<PostsType>,
-        @InjectDataSource() protected dataSource: DataSource) {}
+        @InjectDataSource() protected dataSource: DataSource
+        ) {}
 
     async allPosts(pageSize: number, pageNumber: number, userId?: string): Promise<object> {
         let skip = 0

@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import 'dotenv/config'
 import { MongooseModule } from '@nestjs/mongoose';
+import { Module } from '@nestjs/common';
 import { ServerApiVersion } from 'mongodb';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import 'dotenv/config'
 import { BloggersModule } from './bloggers/bloggers.module';
 import { CommentsModule } from './comments/comments.module';
 import { PostsModule } from './posts/posts.module';
@@ -37,6 +37,7 @@ import { EmailManager } from './email/email.manager';
 import { EmailAdapter } from './email/email.adapter';
 
 
+
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -68,7 +69,7 @@ const uri:string = process.env.mongoURI
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DATABASE_NAME,
     autoLoadEntities: false,
-    synchronize: false,
+    synchronize: true,
   }),
   ConfigModule.forRoot({
     isGlobal: true,
