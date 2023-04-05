@@ -65,6 +65,7 @@ const uri:string = process.env.mongoURI
     url: process.env.DATABASE_URL,
     autoLoadEntities: false,
     synchronize: true,
+    ssl: true,
   }),
   ConfigModule.forRoot({
     isGlobal: true,
