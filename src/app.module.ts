@@ -29,6 +29,8 @@ import { UsersRepository } from './users/users.repository';
 import { CommentsRepository } from './comments/comments.repository';
 import { EmailManager } from './email/email.manager';
 import { EmailAdapter } from './email/email.adapter';
+import { FullDataController } from './Full delete/full_delete.controller';
+import { FullDeleteModule } from './Full delete/full_delete.module';
 
 
 
@@ -89,7 +91,7 @@ const uri:string = process.env.mongoURI
         expiresIn: '24h'
     }
 })],
-  controllers: [AppController, BloggerController, PostController, UsersController, AuthController, CommentsController],
+  controllers: [AppController, BloggerController, PostController, UsersController, AuthController, CommentsController, FullDataController],
   providers: [AppService, 
     BloggerService, 
     {provide: BloggerRepository, useClass: process.env.USE_DATABASE === 'SQL' ? BloggerRepositorySql : BloggerRepository}
@@ -99,7 +101,7 @@ const uri:string = process.env.mongoURI
     UsersService, UsersRepository,
     AuthService,
     CommentsService, CommentsRepository,
-    EmailService, EmailManager, EmailAdapter
+    EmailService, EmailManager, EmailAdapter, FullDeleteModule
 ]
 })
 export class AppModule {}

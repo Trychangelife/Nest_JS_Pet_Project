@@ -3,7 +3,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { authDataSchema, bloggerSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";
 import { PostRepository } from "src/posts/posts.repository";
 import { PostsService } from "src/posts/posts.service";
-import { FullData } from "./full_delete.controller";
+import { FullDataController } from "./full_delete.controller";
 
 
 
@@ -20,7 +20,7 @@ import { FullData } from "./full_delete.controller";
         {name: 'EmailSend', schema: emailSendSchema},
         {name: 'RefreshToken', schema: refreshTokenSchema},
     ])],
-    controllers: [FullData],
+    controllers: [FullDataController],
     providers: [],
   })
   export class FullDeleteModule {}

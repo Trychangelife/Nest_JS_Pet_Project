@@ -4,7 +4,7 @@ import { Model } from "mongoose";
 import { AuthDataType, BloggersType, CommentsType, ConfirmedAttemptDataType, EmailSendDataType, PostsType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "src/types/types";
 
 @Controller('testing')
-export class FullData {
+export class FullDataController {
 
     constructor (
         @InjectModel('Posts') protected postsModel: Model<PostsType>, 
@@ -19,7 +19,7 @@ export class FullData {
     ) {
 
     }
-    @Delete('/testing/all-data')
+    @Delete('all-data')
     async deleteAllData () {
         await this.postsModel.deleteMany()
         await this.bloggerModel.deleteMany()
