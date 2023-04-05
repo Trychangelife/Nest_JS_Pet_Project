@@ -62,6 +62,7 @@ const uri:string = process.env.mongoURI
     username: process.env.POSTGRES_USERNAME,
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DATABASE_NAME,
+    url: process.env.DATABASE_URL,
     autoLoadEntities: false,
     synchronize: true,
   }),
