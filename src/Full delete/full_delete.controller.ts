@@ -19,7 +19,7 @@ export class FullData {
     ) {
 
     }
-    @Delete('all-data')
+    @Delete('/testing/all-data')
     async deleteAllData () {
         await this.postsModel.deleteMany()
         await this.bloggerModel.deleteMany()
