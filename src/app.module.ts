@@ -8,15 +8,15 @@ import { MailerModule } from '@nest-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BloggerRepositorySql } from './bloggers/bloggers.sql.repository';
-import { BloggerRepository } from './bloggers/bloggers.repository';
+import { BlogsRepositorySql } from './bloggers/bloggers.sql.repository';
+import { BlogsRepository } from './bloggers/bloggers.repository';
 import { PostRepository } from './posts/posts.repository';
 import { PostsRepositorySql } from './posts/posts.sql.repository';
-import { BloggerController } from './bloggers/bloggers.controller';
+import { BlogsController } from './bloggers/bloggers.controller';
 import { PostController } from './posts/posts.controller';
-import { BloggerService } from './bloggers/bloggers.service';
+import { BlogsService } from './bloggers/bloggers.service';
 import { PostsService } from './posts/posts.service';
-import { authDataSchema, bloggerSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema, registrationDataSchema, emailSendSchema, codeConfirmSchema } from './db';
+import { authDataSchema, blogsSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema, registrationDataSchema, emailSendSchema, codeConfirmSchema } from './db';
 import { UsersService } from './users/users.service';
 import { AuthService } from './auth/auth.service';
 import { CommentsService } from './comments/comments.service';
@@ -75,7 +75,7 @@ const uri:string = process.env.mongoURI
   }),
   MongooseModule.forRoot(uri, options),
   MongooseModule.forFeature([
-    {name: 'Blogger', schema: bloggerSchema}, 
+    {name: 'Blogs', schema: blogsSchema}, 
     {name: 'Posts', schema: postSchema}, 
     {name: 'Comments', schema: commentsSchema}, 
     {name: 'Users', schema: usersSchema}, 
@@ -91,10 +91,10 @@ const uri:string = process.env.mongoURI
         expiresIn: '24h'
     }
 })],
-  controllers: [AppController, BloggerController, PostController, UsersController, AuthController, CommentsController, FullDataController],
+  controllers: [AppController, BlogsController, PostController, UsersController, AuthController, CommentsController, FullDataController],
   providers: [AppService, 
-    BloggerService, 
-    {provide: BloggerRepository, useClass: process.env.USE_DATABASE === 'SQL' ? BloggerRepositorySql : BloggerRepository}
+    BlogsService, 
+    {provide: BlogsRepository, useClass: process.env.USE_DATABASE === 'SQL' ? BlogsRepositorySql : BlogsRepository}
     ,PostsService,
     {provide: PostRepository, useClass: process.env.USE_DATABASE === 'SQL' ? PostsRepositorySql: PostRepository},
     JwtServiceClass,

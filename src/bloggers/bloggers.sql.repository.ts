@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common"
 import { InjectDataSource } from "@nestjs/typeorm"
-import { BloggersType } from "src/types/types"
+import { BlogsType } from "src/types/types"
 import { DataSource } from "typeorm"
 
 
 @Injectable()
-export class BloggerRepositorySql {
+export class BlogsRepositorySql {
 
     constructor(@InjectDataSource() protected dataSource: DataSource) {
         
@@ -53,24 +53,24 @@ export class BloggerRepositorySql {
             return
         }
     }
-    async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
+    async createBlogger(newBlogger: BlogsType): Promise<BlogsType | null> {
         const bloggerAfterCreate = await this.dataSource.query(`
-        INSERT INTO "Bloggers" (name, "youtubeUrl")
+        INSERT INTO "Bloggers" (name, "websiteUrl")
         VALUES ($1, $2)
         RETURNING *
-        `, [newBlogger.name, newBlogger.youtubeUrl])
+        `, [newBlogger.name, newBlogger.websiteUrl])
         return bloggerAfterCreate
     }
-    async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
+    async changeBlogger(id: string, name: any, websiteUrl: string): Promise<boolean> {
 
         const update = await this.dataSource.query(`
         UPDATE "Bloggers"
-        SET name = $2, "youtubeUrl" = $3
+        SET name = $2, "websiteUrl" = $3
         WHERE id = $1
         RETURNING *
-        `,[id, name,youtubeUrl])
+        `,[id, name,websiteUrl])
 
-        if (update[0][0].name === name && update[0][0].youtubeUrl === youtubeUrl) {
+        if (update[0][0].name === name && update[0][0].websiteUrl === websiteUrl) {
             return true
         }
         else {
@@ -79,7 +79,7 @@ export class BloggerRepositorySql {
         
     }
     async deleteBlogger(id: string): Promise<boolean> {
-        const findUserAfterDelete = await this.dataSource.query(`SELECT id, name, "youtubeUrl" FROM "Bloggers" WHERE id = $1`,[id])
+        const findUserAfterDelete = await this.dataSource.query(`SELECT id, name, "websiteUrl" FROM "Bloggers" WHERE id = $1`,[id])
         if (findUserAfterDelete.length < 1) {
             return false
         }

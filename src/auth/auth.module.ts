@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { UsersRepository } from "src/users/users.repository";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { authDataSchema, bloggerSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";
+import { authDataSchema, blogsSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UsersService } from "src/users/users.service";
 import { EmailService } from "src/email/email.service";

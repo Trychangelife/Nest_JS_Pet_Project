@@ -3,24 +3,24 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtServiceClass } from "../Auth_guards/jwt.service";
 import { PostsService } from "../posts/posts.service";
-import { BloggerService } from "./bloggers.service";
+import { BlogsService } from "./bloggers.service";
 import { BasicAuthGuard } from "../Auth_guards/basic_auth_guard";
 import { constructorPagination } from "../pagination.constructor";
-import { BloggersType, PostsType } from "../types/types";
+import { BlogsType, PostsType } from "../types/types";
 
-@Controller('bloggers')
-export class BloggerController {
+@Controller('blogs')
+export class BlogsController {
     
     constructor(
-      protected bloggerService: BloggerService, 
+      protected blogsService: BlogsService, 
       protected postsService: PostsService,
       protected jwtServiceClass: JwtServiceClass,
-      @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>) {
+      @InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
     }
 
     @Delete('/del')
-    async deleteAllBlogger() {
-      const afterDelete = await this.bloggerService.deleteAllBlogger();
+    async deleteAllBlogs() {
+      const afterDelete = await this.blogsService.deleteAllBlogs();
       if (afterDelete) {
         return HttpStatus.OK
       }
@@ -33,13 +33,13 @@ export class BloggerController {
     async getAllBloggers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
       const searchNameTerm = typeof query.SearchNameTerm === 'string' ? query.SearchNameTerm : null;
       const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
-      const full: object = await this.bloggerService.allBloggers(paginationData.pageSize, paginationData.pageNumber, searchNameTerm);
+      const full: object = await this.blogsService.allBloggers(paginationData.pageSize, paginationData.pageNumber, searchNameTerm);
       return full
     }
 
     @Get(':id')
     async getBloggerById(@Param('id') id: string) {
-      const findBlogger: object | undefined = await this.bloggerService.targetBloggers(id);
+      const findBlogger: object | undefined = await this.blogsService.targetBloggers(id);
         if (findBlogger !== undefined) {
             return findBlogger
         }
@@ -75,9 +75,9 @@ export class BloggerController {
     }
     @UseGuards(BasicAuthGuard)
     @Post()
-    async createBlogger(@Body() bloggersType: BloggersType) {
+    async createBlogger(@Body() bloggersType: BlogsType) {
   
-      const createrPerson: BloggersType | null = await this.bloggerService.createBlogger(bloggersType.name, bloggersType.youtubeUrl);
+      const createrPerson: BlogsType | null = await this.blogsService.createBlogger(bloggersType.name, bloggersType.websiteUrl, bloggersType.description );
       if (createrPerson !== null) {
         return createrPerson
       }
@@ -88,17 +88,17 @@ export class BloggerController {
   
     @Post(':id/posts')
     async createPostByBloggerId(@Param() params, @Body() post: PostsType) {
-      const blogger = await this.bloggerModel.count({ id: params.id }); 
+      const blogger = await this.blogsModel.count({ id: params.id }); 
       if (blogger < 1) { throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND) }
   
       const createPostForSpecificBlogger: string | object | null = await this.postsService.releasePost(post.title, post.content, post.shortDescription, post.bloggerId, params.id);
       return createPostForSpecificBlogger;
   
     }
-
+ 
     @Put(':id')
-    async updateBlogger(@Param() params, @Body() bloggersType: BloggersType) {
-      const alreadyChanges: string = await this.bloggerService.changeBlogger(params.id, bloggersType.name, bloggersType.youtubeUrl);
+    async updateBlogger(@Param() params, @Body() bloggersType: BlogsType) {
+      const alreadyChanges: string = await this.blogsService.changeBlogs(params.id, bloggersType.name, bloggersType.websiteUrl);
       if (alreadyChanges === 'update') {
         throw new HttpException('Update succefully', HttpStatus.NO_CONTENT)
       }
@@ -109,7 +109,7 @@ export class BloggerController {
 
     @Delete(':id')
     async deleteOneBlogger(@Param() params) {
-      const afterDelete = await this.bloggerService.deleteBlogger(params.id);
+      const afterDelete = await this.blogsService.deleteBlogger(params.id);
       if (afterDelete === "204") {
         throw new HttpException('Delete succefully',HttpStatus.NO_CONTENT)
       }

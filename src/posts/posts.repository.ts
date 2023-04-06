@@ -2,7 +2,7 @@ import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Aggregate, Model } from "mongoose"
 import { LikesDTO } from "src/comments/comments.controller"
-import { BloggersType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
+import { BlogsType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
 
 export const postViewModel = {
     _id: 0,
@@ -29,7 +29,7 @@ export class PostRepository {
 
     constructor (
     @InjectModel('Posts') protected postsModel: Model<PostsType>, 
-    @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>, 
+    @InjectModel('Blogs') protected bloggerModel: Model<BlogsType>, 
     @InjectModel('Comments') protected commentsModel: Model<CommentsType>,
     @InjectModel('Users') protected usersModel: Model<UsersType>) {
 

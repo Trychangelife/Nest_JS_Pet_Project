@@ -1,15 +1,16 @@
-import { BloggerClass, BloggersType } from "../types/types"
-import { BloggerRepository } from "./bloggers.repository"
+
+import { BlogsRepository } from "./bloggers.repository"
 import { v4 as uuidv4 } from "uuid"
 import { Injectable, Scope } from "@nestjs/common"
+import { BlogsClass, BlogsType } from "src/types/types"
 
 
 
 @Injectable({ scope: Scope.TRANSIENT })
-export class BloggerService { 
+export class BlogsService { 
 
     
-    constructor (protected bloggerRepository: BloggerRepository) {
+    constructor (protected bloggerRepository: BlogsRepository) {
     }
 
     async allBloggers(pageSize: number, pageNumber: number, searchNameTerm?: string | null): Promise<object> {
@@ -24,14 +25,14 @@ export class BloggerService {
 
         return this.bloggerRepository.targetBloggers(id)
     }
-    async createBlogger(name: string, youtubeUrl: string): Promise<BloggersType | null> {
+    async createBlogger(name: string, websiteUrl: string, description: string): Promise<BlogsType | null> {
         // Построено на классе
-        const newBlogger = new BloggerClass(uuidv4(), name, youtubeUrl)
-        const createdBlogger = await this.bloggerRepository.createBlogger(newBlogger)
-        return createdBlogger
+        const newBlogs = new BlogsClass(uuidv4(), name, description, websiteUrl, new Date(), true)
+        const createdBlogs = await this.bloggerRepository.createBlogger(newBlogs)
+        return createdBlogs
     }
-    async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<string> {
-        const afterUpdate = await this.bloggerRepository.changeBlogger(id, name, youtubeUrl)
+    async changeBlogs(id: string, name: any, websiteUrl: string): Promise<string> {
+        const afterUpdate = await this.bloggerRepository.changeBlogger(id, name, websiteUrl)
         if (afterUpdate == true) {
             return "update";
         }
@@ -48,7 +49,7 @@ export class BloggerService {
             return "404"
         }
     }
-    async deleteAllBlogger(): Promise<boolean> {
-        return await this.bloggerRepository.deleteAllBlogger()
+    async deleteAllBlogs(): Promise<boolean> {
+        return await this.bloggerRepository.deleteAllBlogs()
     }
 }

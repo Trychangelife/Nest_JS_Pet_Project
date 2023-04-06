@@ -1,31 +1,34 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { BloggersType } from "../types/types"
+import { BlogsType } from "../types/types"
 
 const modelViewBloggers = {
     _id: 0,
     id: 1,
     name: 1,
-    youtubeUrl: 1
+    description: 1,
+    websiteUrl: 1,
+    createdAt: 1,
+
 }
 
 @Injectable()
-export class BloggerRepository {
+export class BlogsRepository {
 
-    constructor(@InjectModel('Blogger') protected bloggerModel: Model<BloggersType>) {
+    constructor(@InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
         
     }
 
     async allBloggers(skip: number, limit?: number, searchNameTerm?: string | null, page?: number): Promise<object> {
         if (page !== undefined && limit !== undefined) {
-            const cursor = await this.bloggerModel.find({}, modelViewBloggers).skip(skip).limit(limit)
-            const totalCount = await this.bloggerModel.count({})
+            const cursor = await this.blogsModel.find({}, modelViewBloggers).skip(skip).limit(limit)
+            const totalCount = await this.blogsModel.count({})
             const pagesCount = Math.ceil(totalCount / limit)
-            const fullData = await this.bloggerModel.find({}, modelViewBloggers)
+            const fullData = await this.blogsModel.find({}, modelViewBloggers)
 
             if (searchNameTerm !== null) {
-                const cursorWithRegEx = await this.bloggerModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers).skip(skip).limit(limit)
+                const cursorWithRegEx = await this.blogsModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers).skip(skip).limit(limit)
                 const totalCountWithRegex = cursorWithRegEx.length
                 const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
                 return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
@@ -36,12 +39,12 @@ export class BloggerRepository {
             else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
         }
         else {
-            return await this.bloggerModel.find({}, modelViewBloggers)
+            return await this.blogsModel.find({}, modelViewBloggers)
         }
 
     }
     async targetBloggers(id: string): Promise<object | undefined> {
-        const blogger: BloggersType | null = await this.bloggerModel.findOne({ id: id }, modelViewBloggers)
+        const blogger: BlogsType | null = await this.blogsModel.findOne({ id: id }, modelViewBloggers)
         if (blogger !== null) {
             return blogger
         }
@@ -49,20 +52,20 @@ export class BloggerRepository {
             return
         }
     }
-    async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
-        await this.bloggerModel.create(newBlogger)
-        return await this.bloggerModel.findOne({ id: newBlogger.id }, modelViewBloggers)
+    async createBlogger(newBlogger: BlogsType): Promise<BlogsType | null> {
+        await this.blogsModel.create(newBlogger)
+        return await this.blogsModel.findOne({ id: newBlogger.id }, modelViewBloggers)
     }
     async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
-        const result = await this.bloggerModel.updateOne({ id: id }, { $set: { name: name, youtubeUrl: youtubeUrl } })
+        const result = await this.blogsModel.updateOne({ id: id }, { $set: { name: name, youtubeUrl: youtubeUrl } })
         return result.matchedCount === 1
     }
     async deleteBlogger(id: string): Promise<boolean> {
-        const result = await this.bloggerModel.deleteOne({ id: id })
+        const result = await this.blogsModel.deleteOne({ id: id })
         return result.deletedCount === 1
     }
-    async deleteAllBlogger(): Promise<boolean> {
-        const afterDelete = await this.bloggerModel.deleteMany({})
+    async deleteAllBlogs(): Promise<boolean> {
+        const afterDelete = await this.blogsModel.deleteMany({})
         return afterDelete.acknowledged
     } 
 }

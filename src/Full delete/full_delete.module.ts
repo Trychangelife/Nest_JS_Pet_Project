@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { authDataSchema, bloggerSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";
+import { authDataSchema, blogsSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";
 import { PostRepository } from "src/posts/posts.repository";
 import { PostsService } from "src/posts/posts.service";
 import { FullDataController } from "./full_delete.controller";
@@ -10,7 +10,7 @@ import { FullDataController } from "./full_delete.controller";
 
 @Module({
     imports: [MongooseModule.forFeature([
-        {name: 'Blogger', schema: bloggerSchema}, 
+        {name: 'Blogger', schema: blogsSchema}, 
         {name: 'Posts', schema: postSchema}, 
         {name: 'Comments', schema: commentsSchema},
         {name: 'Users', schema: usersSchema},

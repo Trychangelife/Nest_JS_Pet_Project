@@ -25,14 +25,18 @@ export type extendedLikesInfo = {
 }
 
 @Schema()
-export class BloggerClass {
-    constructor(public  id: string, public name: string, public youtubeUrl: string ) {
+export class BlogsClass {
+    constructor(public  id: string, public name: string, public description: string ,public websiteUrl: string, public createdAt: Date, public isMembership: boolean ) {
     }
 }
-export type BloggersType = {
+export type BlogsType = {
     id: string;
     name: string;
-    youtubeUrl: string;
+    description: string;
+    websiteUrl: string;
+    createdAt: Date;
+    isMembership: boolean;
+
 }
 
 export class Comments {

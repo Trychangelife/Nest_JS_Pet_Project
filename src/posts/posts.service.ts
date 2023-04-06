@@ -6,7 +6,7 @@ import { PostRepository } from "./posts.repository"
 import { v4 as uuidv4 } from "uuid"
 import { DataSource } from 'typeorm'
 import { InjectDataSource } from '@nestjs/typeorm'
-import { BloggersType, Comments, CommentsType, LIKES, Post, PostsType } from '../types/types'
+import { BlogsType, Comments, CommentsType, LIKES, Post, PostsType } from '../types/types'
 
 
 @Injectable()
@@ -14,7 +14,7 @@ export class PostsService {
 
     constructor (
         protected postsRepository: PostRepository, 
-        @InjectModel('Blogger') protected bloggerModel: Model<BloggersType>,
+        @InjectModel('Blogs') protected bloggerModel: Model<BlogsType>,
         @InjectModel('Posts') protected postsModel: Model<PostsType>,
         @InjectDataSource() protected dataSource: DataSource
         ) {}

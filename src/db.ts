@@ -2,15 +2,17 @@
 import { Schema } from "@nestjs/mongoose";
 import { ObjectId, ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
-import { BloggersType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES,  } from "./types/types";
+import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES,  } from "./types/types";
 
 
 
 
-export const bloggerSchema = new mongoose.Schema<BloggersType>({
+export const blogsSchema = new mongoose.Schema<BlogsType>({
     id: {type:String, required:true},
     name: {type:String, required:true},
-    youtubeUrl: {type:String, required:true}
+    description: {type:String, required: true},
+    websiteUrl: {type:String, required:true},
+
 })
 export const postSchema = new mongoose.Schema<PostsType>({
     id: {type:String, required:true},
@@ -116,7 +118,7 @@ export const refreshTokenSchema = new mongoose.Schema<RefreshTokenStorageType>({
 })
 
 
-export const bloggerModel = mongoose.model('bloggers', bloggerSchema)
+export const bloggerModel = mongoose.model('bloggers', blogsSchema)
 export const postsModel = mongoose.model('posts', postSchema)
 export const usersModel = mongoose.model('users', usersSchema)
 export const commentsModel = mongoose.model('comments', commentsSchema)
