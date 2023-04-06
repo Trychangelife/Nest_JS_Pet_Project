@@ -10,6 +10,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
+import { STATUS_CODES } from "http";
 
 
 class AuthForm {
@@ -86,7 +87,7 @@ export class AuthController {
         }
     }
     @Post('registration')
-    async registration(@Body() user: {password: string, login: string, email: string},  @Request() req: {ip: string} ) {
+    async registration(@Body() user: {password: string, login: string, email: string},  @Request() req: {ip: string}, @Res() res ) {
         const result: UsersType | null | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
             throw new HttpException("Login or email already use", HttpStatus.BAD_REQUEST)
@@ -95,7 +96,9 @@ export class AuthController {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
         }
         else {
-            return result
+            res 
+            .status(204)
+            .send(result)
         }
     }
     @Post('registration-confirmation')
