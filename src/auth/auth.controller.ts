@@ -91,7 +91,7 @@ export class AuthController {
         const result: UsersType | null | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
             //throw new HttpException("Login or email already use", HttpStatus.BAD_REQUEST)
-            res.status(400).json({ errorsMessages: [{ message: "Login or email already use", field: "email?" }], resultCode: 1 });
+            res.status(400).json({ errorsMessages: [{ message: "Login or email already use", field: "email?" }]});
         }
         else if (result == null) {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
