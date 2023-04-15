@@ -7,16 +7,18 @@ export class EmailAdapter  {
 
     constructor (private mailerService: MailerService) {}
     async sendEmailConfirmation (email: string, message: string, subject: string): Promise<object> {
-        return await this.mailerService.sendMail({
+        await this.mailerService.sendMail({
         from: 'Evgeniy <jenbka999@gmail.com>',
         to: email,
         subject: subject,
-        html: message
-    }).catch((e) => {
-      throw new HttpException(
-        `Ошибка работы почты: ${JSON.stringify(e)}`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    });
-    }
-} 
+        html: message,
+    })
+    return {}
+    // .catch((e) => {
+    //   throw new HttpException(
+    //     `Ошибка работы почты: ${JSON.stringify(e)}`,
+    //     HttpStatus.UNPROCESSABLE_ENTITY,
+    //   );
+    // });
+    // }
+}}
