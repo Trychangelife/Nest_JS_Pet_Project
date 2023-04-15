@@ -33,7 +33,6 @@ import { FullDataController } from './Full delete/full_delete.controller';
 import { FullDeleteModule } from './Full delete/full_delete.module';
 
 
-
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
