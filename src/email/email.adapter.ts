@@ -11,7 +11,7 @@ export class EmailAdapter  {
 
 
       try {
-        return await this.mailerService.sendMail({
+        return this.mailerService.sendMail({
           from: 'Evgeniy <jenbka999@gmail.com>',
           to: email,
           subject: subject,
