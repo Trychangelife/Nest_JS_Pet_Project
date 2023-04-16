@@ -61,7 +61,7 @@ const uri:string = process.env.mongoURI
     host: process.env.POSTGRES_HOST,
     port: 5432,
     username: process.env.POSTGRES_USERNAME,
-    password: process.env.POSTGRES_PASSWORD,
+    password: process.env.POSTGRES_PASSWORD, 
     database: process.env.POSTGRES_DATABASE_NAME,
     url: process.env.DATABASE_URL,
     autoLoadEntities: false,
