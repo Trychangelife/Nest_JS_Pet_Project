@@ -47,7 +47,7 @@ const uri:string = process.env.mongoURI
     useFactory: async (config: ConfigService) => ({
       transport: {
         host: config.get('EMAIL_HOST'),
-        secure: true,
+        secure: false, 
         port: 587,
         auth: {
                user: config.get('EMAIL_USER'),
