@@ -7,10 +7,6 @@ export class EmailAdapter  {
 
     constructor (private mailerService: MailerService) {}
     async sendEmailConfirmation (email: string, message: string, subject: string): Promise<object> {
-
-
-
-      try {
         return await this.mailerService.sendMail({
           from: 'Evgeniy <jenbka999@gmail.com>',
           to: email,
@@ -35,7 +31,7 @@ export class EmailAdapter  {
     //   );
     // });
     }
-} 
+  //}
 
 
 // try {
