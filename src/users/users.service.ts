@@ -35,7 +35,7 @@ export class UsersService {
             if (await this.usersRepository.findUserByLogin(login) !== null || await this.usersRepository.findUserByEmail(email) !== null ) {
                 return false
             }
-            else {
+            else { 
                 const createdUser = await this.usersRepository.createUser(newUser)
                 this.emailService.emailConfirmation(newUser.email)
                 return createdUser

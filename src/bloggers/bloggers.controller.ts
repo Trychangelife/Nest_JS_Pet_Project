@@ -15,6 +15,7 @@ export class BlogsController {
       protected blogsService: BlogsService, 
       protected postsService: PostsService,
       protected jwtServiceClass: JwtServiceClass,
+
       @InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
     }
 

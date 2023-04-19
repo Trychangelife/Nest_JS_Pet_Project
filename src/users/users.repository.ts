@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common"
-import { InjectModel } from "@nestjs/mongoose"
+
 import { sub } from "date-fns"
 import { Model } from "mongoose"
 import { usersModel } from "src/db"
 import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "src/types/types"
+import { Injectable } from "@nestjs/common"
+import { InjectModel } from "@nestjs/mongoose"
 
 const userViewModel = {
     _id: 0,
@@ -55,15 +56,17 @@ async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
     }
 
 }
-async deleteUser(id: string): Promise<boolean> {
+async deleteUser(id: string): Promise<boolean> { 
     const result = await this.usersModel.deleteOne({ id: id })
     return result.deletedCount === 1
 }
 
 // Основная часть закончена, вспомогательные эндпоинты
-async confirmationEmail(user: UsersType): Promise<boolean> {
+async confirmationEmail(user: UsersType, code?: string): Promise<boolean> {
     const activatedUser = await this.usersModel.updateOne({ id: user.id }, { $set: { "emailConfirmation.activatedStatus": true } })
     if (activatedUser.modifiedCount > 0) {
+        await this.usersModel.updateOne({ id: user.id }, { $set: { "emailConfirmation.codeForActivated": code } })
+
         return true
     }
     else {
@@ -139,7 +142,7 @@ async findUserByLoginForMe(login: string): Promise<any[]> {
     return foundUser2[0]
 }
 async findUserByConfirmationCode(code: string): Promise<UsersType | null> {
-    const foundUser = await this.usersModel.findOne({ "emailConfirmation.codeForActivated": code })
+    const foundUser = await this.usersModel.findOne({ "emailConfirmation.codeForActivated": code }).lean()
     return foundUser
 }
 async refreshActivationCode(email: string, code: string): Promise <UsersType | null> {

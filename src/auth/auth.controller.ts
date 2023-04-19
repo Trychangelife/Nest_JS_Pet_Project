@@ -2,7 +2,7 @@ import { EmailService } from "src/email/email.service";
 import { UsersRepository } from "src/users/users.repository";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseFilters, UseGuards, ValidationPipe } from "@nestjs/common";
 import { CreateUser, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { Injectable, Ip, Request } from "@nestjs/common";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
@@ -11,6 +11,8 @@ import { Model } from "mongoose";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
 import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
 import { STATUS_CODES } from "http";
+import { UserRegistrationFlow } from "src/guard/users.registration.guard";
+
 
 
 class AuthForm {
@@ -87,11 +89,12 @@ export class AuthController {
         }
     }
     @Post('registration')
-    async registration(@Body() user: {password: string, login: string, email: string},  @Request() req: {ip: string}, @Res() res ) {
+    @UseGuards(UserRegistrationFlow)
+    async registration(@Body(new ValidationPipe()) user: {password: string, login: string, email: string},  @Request() req: {ip: string}, @Res() res ) {
         const result: UsersType | null | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
-            //throw new HttpException("Login or email already use", HttpStatus.BAD_REQUEST)
-            res.status(400).json({ errorsMessages: [{ message: "Login or email already use", field: "email?" }]});
+            throw new HttpException("Email or login already exist", HttpStatus.BAD_REQUEST)
+            //res.status(400).json({ errorsMessages:  [{ message: "Login or email already use", field: `${user.email}` }] });
         }
         else if (result == null) {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
@@ -103,16 +106,17 @@ export class AuthController {
         }
     }
     @Post('registration-confirmation')
-    async registrationConfirmation(@Body() body: {code: string}, @Request() req: {ip: string}) {
+    async registrationConfirmation(@Body() body: {code: string}, @Request() req: {ip: string}, @Res() res) {
         await this.authService.informationAboutConfirmed(req.ip, body.code);
         const checkInputCode = await this.authService.counterAttemptConfirm(req.ip, body.code);
         if (checkInputCode) {
             const activationResult = await this.usersService.confirmationEmail(body.code);
             if (activationResult) {
-                return checkInputCode
+                res.status(204).send(checkInputCode)
             }
             else {
-                throw new HttpException("Invalide Code", HttpStatus.BAD_REQUEST)
+                const errorResponseForConfirmAccount = {errorsMessages: [{message: 'account already confirmed',field: "code",}]} 
+                throw new HttpException(errorResponseForConfirmAccount, HttpStatus.BAD_REQUEST)
             }
         }
         else {
@@ -127,10 +131,11 @@ export class AuthController {
             await this.authService.refreshActivationCode(user.email);
             const emailResending = await this.emailService.emailConfirmation(user.email);
             if (emailResending) {
-                throw new HttpException("Email send succefully", HttpStatus.ACCEPTED);
+                throw new HttpException("Email send succefully", HttpStatus.NO_CONTENT);
             }
             else {
-                throw new HttpException({ message: "account already activated", field: "email" }, HttpStatus.BAD_REQUEST)
+                const errorResponseForConfirmAccount= {errorsMessages: [{message: 'account already confirmed',field: "email",}]} 
+                throw new HttpException(errorResponseForConfirmAccount, HttpStatus.BAD_REQUEST)
             }
         }
         else {

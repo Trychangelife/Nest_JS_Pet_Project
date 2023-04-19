@@ -31,6 +31,7 @@ import { EmailManager } from './email/email.manager';
 import { EmailAdapter } from './email/email.adapter';
 import { FullDataController } from './Full delete/full_delete.controller';
 import { FullDeleteModule } from './Full delete/full_delete.module';
+import { UserRegistrationFlow } from './guard/users.registration.guard';
 
 
 const options = {
@@ -91,7 +92,7 @@ const uri:string = process.env.mongoURI
     }
 })],
   controllers: [AppController, BlogsController, PostController, UsersController, AuthController, CommentsController, FullDataController],
-  providers: [AppService, 
+  providers: [AppService,
     BlogsService, 
     {provide: BlogsRepository, useClass: process.env.USE_DATABASE === 'SQL' ? BlogsRepositorySql : BlogsRepository}
     ,PostsService,
