@@ -43,9 +43,11 @@ export class Comments {
     constructor(
         public id: string, 
         public content: string, 
-        public userId: string, 
-        public userLogin: string, 
-        public addedAt: string,
+        public commentatorInfo: {
+            userId: string;
+            userLogin: string;
+        },
+        public createdAt: string,
         public postId: string,
         public likesInfo: {
             likesCount: number,
@@ -67,9 +69,11 @@ export class Comments {
 export type CommentsType = {
     id: string;
     content: string;
-    userId: string;
-    userLogin: string;
-    addedAt: string;
+    commentatorInfo: {
+        userId: string;
+        userLogin: string;
+    };
+    createdAt: string;
     postId: string;
     likesInfo: {
         likesCount: number;
@@ -97,7 +101,7 @@ export class Post {
         public content: string, 
         public blogId: string,
         public blogName: string,
-        public addedAt: Date,
+        public createdAt: Date,
         public extendedLikesInfo: {
             likesCount: number,
             dislikesCount: number,
@@ -130,7 +134,7 @@ export type PostsType = {
     content: string;
     blogId: string;
     blogName: string;
-    addedAt: Date;
+    createdAt: Date;
     extendedLikesInfo: {
         likesCount: number;
         dislikesCount: number;

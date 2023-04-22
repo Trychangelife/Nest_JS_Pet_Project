@@ -100,7 +100,7 @@ export class PostController {
             throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
         }
 
-    }
+    } 
     @Get(':postId/comments')
     async getCommentsByPostId(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params, @Req() req) {
         try {

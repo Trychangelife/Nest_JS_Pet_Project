@@ -30,7 +30,7 @@ export class CommentsRepository {
         myStatus = "None"
     }
     const targetCommentWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}}}
+        $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, /*likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}*/}}
     ]).match({id: commentId})
     if (targetCommentWithAggregation == null) {
         return undefined
@@ -42,7 +42,7 @@ export class CommentsRepository {
     }
     async updateCommentByCommentId(commentId: string, content: string, userId: string): Promise<boolean | null> {
         const findTargetComment = await this.commentsModel.findOne({ id: commentId }, commentsVievModel).lean()
-        if (findTargetComment !== null && findTargetComment.userId === userId) {
+        if (findTargetComment !== null && findTargetComment.commentatorInfo.userId === userId) {
             await this.commentsModel.updateOne({ id: commentId }, { $set: { content: content } })
             return true
         }
@@ -55,7 +55,7 @@ export class CommentsRepository {
     }
     async deleteCommentByCommentId(commentId: string, userId: string): Promise<boolean | null> {
         const findTargetComment = await this.commentsModel.findOne({ id: commentId })
-        if (findTargetComment !== null && findTargetComment.userId === userId) {
+        if (findTargetComment !== null && findTargetComment.commentatorInfo.userId === userId) {
             await this.commentsModel.deleteOne({id: commentId})
             return true
         }

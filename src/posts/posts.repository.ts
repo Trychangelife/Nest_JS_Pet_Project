@@ -12,14 +12,14 @@ export const postViewModel = {
     content: 1,
     bloggerId: 1,
     bloggerName: 1,
-    addedAt: 1,
-    extendedLikesInfo: 1,
+    createdAt: 1
 }
 
 export const commentsVievModel = {
     _id: 0,
     postId: 0,
     __v: 0,
+    likesInfo:0,
     likeStorage: 0,
     dislikeStorage: 0
 }
@@ -40,7 +40,7 @@ async allPosts(skip: number, limit: number, page?: number, userId?: string): Pro
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
     const arrayForReturn = []
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ])
     for (let index = 0; index < targetPostWithAggregation.length; index++) {
         let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
@@ -82,7 +82,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     }
     
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}
     }
     ]).match({id: postId})
     if (targetPostWithAggregation == null) {
@@ -90,7 +90,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     }
     else {
         return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)
-            //.sort((a,b) => a.addedAt.getTime() - b.addedAt.getTime())
+            //.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime())
         }}; 
         try {
            
@@ -107,11 +107,11 @@ async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number
     const checkBloggerExist = await this.bloggerModel.count({ id: bloggerId })
     if (checkBloggerExist < 1) { return undefined }
     if (page !== undefined && pageSize !== undefined) {
-        const postsBloggerWithPaginator = await this.postsModel.find({ bloggerId: bloggerId }, postViewModel).skip(skip).limit(pageSize).lean()
+        const postsBloggerWithPaginator = await this.postsModel.find({ blogId: bloggerId }, postViewModel).skip(skip).limit(pageSize).lean()
         const pagesCount = Math.ceil(totalCount / pageSize)
         const arrayForReturn = []
         const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, addedAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ]).match({bloggerId: bloggerId})
     for (let index = 0; index < targetPostWithAggregation.length; index++) {
         let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
@@ -135,7 +135,7 @@ async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number
             return { pagesCount, page: page, pageSize: pageSize, totalCount, items: arrayForReturn }
         }
         else {
-            const postsBloggerWithOutPaginator = await this.postsModel.find({ bloggerId: bloggerId }).lean()
+            const postsBloggerWithOutPaginator = await this.postsModel.find({ blogId: bloggerId }).lean()
             return { pagesCount: 0, page: page, pageSize: pageSize, totalCount, items: postsBloggerWithOutPaginator }
         }
 
