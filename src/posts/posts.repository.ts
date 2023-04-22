@@ -193,7 +193,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     ]).sort({createdAt: ascOrDesc}).match({postId: postId})
     const commentsWithAggregation1 = await this.commentsModel.find({postId: postId},commentsVievModel
     ).skip(skip).limit(limit).lean().sort({createdAt: ascOrDesc})
-    console.log(ascOrDesc)
+
     const arrayForReturn = []
     const arrayForReturn2 = []
     for (let index = 0; index < commentsWithAggregation1.length; index++) {
@@ -241,7 +241,6 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
         const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
         const howMuchLikes = await this.postsModel.find({"extendedLikesInfo.newestLikes": []}).count()
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
-        console.log(checkOnLike)
         if (checkOnDislike.length > 0) {
             // Проверяем, вдруг уже есть дизлайк, нужно его убрать (одновременно два статуса быть не может)
             await this.postsModel.updateOne({ id: postId }, { $set: {"extendedLikesInfo.dislikesCount": dislikesCountMinusDislike } })

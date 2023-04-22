@@ -33,6 +33,7 @@ export class CommentsRepository {
         $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, /*likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}*/}}
     ]).match({id: commentId})
     if (targetCommentWithAggregation == null) {
+        console.log(targetCommentWithAggregation)
         return undefined
     }
     else {
@@ -83,7 +84,7 @@ export class CommentsRepository {
             const checkOnLike = await this.commentsModel.find({$and: [{"likeStorage.userId": userId}, {id: commentId}] } ).lean()
             const howMuchLikes = await this.commentsModel.find({likeStorage: []}).count()
             const checkOnDislike = await this.commentsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: commentId}] } ).lean()
-            console.log(howMuchLikes)
+         
             if (checkOnDislike.length > 0) {
                 // Проверяем, вдруг уже есть дизлайк, нужно его убрать (одновременно два статуса быть не может)
                 await this.commentsModel.updateOne({ id: commentId }, { $set: {"likesInfo.dislikesCount": dislikesCountMinusDislike } })

@@ -56,13 +56,13 @@ export class PostsService {
         if (bloggerIdUrl && foundBloggerW !== null) {
             // Построено на классе
             const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerIdUrl, foundBloggerW.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
-            console.log(newPost)
+        
             return await this.postsRepository.releasePost(newPost, bloggerIdUrl)
         }
         else if (foundBlogger !== null && bloggerId) {
             // Построено на классе
             const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
-            console.log(newPost)
+    
             return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
         }
         else { return null }

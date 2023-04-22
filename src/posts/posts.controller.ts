@@ -1,10 +1,12 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseEnumPipe, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseEnumPipe, Post, Put, Query, Req, UseFilters, UseGuards } from "@nestjs/common";
 import { BasicAuthGuard } from "../Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "../Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "../Auth_guards/jwt.service";
 import { constructorPagination } from "../pagination.constructor";
 import { LIKES, PostsType, UsersType } from "../types/types";
 import { PostsService } from "./posts.service";
+import { Comment } from "src/types/class-validator.form";
+import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
 
 @Controller('posts')
 export class PostController {
@@ -90,9 +92,10 @@ export class PostController {
     }
     // Здесь не хватает юзера (проверить после занесения юзера в nestjs)
     @UseGuards(JwtAuthGuard)
+    @UseFilters(new HttpExceptionFilter())
     @Post(':postId/comments')
-    async createCommentForPost(@Param('postId') postId: string, @Body() post: PostsType, @Req() req) {
-        const newComment = await this.postsService.createCommentForSpecificPost(postId, post.content, req.user!.id, req.user!.login);
+    async createCommentForPost(@Param('postId') postId: string, @Body() content: Comment, @Req() req) {
+        const newComment = await this.postsService.createCommentForSpecificPost(postId, content.content, req.user!.id, req.user!.login);
         if (newComment) {
             return newComment
         }

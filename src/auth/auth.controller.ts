@@ -9,28 +9,10 @@ import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
-import { IsNotEmpty, IsOptional, Matches, MaxLength, MinLength } from "class-validator";
 import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
 import { UserRegistrationFlow } from "src/guard/users.registration.guard";
+import { AuthForm } from "src/types/class-validator.form";
 
-
-const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-const loginRegex = /^[a-zA-Z0-9_-]*$/
-export class AuthForm {
-    @MinLength(3)
-    @MaxLength(10)
-    @IsOptional()
-    login: string
-    @MinLength(6)
-    @MaxLength(20)
-    @Matches(loginRegex)
-    password: string
-    @IsNotEmpty()
-    @IsOptional()
-    @Matches(emailRegex)
-    email: string
-    loginOrEmail: string
-}
 
 @Controller('auth')
 export class AuthController {

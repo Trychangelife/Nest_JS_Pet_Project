@@ -64,6 +64,7 @@ export class Comments {
             userId: string,
             login: string
         }]) {
+            
     }
 }
 export type CommentsType = {
