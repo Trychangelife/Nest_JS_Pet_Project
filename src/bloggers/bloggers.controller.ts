@@ -31,9 +31,9 @@ export class BlogsController {
     }
 
     @Get()
-    async getAllBloggers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
+    async getAllBloggers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string, sortBy: string, sortDirection: string}) {
       const searchNameTerm = typeof query.SearchNameTerm === 'string' ? query.SearchNameTerm : null;
-      const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+      const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
       const full: object = await this.blogsService.allBloggers(paginationData.pageSize, paginationData.pageNumber, searchNameTerm);
       return full
     }
@@ -50,11 +50,11 @@ export class BlogsController {
     }
 
     @Get(':bloggerId/posts')
-    async getPostByBloggerID(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params, @Req() req) {
+    async getPostByBloggerID(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
       try {
         const token = req.headers.authorization.split(' ')[1]
         const userId = await this.jwtServiceClass.getUserByToken(token)
-        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
         const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize, userId);
        if (findBlogger !== undefined) {
         return findBlogger
@@ -63,7 +63,7 @@ export class BlogsController {
         throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
       }
       } catch (error) {
-        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
       const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize);
       if (findBlogger !== undefined) {
         return findBlogger

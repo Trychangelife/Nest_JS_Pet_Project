@@ -1,5 +1,6 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
+import { id } from "date-fns/locale"
 import { Aggregate, Model } from "mongoose"
 import { LikesDTO } from "src/comments/comments.controller"
 import { BlogsType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
@@ -17,11 +18,15 @@ export const postViewModel = {
 
 export const commentsVievModel = {
     _id: 0,
-    postId: 0,
-    __v: 0,
-    likesInfo:0,
-    likeStorage: 0,
-    dislikeStorage: 0
+    id: 1,
+    content: 1,
+    commentatorInfo: {userId: 1, userLogin: 1},
+    createdAt: 1
+    //postId: 0,
+    //__v: 0,
+    //likesInfo:0,
+    //likeStorage: 0,
+    //dislikeStorage: 0
 }
 
 @Injectable()
@@ -40,31 +45,31 @@ async allPosts(skip: number, limit: number, page?: number, userId?: string): Pro
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
     const arrayForReturn = []
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, /*extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}*/}}
     ])
-    for (let index = 0; index < targetPostWithAggregation.length; index++) {
-        let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
-        }};
-        const checkOnDislike = await this.postsModel.findOne({$and: [{id: post.id}, {"dislikeStorage.userId": userId}]}).lean()
-        const checkOnLike = await this.postsModel.findOne({$and: [{id: post.id}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean()
-        let myStatus = ''
-         if (checkOnLike) {
-        myStatus = "Like"
-    }
-            else if (checkOnDislike) {
-        myStatus = "Dislike"
-    }
-            else {
-        myStatus = "None"
-    }
-        post.extendedLikesInfo.myStatus = myStatus
-        arrayForReturn.push(post)
-    }
+    // for (let index = 0; index < targetPostWithAggregation.length; index++) {
+    //     let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
+    //     }};
+    //     const checkOnDislike = await this.postsModel.findOne({$and: [{id: post.id}, {"dislikeStorage.userId": userId}]}).lean()
+    //     const checkOnLike = await this.postsModel.findOne({$and: [{id: post.id}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean()
+    //     let myStatus = ''
+    //      if (checkOnLike) {
+    //     myStatus = "Like"
+    // }
+    //         else if (checkOnDislike) {
+    //     myStatus = "Dislike"
+    // }
+    //         else {
+    //     myStatus = "None"
+    // }
+    //     post.extendedLikesInfo.myStatus = myStatus
+    //     arrayForReturn.push(post)
+    // }
     
     
 
-    
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn }
+    // ВЕРНУТЬ ЗДЕСЬ В ITEMS arrayForReturn и РАСКОМЕНТИТЬ СВЕРХУ
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: targetPostWithAggregation }
 }
 async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
@@ -82,7 +87,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     }
     
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, createdAt: 1, /*extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}*/}
     }
     ]).match({id: postId})
     if (targetPostWithAggregation == null) {
@@ -90,7 +95,6 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     }
     else {
         return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)
-            //.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime())
         }}; 
         try {
            
@@ -111,7 +115,7 @@ async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number
         const pagesCount = Math.ceil(totalCount / pageSize)
         const arrayForReturn = []
         const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, /*extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}*/}}
     ]).match({bloggerId: bloggerId})
     for (let index = 0; index < targetPostWithAggregation.length; index++) {
         let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
@@ -176,43 +180,46 @@ async createCommentForSpecificPost(createdComment: CommentsType): Promise<Commen
     return foundNewPost}
     else {return false}
 }
-async takeCommentByIdPost (postId: string, skip: number, limit: number, page: number, userId?: string): Promise<object | boolean> {
+async takeCommentByIdPost (postId: string, skip: number, limit: number, page: number, userId?: string, sortBy?: string, sortDirection?: string): Promise<object | boolean> {
     const findPosts = await this.postsModel.findOne({id: postId}).lean()
     const totalCount = await this.commentsModel.count({postId: postId})
     const pagesCount = Math.ceil(totalCount / limit)
-    
+    let ascOrDesc: any = -1 
+    if (sortDirection === 'asc') {ascOrDesc = 1} 
     if (findPosts !== null) {
     const findComments = await this.commentsModel.find({postId: postId}, commentsVievModel).skip(skip).limit(limit).lean()
     const commentsWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, userId: 1, userLogin: 1, addedAt: 1, postId: 1, likesInfo: 1}}
-    ]).match({postId: postId})
+        $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, postId: 1 /* likesInfo: 0*/}}
+    ]).sort({createdAt: ascOrDesc}).match({postId: postId})
+    const commentsWithAggregation1 = await this.commentsModel.find({postId: postId},commentsVievModel
+    ).skip(skip).limit(limit).lean().sort({createdAt: ascOrDesc})
+    console.log(ascOrDesc)
     const arrayForReturn = []
-    for (let index = 0; index < commentsWithAggregation.length; index++) {
+    const arrayForReturn2 = []
+    for (let index = 0; index < commentsWithAggregation1.length; index++) {
 
         // {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)
         // }}; 
 
-        let comment = {...commentsWithAggregation[index], likesInfo: {...commentsWithAggregation[index].likesInfo
-             }};
-        const checkOnDislike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"dislikeStorage.userId": userId}]}).lean()
-        const checkOnLike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"likeStorage.userId": userId}]}).lean()
-        let myStatus = ''
-         if (checkOnLike) {
-        myStatus = "Like"
-    }
-            else if (checkOnDislike) {
-        myStatus = "Dislike"
-    }
-            else {
-        myStatus = "None"
-    }
-    comment.likesInfo.myStatus = myStatus
+        let comment = {...commentsWithAggregation1[index],/* likesInfo: {...commentsWithAggregation[index].likesInfo}*/};
+    //     const checkOnDislike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"dislikeStorage.userId": userId}]}).lean()
+    //     const checkOnLike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"likeStorage.userId": userId}]}).lean()
+    //     let myStatus = ''
+    //      if (checkOnLike) {
+    //     myStatus = "Like"
+    // }
+    //         else if (checkOnDislike) {
+    //     myStatus = "Dislike"
+    // }
+    //         else {
+    //     myStatus = "None"
+    // }
+    // comment.likesInfo.myStatus = myStatus
     delete comment.postId
         arrayForReturn.push(comment)
     }
 
-
-
+    // ЕСЛИ НУЖНО БУДЕТ ВЕРНУТЬ ОБРАТНО С ЛАЙКАМИ - Просто в ITEMS возвращаем arrayForReturn
     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn }}
     else { return false}
 }

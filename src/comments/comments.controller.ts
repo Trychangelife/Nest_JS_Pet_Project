@@ -44,7 +44,7 @@ export class CommentsController {
     async updateCommentByCommentId(@Param() params, @Body() comment: CommentsType, @Req() req) {
         const result = await this.commentsService.updateCommentByCommentId(params.commentId, comment.content, req.user!.id);
         if (result) {
-            return HttpStatus.NO_CONTENT
+            return result
         }
         else if (result == null) {
             throw new HttpException('Comments NOT FOUND',HttpStatus.NOT_FOUND)
@@ -54,9 +54,9 @@ export class CommentsController {
         }
     }
     @UseGuards(JwtAuthGuard)
-    @Delete('id')
+    @Delete('Id')
     async deleteCommentById(@Param('Id') params, @Req() req) {
-        const resultDelete = await this.commentsService.deleteCommentByCommentId(params.commentId, req.user!.id);
+        const resultDelete = await this.commentsService.deleteCommentByCommentId(params.Id, req.user!.id);
         if (resultDelete) {
             return HttpStatus.NO_CONTENT
         }

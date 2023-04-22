@@ -12,15 +12,15 @@ export class PostController {
     constructor(protected postsService: PostsService, protected jwtServiceClass: JwtServiceClass) {
     }
     @Get()
-    async getAllPosts(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Req() req) {
+    async getAllPosts(@Query() query: {SearchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByToken(token)
-            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+            const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
             const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber, userId);
             return getAllPosts;
         } catch (error) {
-            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+            const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
             const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber);
             return getAllPosts;
         }
@@ -102,12 +102,12 @@ export class PostController {
 
     } 
     @Get(':postId/comments')
-    async getCommentsByPostId(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}, @Param() params, @Req() req) {
+    async getCommentsByPostId(@Query() query: {SearchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByToken(token)
-            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
-            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize,userId);
+            const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
+            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize,userId, paginationData.sortBy, paginationData.sortDirection);
                 if (newComment) {
                     return newComment
             }
@@ -115,8 +115,9 @@ export class PostController {
                      throw new HttpException("Post doesn't exists",HttpStatus.NOT_FOUND)
         }
         } catch (error) {
-            const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
-        const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize);
+            const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
+            const userIdMok = 'just'
+            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize, userIdMok, paginationData.sortBy, paginationData.sortDirection);
         if (newComment) {
             return newComment
         }

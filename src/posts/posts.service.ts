@@ -89,12 +89,12 @@ export class PostsService {
                 return false
             }
     }
-    async takeCommentByIdPost (postId: string, page: number, pageSize: number, userId?: string): Promise<object | boolean> {
+    async takeCommentByIdPost (postId: string, page: number, pageSize: number, userId?: string, sortBy?: string, sortDirection?: string): Promise<object | boolean> {
         let skip = 0
         if (page && pageSize) {
             skip = (page - 1) * pageSize
         }
-        return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page, userId)
+        return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page, userId, sortBy, sortDirection)
     }
     async like_dislike (postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
         return await this.postsRepository.like_dislike(postId, likeStatus, userId, login)

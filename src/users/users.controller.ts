@@ -23,8 +23,8 @@ export class UsersController {
 
     
     @Get()
-    async getAllUsers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string}) {
-        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string);
+    async getAllUsers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string, sortBy: string, sortDirection: string}) {
+        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
         const resultUsers = await this.usersService.allUsers(paginationData.pageSize, paginationData.pageNumber);
         return resultUsers
     }
