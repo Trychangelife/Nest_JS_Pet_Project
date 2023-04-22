@@ -17,10 +17,9 @@ import { UserRegistrationFlow } from "src/guard/users.registration.guard";
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 const loginRegex = /^[a-zA-Z0-9_-]*$/
 export class AuthForm {
-    
-    @IsNotEmpty()
     @MinLength(3)
     @MaxLength(10)
+    @IsOptional()
     login: string
     @MinLength(6)
     @MaxLength(20)
@@ -30,6 +29,7 @@ export class AuthForm {
     @IsOptional()
     @Matches(emailRegex)
     email: string
+    loginOrEmail: string
 }
 
 @Controller('auth')
@@ -45,11 +45,11 @@ export class AuthController {
     }
     @Post('login')
     async authorization(@Request() req: {ip: string}, @Body() DataUser: AuthForm, @Res() res) {
-        await this.authService.informationAboutAuth(req.ip, DataUser.login);
-        const checkIP = await this.authService.counterAttemptAuth(req.ip, DataUser.login);
+        await this.authService.informationAboutAuth(req.ip, DataUser.loginOrEmail);
+        const checkIP = await this.authService.counterAttemptAuth(req.ip, DataUser.loginOrEmail);
         if (checkIP) {
-            const user = await this.usersService.checkCredentials(DataUser.login, DataUser.password);
-            const foundUser = await this.usersRepository.findUserByLogin(DataUser.login);
+            const user = await this.usersService.checkCredentials(DataUser.loginOrEmail, DataUser.password);
+            const foundUser = await this.usersRepository.findUserByLogin(DataUser.loginOrEmail);
             if (!user) {
                 throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED)
             }
