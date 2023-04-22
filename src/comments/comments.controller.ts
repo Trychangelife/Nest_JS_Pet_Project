@@ -54,8 +54,8 @@ export class CommentsController {
         }
     }
     @UseGuards(JwtAuthGuard)
-    @Delete(':commentId')
-    async deleteCommentById(@Param('commentId') params, @Req() req) {
+    @Delete('id')
+    async deleteCommentById(@Param('Id') params, @Req() req) {
         const resultDelete = await this.commentsService.deleteCommentByCommentId(params.commentId, req.user!.id);
         if (resultDelete) {
             return HttpStatus.NO_CONTENT

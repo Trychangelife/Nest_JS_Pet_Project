@@ -19,8 +19,8 @@ export const postSchema = new mongoose.Schema<PostsType>({
     title: {type:String},
     shortDescription: {type:String},
     content: {type:String},
-    bloggerId: {type:String, required:true},
-    bloggerName: {type:String, required:true},
+    blogId: {type:String, required:true},
+    blogName: {type:String, required:true},
     addedAt: {type: Date, required: true},
     extendedLikesInfo: {
         likesCount: {type: Number, required:true, default: 0},

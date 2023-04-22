@@ -52,10 +52,10 @@ export class PostController {
     @UseGuards(BasicAuthGuard)
     @Post()
     async createPost(@Body() post: PostsType) {
-        const giveMePost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.bloggerId);
+        const giveMePost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.blogId);
         if (giveMePost == null) {
             throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
-            // res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 });
+            // res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "blogId" }], resultCode: 1 });
         }
         else {
             throw new HttpException(giveMePost ,HttpStatus.CREATED);
@@ -64,7 +64,7 @@ export class PostController {
     @UseGuards(BasicAuthGuard)
     @Put(':postId')
     async updatePost(@Param() params, @Body() post: PostsType) {
-        const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.bloggerId);
+        const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.blogId);
         if (afterChanged !== "404" && afterChanged !== '400') {
             throw new HttpException(afterChanged,HttpStatus.ACCEPTED)
         }

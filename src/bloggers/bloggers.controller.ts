@@ -92,7 +92,7 @@ export class BlogsController {
       const blogger = await this.blogsModel.count({ id: params.id }); 
       if (blogger < 1) { throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND) }
   
-      const createPostForSpecificBlogger: string | object | null = await this.postsService.releasePost(post.title, post.content, post.shortDescription, post.bloggerId, params.id);
+      const createPostForSpecificBlogger: string | object | null = await this.postsService.releasePost(post.title, post.content, post.shortDescription, post.blogId, params.id);
       return createPostForSpecificBlogger;
   
     }

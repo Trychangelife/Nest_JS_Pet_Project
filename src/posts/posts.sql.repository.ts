@@ -140,14 +140,14 @@ async allPosts(skip: number, limit: number, page?: number, userId?: string): Pro
 
 //     }
 // }
-async releasePost(newPosts: PostsType, bloggerId: string, bloggerIdUrl?: string): Promise<object | string> {
-    const findBlogger = await this.dataSource.query(`SELECT id FROM "Bloggers" WHERE id = $1`, [bloggerId])
+async releasePost(newPosts: PostsType, blogId: string, bloggerIdUrl?: string): Promise<object | string> {
+    const findBlogger = await this.dataSource.query(`SELECT id FROM "Bloggers" WHERE id = $1`, [blogId])
     if (findBlogger.length < 1) { return "400" }
     const result = await this.dataSource.query(`
     INSERT INTO "Posts" (title, "shortDescription", content, "bloggerId", "bloggerName")
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *
-    `,[newPosts.title, newPosts.shortDescription, newPosts.content, bloggerId, newPosts.bloggerName])
+    `,[newPosts.title, newPosts.shortDescription, newPosts.content, blogId, newPosts.blogName])
     if (result !== null) { return result }
     else { return "400" }
 }
