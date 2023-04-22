@@ -40,7 +40,7 @@ import { UsersRepository } from "src/users/users.repository";
       }          
         throw new BadRequestException(errorResponseForLogin);
       }
-      else {
+      else { 
         return true;
       }  
       

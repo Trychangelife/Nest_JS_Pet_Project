@@ -2,25 +2,34 @@ import { EmailService } from "src/email/email.service";
 import { UsersRepository } from "src/users/users.repository";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
-import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseFilters, UseGuards, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CreateUser, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { Injectable, Ip, Request } from "@nestjs/common";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
-import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
-import { STATUS_CODES } from "http";
+import { IsNotEmpty, IsOptional, Matches, MaxLength, MinLength } from "class-validator";
+import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
 import { UserRegistrationFlow } from "src/guard/users.registration.guard";
 
 
-
-class AuthForm {
+const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+const loginRegex = /^[a-zA-Z0-9_-]*$/
+export class AuthForm {
+    
     @IsNotEmpty()
+    @MinLength(3)
+    @MaxLength(10)
     login: string
     @MinLength(6)
     @MaxLength(20)
+    @Matches(loginRegex)
     password: string
+    @IsNotEmpty()
+    @IsOptional()
+    @Matches(emailRegex)
+    email: string
 }
 
 @Controller('auth')
@@ -72,7 +81,7 @@ export class AuthController {
         else if (refreshToken) {
             const newAccessToken: any = await this.jwtService.getNewAccessToken(refreshToken);
             if (newAccessToken !== null) {
-                res
+                res  
                  .cookie("refreshToken", newAccessToken.newRefreshToken, {
                      httpOnly: true,
                      secure: process.env.NODE_ENV === "production"
@@ -90,21 +99,24 @@ export class AuthController {
     }
     @Post('registration')
     @UseGuards(UserRegistrationFlow)
-    async registration(@Body(new ValidationPipe()) user: {password: string, login: string, email: string},  @Request() req: {ip: string}, @Res() res ) {
+    @UseFilters(new HttpExceptionFilter())
+    //@UsePipes(new CustomValidationPipe())
+    async registration(@Body() user: AuthForm,  @Request() req: {ip: string}, @Res() res ) {
         const result: UsersType | null | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
-            throw new HttpException("Email or login already exist", HttpStatus.BAD_REQUEST)
+            throw new HttpException("",HttpStatus.BAD_REQUEST)
+
             //res.status(400).json({ errorsMessages:  [{ message: "Login or email already use", field: `${user.email}` }] });
         }
         else if (result == null) {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
         }
-        else {
+        else { 
             res 
-            .status(204)
+            .status(204) 
             .send(result)
         }
-    }
+    } 
     @Post('registration-confirmation')
     async registrationConfirmation(@Body() body: {code: string}, @Request() req: {ip: string}, @Res() res) {
         await this.authService.informationAboutConfirmed(req.ip, body.code);
