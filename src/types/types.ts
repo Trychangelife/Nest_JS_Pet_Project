@@ -166,14 +166,17 @@ export class CreateUser {
     login: string
     id: string
     password: string
-}
+    createdAt: string
 
+}
+@Schema()
 export class User { 
     constructor(
         public _id: ObjectId, 
         public id: string, 
         public login: string,
         public email: string,
+        public createdAt: string,
         public accountData: { passwordHash: string, passwordSalt: string},
         public emailConfirmation: {codeForActivated: string, activatedStatus: boolean}) {}
 }
@@ -181,7 +184,8 @@ export type UsersType = {
     _id: ObjectId;
     id: string;
     login: string;
-    email: string
+    email: string;
+    createdAt: string;
     accountData: {
         passwordHash: string;
         passwordSalt: string;

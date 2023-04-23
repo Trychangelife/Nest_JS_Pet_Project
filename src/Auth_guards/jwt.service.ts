@@ -14,11 +14,11 @@ export class JwtServiceClass {
     }
     
     async accessToken(user: UsersType) {
-        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '40m'})
+        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10s'})
         return accessToken
     }
     async refreshToken(user: UsersType): Promise<string> {
-        const refreshToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '1h'})
+        const refreshToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
         const newRefreshToken: RefreshTokenStorageType = {
             userId: user.id,
             refreshToken: refreshToken

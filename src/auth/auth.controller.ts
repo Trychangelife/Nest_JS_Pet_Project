@@ -2,9 +2,8 @@ import { EmailService } from "src/email/email.service";
 import { UsersRepository } from "src/users/users.repository";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
-import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
-import { CreateUser, RefreshTokenStorageType, UsersType } from "src/types/types";
-import { Injectable, Ip, Request } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Request, Res, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { RefreshTokenStorageType, UsersType } from "src/types/types";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
@@ -41,7 +40,7 @@ export class AuthController {
                 res
                 .cookie("refreshToken", refreshToken, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production"
+                    secure: true//process.env.NODE_ENV === "production"
                 })
                 .status(200)
                 .send({ accessToken });
@@ -66,7 +65,7 @@ export class AuthController {
                 res  
                  .cookie("refreshToken", newAccessToken.newRefreshToken, {
                      httpOnly: true,
-                     secure: process.env.NODE_ENV === "production"
+                     secure: true//process.env.NODE_ENV === "production"
                  })
                 .status(200)
                 .send({accessToken: newAccessToken.newAccessToken});
@@ -146,12 +145,12 @@ export class AuthController {
             throw new HttpException("Logout succefully, bye!", HttpStatus.NO_CONTENT)
         }
         else {
-            throw new HttpException("Sorry, you already logout, repeat authorization", HttpStatus.BAD_REQUEST)
+            throw new HttpException("Sorry, you already logout, repeat authorization", HttpStatus.UNAUTHORIZED)
         }
     }
     @UseGuards(JwtAuthGuard)
     @Get('me')
-    async aboutMe(@Body() @Request() req) {
+    async aboutMe(@Request() req ) {
         const foundUser = await this.usersRepository.findUserByLoginForMe(req.user.login);
         return foundUser
     }

@@ -1,9 +1,12 @@
-import { BadRequestException, Injectable, Ip, Request } from "@nestjs/common";
+import { BadRequestException, Injectable, Ip, Request, UseFilters, UseGuards } from "@nestjs/common";
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 import { constructorPagination } from "src/pagination.constructor";
 import { UsersType } from "src/types/types";
 import { UsersService } from "./users.service";
+import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
+import { UserRegistrationFlow } from "src/guard/users.registration.guard";
+import { AuthForm } from "src/types/class-validator.form";
 
 class CreateUser {
   @IsEmail()
@@ -29,8 +32,10 @@ export class UsersController {
         return resultUsers
     }
     @Post()
+    @UseGuards(UserRegistrationFlow)
+    @UseFilters(new HttpExceptionFilter())
     // Проверить, IP скорее всего не работает
-    async createUser(@Body() user: CreateUser,  @Request() req: {ip: string}) {
+    async createUser(@Body() user: AuthForm,  @Request() req: {ip: string}) {
         const result: UsersType | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
           throw new BadRequestException([{message: 'Bad email', field: 'Email'}])

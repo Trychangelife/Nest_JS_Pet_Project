@@ -84,6 +84,7 @@ export const usersSchema = new mongoose.Schema<UsersType>({
     id: {type: String, required: true},
     login: {type: String, required: true},
     email: {type: String, required: true},
+    createdAt: {type: String, required: true},
     accountData: {
         passwordHash: {type: String, required: true},
         passwordSalt: {type: String, required: true},

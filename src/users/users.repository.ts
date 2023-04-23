@@ -9,7 +9,9 @@ import { InjectModel } from "@nestjs/mongoose"
 const userViewModel = {
     _id: 0,
     id: 1,
-    login: 1 
+    email: 1,
+    login: 1 ,
+    createdAt: 1
 }
 const userViewModelForMe = {
 _id: 0,
@@ -28,7 +30,7 @@ const aggregate = usersModel.aggregate([
 export class UsersRepository {
 
     constructor (
-        @InjectModel('Users') protected usersModel: Model<UsersType>,
+        @InjectModel('Users') public usersModel: Model<UsersType>,
         @InjectModel('RegistrationData') protected registrationDataModel: Model<RegistrationDataType>,
         @InjectModel('AuthData') protected authDataModel: Model<AuthDataType>,
         @InjectModel('CodeConfirm') protected codeConfirmModel: Model<ConfirmedAttemptDataType>,
@@ -52,7 +54,8 @@ async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
         return false
     }
     else {
-        return await this.usersModel.findOne({ id: newUser.id }, userViewModel)
+        const createdUser = await this.usersModel.findOne({ id: newUser.id }, userViewModel).lean()
+        return createdUser
     }
 
 }
@@ -134,12 +137,14 @@ async findUserByLogin(login: string): Promise<UsersType | null> {
 }
 
 
-async findUserByLoginForMe(login: string): Promise<any[]> {
+async findUserByLoginForMe(login: string): Promise<any[] | UsersType> {
     const foundUser2 = await this.usersModel.aggregate([
         {$match: {login: login}},
         {$project: {_id: 0, userId: "$id", email: 1, login: 1}}
     ])
+    //const foundUser = await this.usersModel.findOne({ login: login }).lean()
     return foundUser2[0]
+    //return foundUser
 }
 async findUserByConfirmationCode(code: string): Promise<UsersType | null> {
     const foundUser = await this.usersModel.findOne({ "emailConfirmation.codeForActivated": code }).lean()
