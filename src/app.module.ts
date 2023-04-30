@@ -31,6 +31,8 @@ import { EmailManager } from './email/email.manager';
 import { EmailAdapter } from './email/email.adapter';
 import { FullDataController } from './Full delete/full_delete.controller';
 import { FullDeleteModule } from './Full delete/full_delete.module';
+import { SecurityDeviceController } from './security_devices/security.controller';
+import { SecurityDeviceService } from './security_devices/security.service';
 
 
 const options = {
@@ -90,7 +92,7 @@ const uri:string = process.env.mongoURI
         expiresIn: '24h'
     }
 })],
-  controllers: [AppController, BlogsController, PostController, UsersController, AuthController, CommentsController, FullDataController],
+  controllers: [AppController, BlogsController, PostController, UsersController, AuthController, CommentsController, FullDataController, SecurityDeviceController],
   providers: [AppService,
     BlogsService, 
     {provide: BlogsRepository, useClass: process.env.USE_DATABASE === 'SQL' ? BlogsRepositorySql : BlogsRepository}
@@ -100,7 +102,7 @@ const uri:string = process.env.mongoURI
     UsersService, UsersRepository,
     AuthService,
     CommentsService, CommentsRepository,
-    EmailService, EmailManager, EmailAdapter, FullDeleteModule
+    EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService
 ]
 })
 export class AppModule {}

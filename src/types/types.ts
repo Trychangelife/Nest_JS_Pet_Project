@@ -180,6 +180,18 @@ export class User {
         public accountData: { passwordHash: string, passwordSalt: string},
         public emailConfirmation: {codeForActivated: string, activatedStatus: boolean}) {}
 }
+
+export class DeviceAuthData {
+    constructor (
+    public userId: string,
+    public refreshToken: string,
+    public ip: string,
+    public title: string,
+    public deviceId: string,
+    public lastActiveDate: string
+    ) {}
+}
+
 export type UsersType = {
     _id: ObjectId;
     id: string;
@@ -220,6 +232,10 @@ export type ConfirmedAttemptDataType = {
 export type RefreshTokenStorageType = {
     userId: string
     refreshToken: string
+    ip: string
+    title: string
+    deviceId: string
+    lastActiveDate: string
 }
 
 

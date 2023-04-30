@@ -25,8 +25,10 @@ export class AuthController {
         @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>) {
     }
     @Post('login')
-    async authorization(@Request() req: {ip: string}, @Body() DataUser: AuthForm, @Res() res) {
+    async authorization(@Request() req, @Body() DataUser: AuthForm, @Res() res) {
         await this.authService.informationAboutAuth(req.ip, DataUser.loginOrEmail);
+        const ip = req.ip
+        const aboutDevice = req.headers['user-agent'] 
         const checkIP = await this.authService.counterAttemptAuth(req.ip, DataUser.loginOrEmail);
         if (checkIP) {
             const user = await this.usersService.checkCredentials(DataUser.loginOrEmail, DataUser.password);
@@ -36,7 +38,7 @@ export class AuthController {
             }
             else if (foundUser && user) {
                 const accessToken = await this.jwtService.accessToken(foundUser);
-                const refreshToken = await this.jwtService.refreshToken(foundUser);
+                const refreshToken = await this.jwtService.refreshToken(foundUser, ip, aboutDevice);
                 res
                 .cookie("refreshToken", refreshToken, {
                     httpOnly: true,
@@ -56,11 +58,13 @@ export class AuthController {
     @Post('refresh-token')
     async updateAccessToken(@Req() req, @Res() res) {
         const refreshToken = req.cookies["refreshToken"];
+        const ip = req.ip
+        const aboutDevice = req.headers['user-agent']    
         if (!refreshToken) {
             throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)
         }
         else if (refreshToken) {
-            const newAccessToken: any = await this.jwtService.getNewAccessToken(refreshToken);
+            const newAccessToken: any = await this.jwtService.getNewAccessToken(refreshToken, ip, aboutDevice);
             if (newAccessToken !== null) {
                 res  
                  .cookie("refreshToken", newAccessToken.newRefreshToken, {

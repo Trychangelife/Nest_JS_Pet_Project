@@ -118,8 +118,11 @@ export const codeConfirmSchema = new mongoose.Schema<ConfirmedAttemptDataType>({
 export const refreshTokenSchema = new mongoose.Schema<RefreshTokenStorageType>({
     userId: {type: String, required: true},
     refreshToken: {type: String, required: true},
+    ip: {type: String, required: true},
+    title: {type: String, required: true},
+    deviceId: {type: String, required: true},
+    lastActiveDate: {type: String, required: true}
 })
-
 
 export const bloggerModel = mongoose.model('bloggers', blogsSchema)
 export const postsModel = mongoose.model('posts', postSchema)

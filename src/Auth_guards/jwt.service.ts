@@ -4,6 +4,7 @@ import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { JwtService} from '@nestjs/jwt'
 import { RefreshTokenStorageType, UsersType } from "src/types/types";
+import { uuid } from "uuidv4";
 
 
 @Injectable()
@@ -17,11 +18,15 @@ export class JwtServiceClass {
         const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10s'})
         return accessToken
     }
-    async refreshToken(user: UsersType): Promise<string> {
+    async refreshToken(user: UsersType, ip: string, aboutDevice: string): Promise<string> {
         const refreshToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
         const newRefreshToken: RefreshTokenStorageType = {
             userId: user.id,
-            refreshToken: refreshToken
+            refreshToken: refreshToken,
+            ip: ip,
+            title: aboutDevice,
+            lastActiveDate: (new Date()).toDateString(),
+            deviceId: uuid()
         }
         const foundExistToken = await this.refreshTokenModel.findOne({ userId: user.id })
         if (foundExistToken == null) {
@@ -42,13 +47,13 @@ export class JwtServiceClass {
             return null
         }
     }
-    async getNewAccessToken(rToken: string): Promise<object | null> {
+    async getNewAccessToken(rToken: string, ip: string, aboutDevice: string): Promise<object | null> {
         const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken })
         if (checkToken !== null) {
             try {
                 const result: any = this.jwtService.verify(rToken, {secret: process.env.JWT_REFRESH_SECRET})
                 const newAccessToken = await this.accessToken(result)
-                const newRefreshToken =  await this.refreshToken(result)
+                const newRefreshToken =  await this.refreshToken(result, ip, aboutDevice)
                 return { newAccessToken, newRefreshToken }
             } catch (error) {
                 return null
