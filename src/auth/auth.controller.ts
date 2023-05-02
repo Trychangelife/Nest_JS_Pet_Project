@@ -42,7 +42,7 @@ export class AuthController {
                 res
                 .cookie("refreshToken", refreshToken, {
                     httpOnly: true,
-                    secure: true//process.env.NODE_ENV === "production"
+                    //secure: true//process.env.NODE_ENV === "production"
                 })
                 .status(200)
                 .send({ accessToken });
@@ -68,8 +68,8 @@ export class AuthController {
             if (newAccessToken !== null) {
                 res  
                  .cookie("refreshToken", newAccessToken.newRefreshToken, {
-                     httpOnly: true,
-                     secure: true//process.env.NODE_ENV === "production"
+                     httpOnly: true, 
+                     //secure: true//process.env.NODE_ENV === "production"
                  })
                 .status(200)
                 .send({accessToken: newAccessToken.newAccessToken});

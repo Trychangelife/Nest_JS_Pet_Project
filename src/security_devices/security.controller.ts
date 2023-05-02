@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, HttpException, HttpStatus, Request } from "@nestjs/common";
+import { Controller, Delete, Get, HttpException, HttpStatus, Req } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtServiceClass } from "src/Auth_guards/jwt.service";
@@ -17,8 +17,8 @@ export class SecurityDeviceController {
     }
     //GET - список всех активных сессий пользователя
     @Get('devices')
-    async returnAllDevices(@Request() req ) {
-        const refreshToken = req.cookies["refreshToken"]; 
+    async returnAllDevices(@Req() req ) {
+        const refreshToken = req.cookies["refreshToken"];
         const token = req.headers.authorization.split(' ')[1]
         const userId = await this.jwtServiceClass.getUserByToken(token)
         if (!refreshToken) {
@@ -29,14 +29,15 @@ export class SecurityDeviceController {
     }
     //DELETE - удаление всех других (кроме текущей) сессий
     @Delete('devices')
-    async terminateAllSession(@Request() req ) {
+    async terminateAllSession(@Req() req ) {
         const foundUser = await this.usersRepository.findUserByLoginForMe(req.user.login);
         return foundUser
     }
     //DELETE - удаление конкретной сессии по deviceId
-    @Delete('devices:id')
-    async terminateTargetSessionById(@Request() req ) {
+    @Delete('devices/:id')
+    async terminateTargetSessionById(@Req() req) {
         const foundUser = await this.usersRepository.findUserByLoginForMe(req.user.login);
         return foundUser
     }
 }
+ 

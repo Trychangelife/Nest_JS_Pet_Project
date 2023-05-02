@@ -5,6 +5,7 @@ import { SecurityDeviceController } from "./security.controller";
 import { SecurityDeviceService } from "./security.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { refreshTokenSchema } from "src/db";
+import { SecurityDeviceRepository } from "./security.repository";
 
 
 
@@ -20,7 +21,7 @@ import { refreshTokenSchema } from "src/db";
 ])
 ],
     controllers: [SecurityDeviceController],
-    providers: [JwtService, JwtServiceClass, SecurityDeviceService],
+    providers: [JwtService, JwtServiceClass, SecurityDeviceService, SecurityDeviceRepository],
     exports: []
   })
   export class SecurityDeviceModule {}

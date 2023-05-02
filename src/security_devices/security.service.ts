@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType, UsersType } from "src/types/types"
-import { UsersRepository } from "src/users/users.repository"
-import { uuid } from "uuidv4"
+import { RefreshTokenStorageType } from "src/types/types"
+import { SecurityDeviceRepository } from "./security.repository"
 
 
 
@@ -11,12 +10,13 @@ import { uuid } from "uuidv4"
 export class SecurityDeviceService {
 
     constructor (
-        @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>
+        @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>,
+        public securityDeviceRepository: SecurityDeviceRepository
         ) {
 
     }
     async returnAllDevices (userId: string): Promise <object> {
-    const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }).lean()
+    const foundAllDevice = await this.securityDeviceRepository.returnAllDevices(userId)
     return foundAllDevice
 }
 }
