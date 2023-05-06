@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { JwtService} from '@nestjs/jwt'
-import { RefreshTokenStorageType, UsersType } from "src/types/types";
+import { PayloadType, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { uuid } from "uuidv4";
 
 
@@ -18,28 +18,44 @@ export class JwtServiceClass {
         const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '5m'})
         return accessToken
     }
-    async refreshToken(user: UsersType, ip: string, aboutDevice: string): Promise<string> {
-        const refreshToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
-        const newRefreshToken: RefreshTokenStorageType = {
+    async refreshToken(user: UsersType, ip: string, titleDevice: string): Promise<string> {
+        const checkUserAgent = await this.refreshTokenModel.findOne({userId: user.id, title: titleDevice}).lean()
+        // Условия если пользователь уже авторизовался с этого устройства и нужно лишь заменить RefreshToken + Сохранить DeviceID
+        if (checkUserAgent !== null ) {
+            const deviceId = checkUserAgent.deviceId
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            const date = new Date();
+            const fullDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
+            if (refreshToken) {
+                await this.refreshTokenModel.updateOne({ userId: user.id, title: titleDevice }, { $set: { lastActiveDate: fullDate, refreshToken: refreshToken } })
+            }
+            return refreshToken
+        }
+        const deviceId = uuid()
+        const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+        const newRefreshTokenForStorage: RefreshTokenStorageType = {
             userId: user.id,
             refreshToken: refreshToken,
             ip: ip,
-            title: aboutDevice,
+            title: titleDevice,
             lastActiveDate: (new Date()).toDateString(),
-            deviceId: uuid()
+            deviceId: deviceId
         }
-        const foundExistToken = await this.refreshTokenModel.findOne({ userId: user.id })
-        if (foundExistToken == null) {
-            await this.refreshTokenModel.create(newRefreshToken)
-            return refreshToken
-        }
-        else {
-            await this.refreshTokenModel.updateOne({ userId: user.id }, { $set: { refreshToken: newRefreshToken.refreshToken } })
-            //await refreshTokenModel.findOneAndDelete({refreshToken: refreshToken})
-            return refreshToken
-        }
+        await this.refreshTokenModel.create(newRefreshTokenForStorage)
+        return refreshToken
+        // if (checkUserAgent == null) {
+        //     await this.refreshTokenModel.create(newRefreshTokenForStorage)
+        //     return refreshToken
+        // }
+        // else {
+        //     //Строка 39 отвечает за постоянное обновление токенов. Закомментил для мультидевайса
+        //     //await this.refreshTokenModel.updateOne({ userId: user.id }, { $set: { refreshToken: newRefreshTokenForStorage.refreshToken } })
+        //     await this.refreshTokenModel.create(newRefreshTokenForStorage)
+        //     //await refreshTokenModel.findOneAndDelete({refreshToken: refreshToken})
+        //     return refreshToken
+        // }
     }
-    async getUserByToken(token: string) {
+    async getUserByAccessToken(token: string) {
         try {
             const result: any = this.jwtService.verify(token, {secret: process.env.JWT_SECRET})
             return result.id
@@ -47,13 +63,21 @@ export class JwtServiceClass {
             return null
         }
     }
-    async getNewAccessToken(rToken: string, ip: string, aboutDevice: string): Promise<object | null> {
+    async getUserByRefreshToken(token: string) {
+        try {
+            const result: any = this.jwtService.verify(token, {secret: process.env.JWT_REFRESH_SECRET})
+            return result.id
+        } catch (error) {
+            return null
+        }
+    }
+    async getNewAccessToken(rToken: string, ip: string, titleDevice: string): Promise<object | null> {
         const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken })
         if (checkToken !== null) {
             try {
                 const result: any = this.jwtService.verify(rToken, {secret: process.env.JWT_REFRESH_SECRET})
                 const newAccessToken = await this.accessToken(result)
-                const newRefreshToken =  await this.refreshToken(result, ip, aboutDevice)
+                const newRefreshToken =  await this.refreshToken(result, ip, titleDevice)
                 return { newAccessToken, newRefreshToken }
             } catch (error) {
                 return null
@@ -71,5 +95,11 @@ export class JwtServiceClass {
         } catch (error) {
             return false
         }
+    }
+    async getJwtPayload (refreshToken: string): Promise<PayloadType> {
+        const tokenParts = refreshToken.split('.');
+        const payloadString = Buffer.from(tokenParts[1], 'base64').toString('utf-8');
+        const payload = JSON.parse(payloadString);
+        return payload
     }
 }

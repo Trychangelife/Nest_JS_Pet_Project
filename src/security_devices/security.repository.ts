@@ -21,10 +21,28 @@ export class SecurityDeviceRepository {
         const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }, deviceView).lean()
         return foundAllDevice
     }
-    async terminateAllSession (userId: string): Promise <object> {
-        return 
+    // async terminateAllSession (userId: string, deviceId: string): Promise <object> {
+    //     const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }).lean()
+
+    //     return 
+    // }
+
+    async terminateAllSession(userId: string, deviceId: string): Promise<boolean> {
+        const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }).lean();
+        for (const device of foundAllDevice) {
+          if (device.deviceId !== deviceId) {
+            await this.refreshTokenModel.deleteOne({ userId: device.userId });
+          }
+        }
+      
+        return true;
+      }
+    async terminateTargetSessionById (userId: string, deviceId: string): Promise <boolean> {
+        await this.refreshTokenModel.deleteOne({ userId: userId, deviceId: deviceId });
+        return true
     }
-    async terminateTargetSessionById (userId: string): Promise <object> {
-        return 
+    async foundUserIdByDeviceId (deviceId: string): Promise <string> {
+        const foundUserByDeviceId = await this.refreshTokenModel.findOne({deviceId: deviceId}).lean()
+        return foundUserByDeviceId.userId
     }
 }

@@ -24,7 +24,7 @@ export class CommentsController {
     async getCommentById(@Param() params, @Req() req) {
     try {
         const token = req.headers.authorization.split(' ')[1]
-        const userId = await this.jwtServiceClass.getUserByToken(token)
+        const userId = await this.jwtServiceClass.getUserByAccessToken(token)
         const result = await this.commentsService.getCommentsById(params.id, userId);
         if (result !== null && result !== undefined) {
             return result

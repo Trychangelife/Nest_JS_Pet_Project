@@ -19,7 +19,7 @@ export class JwtAuthGuard implements CanActivate {
             if (bearer !== "Bearer" || !token) {
                 throw new UnauthorizedException(401)
             }
-            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             if (userId) {
                 const user: UsersType =  await this.usersService.findUserById(userId)
                 req.user = user;

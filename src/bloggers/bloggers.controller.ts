@@ -53,7 +53,7 @@ export class BlogsController {
     async getPostByBloggerID(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
       try {
         const token = req.headers.authorization.split(' ')[1]
-        const userId = await this.jwtServiceClass.getUserByToken(token)
+        const userId = await this.jwtServiceClass.getUserByAccessToken(token)
         const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
         const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize, userId);
        if (findBlogger !== undefined) {

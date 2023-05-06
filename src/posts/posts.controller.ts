@@ -17,7 +17,7 @@ export class PostController {
     async getAllPosts(@Query() query: {SearchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
-            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
             const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber, userId);
             return getAllPosts;
@@ -32,7 +32,7 @@ export class PostController {
     async getPostByID(@Param() params, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
-            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const takePost: object | undefined = await this.postsService.targetPosts(params.id, userId);
             if (takePost !== undefined) {
                 return takePost
@@ -108,7 +108,7 @@ export class PostController {
     async getCommentsByPostId(@Query() query: {SearchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
-            const userId = await this.jwtServiceClass.getUserByToken(token)
+            const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
             const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize,userId, paginationData.sortBy, paginationData.sortDirection);
                 if (newComment) {
