@@ -121,7 +121,7 @@ export const refreshTokenSchema = new mongoose.Schema<RefreshTokenStorageType>({
     ip: {type: String, required: true},
     title: {type: String, required: true},
     deviceId: {type: String, required: true},
-    lastActiveDate: {type: String, required: true}
+    lastActiveDate: {type: Date, required: true}
 })
 
 export const bloggerModel = mongoose.model('bloggers', blogsSchema)

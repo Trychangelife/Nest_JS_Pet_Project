@@ -70,10 +70,10 @@ export class AuthController {
                  .cookie("refreshToken", newAccessToken.newRefreshToken, {
                      httpOnly: true, 
                      secure: true//process.env.NODE_ENV === "production"
-                 })
+                 }) 
                 .status(200)
                 .send({accessToken: newAccessToken.newAccessToken});
-            }
+            }  
             else {
                 throw new HttpException('Refresh Token already not valid, repeat authorization', HttpStatus.UNAUTHORIZED)
             }

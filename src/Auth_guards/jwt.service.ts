@@ -24,10 +24,10 @@ export class JwtServiceClass {
         if (checkUserAgent !== null ) {
             const deviceId = checkUserAgent.deviceId
             const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
-            const date = new Date();
-            const fullDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
+            //const date = new Date();
+            //const fullDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
             if (refreshToken) {
-                await this.refreshTokenModel.updateOne({ userId: user.id, title: titleDevice }, { $set: { lastActiveDate: fullDate, refreshToken: refreshToken } })
+                await this.refreshTokenModel.updateOne({ userId: user.id, title: titleDevice }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
             }
             return refreshToken
         }
@@ -38,7 +38,7 @@ export class JwtServiceClass {
             refreshToken: refreshToken,
             ip: ip,
             title: titleDevice,
-            lastActiveDate: (new Date()).toDateString(),
+            lastActiveDate: new Date(),
             deviceId: deviceId
         }
         await this.refreshTokenModel.create(newRefreshTokenForStorage)

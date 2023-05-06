@@ -235,7 +235,7 @@ export type RefreshTokenStorageType = {
     ip: string
     title: string
     deviceId: string
-    lastActiveDate: string
+    lastActiveDate: Date
 }
 export type PayloadType = {
     id: string
