@@ -29,7 +29,6 @@ export class SecurityDeviceController {
     //DELETE - удаление всех других (кроме текущей) сессий
     @Delete('devices')
     async terminateAllSession(@Req() req ) {
-        console.log('Devices ALL')
         const refreshToken = req.cookies["refreshToken"];
         if (!refreshToken) 
         {throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)}
@@ -41,29 +40,8 @@ export class SecurityDeviceController {
         throw new HttpException("All session terminate", HttpStatus.NO_CONTENT);
         
     }
-    //DELETE - удаление конкретной сессии по deviceId
-    // @Delete('devices/:deviceId')
-    // async terminateTargetSessionById(@Req() req, @Param() params) {
-    //     console.log('Devices ID')
-    //     const refreshToken = req.cookies["refreshToken"];
-    //     if (!refreshToken) {throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)} 
-    //     const userId = await this.jwtServiceClass.getUserByRefreshToken(refreshToken)
-    //     if (userId == undefined || userId == null) {throw new HttpException('Not found', HttpStatus.NOT_FOUND)}
-    //     const checkRefreshToken = await this.jwtServiceClass.checkRefreshToken(refreshToken)
-    //     if (!checkRefreshToken) 
-    //     {throw new HttpException('Refresh token expired or incorect', HttpStatus.UNAUTHORIZED)}
-    //     const payload: PayloadType = await this.jwtServiceClass.getJwtPayload(refreshToken)
-    //      	//If try to delete the deviceId of other user
-    //     const foundUserIdByDeviceId = await this.securityService.foundUserIdByDeviceId(params.deviceId)
-    //     if (payload.id !== foundUserIdByDeviceId) 
-    //     {throw new HttpException('Refresh token expired or incorect', HttpStatus.FORBIDDEN)}
-    //     await this.securityService.terminateTargetSessionById(userId, params.deviceId)
-    //     throw new HttpException("All session terminate", HttpStatus.NO_CONTENT);
-    // } 
-
     @Delete('devices/:deviceId')
     async terminateTargetSessionById(@Req() req, @Param('deviceId') deviceId: string) {
-        console.log('Devices ID')
         const refreshToken = req.cookies["refreshToken"];
         if (!refreshToken) {
             throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)
