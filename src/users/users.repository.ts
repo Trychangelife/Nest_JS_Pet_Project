@@ -115,7 +115,7 @@ async counterAttemptEmail(ip: string, email?: string): Promise<boolean> {
     const dateResult = sub(new Date(), {
         seconds: 10
     })
-    const checkResultByIp = await this.emailSendModel.countDocuments({ $and: [{ ip: ip }, { emailSendDate: { $gt: dateResult } }] })
+    const checkResultByIp = await this.emailSendModel.countDocuments({ $and: [{ ip: ip, email: email }, { emailSendDate: { $gt: dateResult } }] })
     if (checkResultByIp > 5) {
         return false
     }
