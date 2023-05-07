@@ -73,7 +73,8 @@ export class JwtServiceClass {
         }
     }
     async getNewAccessToken(rToken: string, ip: string, titleDevice: string): Promise<object | null> {
-        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken, title: titleDevice })
+        const deviceIdForSearch: PayloadType = await this.getJwtPayload(rToken)
+        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken, title: deviceIdForSearch.deviceId})
         if (checkToken !== null) {
             try {
                 const result: any = this.jwtService.verify(checkToken.refreshToken, {secret: process.env.JWT_REFRESH_SECRET})
