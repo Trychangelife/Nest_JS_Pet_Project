@@ -73,10 +73,10 @@ export class JwtServiceClass {
         }
     }
     async getNewAccessToken(rToken: string, ip: string, titleDevice: string): Promise<object | null> {
-        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken })
+        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken, title: titleDevice })
         if (checkToken !== null) {
             try {
-                const result: any = this.jwtService.verify(rToken, {secret: process.env.JWT_REFRESH_SECRET})
+                const result: any = this.jwtService.verify(checkToken.refreshToken, {secret: process.env.JWT_REFRESH_SECRET})
                 const newAccessToken = await this.accessToken(result)
                 const newRefreshToken =  await this.refreshToken(result, ip, titleDevice)
                 return { newAccessToken, newRefreshToken }
