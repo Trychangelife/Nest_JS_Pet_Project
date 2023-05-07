@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
+import { JwtServiceClass } from "../Auth_guards/jwt.service";
 import { SecurityDeviceController } from "./security.controller";
 import { SecurityDeviceService } from "./security.service";
 import { MongooseModule } from "@nestjs/mongoose";
-import { refreshTokenSchema } from "src/db";
+import { refreshTokenSchema } from "../db";
 import { SecurityDeviceRepository } from "./security.repository";
 
 

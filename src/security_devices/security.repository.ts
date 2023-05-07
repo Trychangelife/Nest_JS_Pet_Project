@@ -1,7 +1,7 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { BlogsType, CommentsType, PostsType, RefreshTokenStorageType, UsersType } from "src/types/types"
+import { BlogsType, CommentsType, PostsType, RefreshTokenStorageType, UsersType } from "../types/types"
 
 export const deviceView = {
     _id: 0,
