@@ -38,6 +38,7 @@
     "@types/node": "^18.15.11",
     "@types/nodemailer": "^6.4.7",
     "@types/uuid": "^9.0.1",
+    "@types/validator": "^13.7.16",
     "base-64": "^1.0.0",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
