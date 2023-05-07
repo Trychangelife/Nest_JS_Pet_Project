@@ -15,7 +15,7 @@ export class JwtServiceClass {
     }
     
     async accessToken(user: UsersType) {
-        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '5m'})
+        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10s'})
         return accessToken
     }
     async refreshToken(user: UsersType, ip: string, titleDevice: string): Promise<string> {
@@ -23,7 +23,7 @@ export class JwtServiceClass {
         // Условия если пользователь уже авторизовался с этого устройства и нужно лишь заменить RefreshToken + Сохранить DeviceID
         if (checkUserAgent !== null ) {
             const deviceId = checkUserAgent.deviceId
-            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
             //const date = new Date();
             //const fullDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
             if (refreshToken) {
@@ -33,7 +33,7 @@ export class JwtServiceClass {
             
         }
         const deviceId = uuid()
-        const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+        const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
         const newRefreshTokenForStorage: RefreshTokenStorageType = {
             userId: user.id,
             refreshToken: refreshToken,
