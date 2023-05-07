@@ -19,6 +19,7 @@ export class SecurityDeviceRepository {
     ) {   }
     async returnAllDevices (userId: string): Promise <object> {
         const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }, deviceView).lean()
+        console.log("GET ALL DEVICES", foundAllDevice)
         return foundAllDevice
     }
     async terminateAllSession(userId: string, deviceId: string): Promise<boolean> {
