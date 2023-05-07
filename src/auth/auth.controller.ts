@@ -8,7 +8,7 @@ import { JwtServiceClass } from "src/Auth_guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
-import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
+import { HttpExceptionFilter } from "../exception_filters/exception_filter";
 import { UserRegistrationFlow } from "src/guard/users.registration.guard";
 import { AuthForm } from "src/types/class-validator.form";
 
