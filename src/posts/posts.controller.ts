@@ -5,8 +5,8 @@ import { JwtServiceClass } from "../Auth_guards/jwt.service";
 import { constructorPagination } from "../pagination.constructor";
 import { LIKES, PostsType, UsersType } from "../types/types";
 import { PostsService } from "./posts.service";
-import { Comment } from "src/types/class-validator.form";
 import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
+import { Comment } from "../types/class-validator.form";
 
 @Controller('posts')
 export class PostController {

@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IsEmail, IsNotEmpty, IsString, MaxLength, min, MinLength } from "class-validator";
-import { ObjectId } from "mongodb";
+import { ObjectId } from "mongodb"; 
 
 
 

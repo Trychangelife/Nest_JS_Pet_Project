@@ -1,5 +1,3 @@
-
-import { Schema } from "@nestjs/mongoose";
 import { ObjectId, ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
 import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES,  } from "./types/types";
