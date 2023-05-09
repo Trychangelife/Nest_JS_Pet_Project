@@ -24,6 +24,7 @@ export class SecurityDeviceController {
             throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)
         }
         const resultAllDevice = await this.securityService.returnAllDevices(userId)
+        console.log(resultAllDevice)
         return resultAllDevice
     }
     //DELETE - удаление всех других (кроме текущей) сессий
