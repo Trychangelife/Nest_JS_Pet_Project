@@ -30,12 +30,16 @@ export class SecurityDeviceController {
     @Delete('devices')
     async terminateAllSession(@Req() req ) {
         const refreshToken = req.cookies["refreshToken"];
+        const userAgent = req.headers['user-agent'] 
+        //console.log(refreshToken, 'Поступил запрос на удаление всех девайсов')
         if (!refreshToken) 
         {throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)}
         const userId = await this.jwtServiceClass.getUserByRefreshToken(refreshToken)
         const checkRefreshToken = await this.jwtServiceClass.checkRefreshToken(refreshToken)
+        //console.log({userId: userId, checkRefreshToken: checkRefreshToken})
         if (!checkRefreshToken) {throw new HttpException('Refresh token expired or incorect', HttpStatus.UNAUTHORIZED)}
         const payload: PayloadType = await this.jwtServiceClass.getJwtPayload(refreshToken)
+        //console.log({payload:payload})
         await this.securityService.terminateAllSession(userId, payload.deviceId)
         throw new HttpException("All session terminate", HttpStatus.NO_CONTENT);
         
@@ -48,11 +52,11 @@ export class SecurityDeviceController {
         } 
         const userId = await this.jwtServiceClass.getUserByRefreshToken(refreshToken)
         const foundUserIdByDeviceId = await this.securityService.foundUserIdByDeviceId(deviceId)
-        if (!userId || foundUserIdByDeviceId == null) {
+        if (foundUserIdByDeviceId == null) {
             throw new HttpException('Not found', HttpStatus.NOT_FOUND)
         }
-        const checkRefreshToken = await this.jwtServiceClass.checkRefreshToken(refreshToken)
-        if (!checkRefreshToken) {
+        //const checkRefreshToken = await this.jwtServiceClass.checkRefreshToken(refreshToken)
+        if (!userId) {
             throw new HttpException('Refresh token expired or incorrect', HttpStatus.UNAUTHORIZED)
         }
         const payload: PayloadType = await this.jwtServiceClass.getJwtPayload(refreshToken)

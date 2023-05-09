@@ -19,19 +19,18 @@ export class SecurityDeviceRepository {
     ) {   }
     async returnAllDevices (userId: string): Promise <object> {
         const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }, deviceView).lean()
-        console.log("GET ALL DEVICES", foundAllDevice)
         return foundAllDevice
     }
     async terminateAllSession(userId: string, deviceId: string): Promise<boolean> {
         const foundAllDevice = await this.refreshTokenModel.find({ userId: userId }).lean();
-        console.log("before delete",foundAllDevice)
+        //console.log({foundAllDevice: foundAllDevice, userId: userId, deviceId: deviceId}, "Запрос дошел до репозитория - сейчас начнется удаление")
         for (const device of foundAllDevice) {
           if (device.deviceId !== deviceId) {
             await this.refreshTokenModel.deleteOne({ deviceId: device.deviceId });
           }
         }
-        const foundAllDeviceAfter = await this.refreshTokenModel.find({ userId: userId }).lean();
-        console.log('after Delete', foundAllDeviceAfter)
+        const foundAllDevice1 = await this.refreshTokenModel.find({ userId: userId }).lean();
+        //console.log({foundAllDevice: foundAllDevice1},"Результат после удаления")
         return true;
       }
     async terminateTargetSessionById (userId: string, deviceId: string): Promise <boolean> {

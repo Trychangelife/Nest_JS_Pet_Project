@@ -5,6 +5,7 @@ import { Injectable } from "@nestjs/common";
 import { JwtService} from '@nestjs/jwt'
 import { PayloadType, RefreshTokenStorageType, UsersType } from "src/types/types";
 import { uuid } from "uuidv4";
+import { deviceView } from "src/security_devices/security.repository";
 
 
 @Injectable()
@@ -15,7 +16,7 @@ export class JwtServiceClass {
     }
     
     async accessToken(user: UsersType) {
-        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10s'})
+        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10m'})
         return accessToken
     }
     async refreshToken(user: UsersType, ip: string, titleDevice: string): Promise<string> {
@@ -23,17 +24,17 @@ export class JwtServiceClass {
         // Условия если пользователь уже авторизовался с этого устройства и нужно лишь заменить RefreshToken + Сохранить DeviceID
         if (checkUserAgent !== null ) {
             const deviceId = checkUserAgent.deviceId
-            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
             //const date = new Date();
             //const fullDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
             if (refreshToken) {
-                await this.refreshTokenModel.updateOne({ userId: user.id, title: titleDevice }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
+                await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
                 return refreshToken
             }
-            
+            return
         }
         const deviceId = uuid()
-        const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
+        const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
         const newRefreshTokenForStorage: RefreshTokenStorageType = {
             userId: user.id,
             refreshToken: refreshToken,
@@ -74,7 +75,8 @@ export class JwtServiceClass {
     }
     async getNewAccessToken(rToken: string, ip: string, titleDevice: string): Promise<object | null> {
         //const deviceIdForSearch: PayloadType = await this.getJwtPayload(rToken)
-        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken})
+        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken}).lean()
+        console.log(checkToken, ip, titleDevice, rToken)
         if (checkToken !== null) {
             try {
                 const result: any = this.jwtService.verify(checkToken.refreshToken, {secret: process.env.JWT_REFRESH_SECRET})
@@ -98,6 +100,18 @@ export class JwtServiceClass {
             return false
         }
     }
+    // async checkRefreshTokenWithTitle(refreshToken: string, userAgent: string): Promise<boolean | object> {
+
+    //         const result = this.jwtService.verify(refreshToken, {secret: process.env.JWT_REFRESH_SECRET})
+    //         const checkToken = await this.refreshTokenModel.findOne({ refreshToken: refreshToken, title: userAgent})
+    //         if (result && (checkToken !== null)) {
+    //             return {token: result}
+    //         }
+    //         else {
+    //             return false
+    //         }
+            
+    // }
     async getJwtPayload (refreshToken: string): Promise<PayloadType> {
         const tokenParts = refreshToken.split('.');
         const payloadString = Buffer.from(tokenParts[1], 'base64').toString('utf-8');
