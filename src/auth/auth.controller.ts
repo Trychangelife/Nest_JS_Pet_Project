@@ -143,7 +143,7 @@ export class AuthController {
     async logout(@Req() req) {
         const refreshTokenInCookie = req.cookies.refreshToken
         const checkRefreshToken = await this.jwtService.checkRefreshToken(refreshTokenInCookie)
-        const findTokenInData = await this.refreshTokenModel.findOne({refreshToken: refreshTokenInCookie})
+        const findTokenInData = await this.refreshTokenModel.findOne({refreshToken: refreshTokenInCookie}).lean()
         if (refreshTokenInCookie && checkRefreshToken !== false && findTokenInData !== null) {
             await this.refreshTokenModel.findOneAndDelete({refreshToken: refreshTokenInCookie})
             throw new HttpException("Logout succefully, bye!", HttpStatus.NO_CONTENT)
