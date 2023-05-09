@@ -25,37 +25,23 @@ export class JwtServiceClass {
         if (checkUserAgent !== null ) {
             const deviceId = checkUserAgent.deviceId
             const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
-            //const date = new Date();
-            //const fullDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
-            if (refreshToken) {
-                await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
-                return refreshToken
+            await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
+            return refreshToken
+        }
+        else {
+            const deviceId = uuid()
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            const newRefreshTokenForStorage: RefreshTokenStorageType = {
+                userId: user.id,
+                refreshToken: refreshToken,
+                ip: ip,
+                title: titleDevice,
+                lastActiveDate: new Date(),
+                deviceId: deviceId
             }
-            return
+            await this.refreshTokenModel.create(newRefreshTokenForStorage)
+            return refreshToken
         }
-        const deviceId = uuid()
-        const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
-        const newRefreshTokenForStorage: RefreshTokenStorageType = {
-            userId: user.id,
-            refreshToken: refreshToken,
-            ip: ip,
-            title: titleDevice,
-            lastActiveDate: new Date(),
-            deviceId: deviceId
-        }
-        await this.refreshTokenModel.create(newRefreshTokenForStorage)
-        return refreshToken
-        // if (checkUserAgent == null) {
-        //     await this.refreshTokenModel.create(newRefreshTokenForStorage)
-        //     return refreshToken
-        // }
-        // else {
-        //     //Строка 39 отвечает за постоянное обновление токенов. Закомментил для мультидевайса
-        //     //await this.refreshTokenModel.updateOne({ userId: user.id }, { $set: { refreshToken: newRefreshTokenForStorage.refreshToken } })
-        //     await this.refreshTokenModel.create(newRefreshTokenForStorage)
-        //     //await refreshTokenModel.findOneAndDelete({refreshToken: refreshToken})
-        //     return refreshToken
-        // }
     }
     async getUserByAccessToken(token: string) {
         try {
