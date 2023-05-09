@@ -19,11 +19,18 @@ export class JwtServiceClass {
         const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10m'})
         return accessToken
     }
-    async refreshToken(user: UsersType, ip: string, titleDevice: string): Promise<string> {
+    async refreshToken(user: UsersType, ip: string, titleDevice: string, rToken?: string): Promise<string> {
         const checkUserAgent = await this.refreshTokenModel.findOne({userId: user.id, title: titleDevice}).lean()
+        const checkToken = await this.refreshTokenModel.findOne({ refreshToken: rToken}).lean()
         // Условия если пользователь уже авторизовался с этого устройства и нужно лишь заменить RefreshToken + Сохранить DeviceID
         if (checkUserAgent !== null ) {
             const deviceId = checkUserAgent.deviceId
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
+            return refreshToken
+        }
+        else if (checkToken !== null) {
+            const deviceId = checkToken.deviceId
             const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
             await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
             return refreshToken
@@ -67,7 +74,7 @@ export class JwtServiceClass {
             try {
                 const result: any = this.jwtService.verify(checkToken.refreshToken, {secret: process.env.JWT_REFRESH_SECRET})
                 const newAccessToken = await this.accessToken(result)
-                const newRefreshToken =  await this.refreshToken(result, ip, titleDevice)
+                const newRefreshToken =  await this.refreshToken(result, ip, titleDevice, rToken)
                 return { newAccessToken, newRefreshToken }
             } catch (error) {
                 return null
