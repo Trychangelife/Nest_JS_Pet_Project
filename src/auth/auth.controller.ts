@@ -173,7 +173,7 @@ export class AuthController {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
         }
     } 
-    //@UseFilters(new HttpExceptionFilter())
+    @UseFilters(new HttpExceptionFilter())
     @Post('new-password')
     async newPassword(@Req() req,@Body() newPasswordEntity: NewPassword) {
         // Регистрируем обращение на наш эндпоинт 
@@ -188,7 +188,7 @@ export class AuthController {
                     throw new HttpException("Just 204", HttpStatus.NO_CONTENT)
                 }
                 else {
-                    throw new HttpException("Just 204", HttpStatus.BAD_REQUEST)
+                    throw new HttpException(`{ errorsMessages: [{ message: Any<String>, field: "${newPasswordEntity.recoveryCode}" }] }`, HttpStatus.BAD_REQUEST)
                 }
         }
         else {

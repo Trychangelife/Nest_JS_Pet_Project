@@ -22,7 +22,7 @@ export class UsersService {
 
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
-        return await this.usersRepository.createNewPassword(passwordHash, recoveryCode)
+        return await this.usersRepository.createNewPassword(passwordHash, passwordSalt, recoveryCode)
     }
     async createUser(password: string, login: string,  email: string, ip: string): Promise<UsersType | null | boolean> {
 

@@ -1,4 +1,4 @@
-import { MinLength, MaxLength, IsOptional, Matches, IsNotEmpty } from "class-validator"
+import { MinLength, MaxLength, IsOptional, Matches, IsNotEmpty, IsUUID } from "class-validator"
 
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 const loginRegex = /^[a-zA-Z0-9_-]*$/
@@ -30,6 +30,7 @@ export class NewPassword  {
     @MaxLength(20)
     newPassword: string
     @IsNotEmpty()
+    @IsUUID()
     recoveryCode: string
 }
 export class Comment {

@@ -61,9 +61,9 @@ async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
     }
 
 }
-async createNewPassword(passwordHash: string, recoveryCode: string): Promise <null | boolean> {
+async createNewPassword(passwordHash: string, passwordSalt: string ,recoveryCode: string): Promise <null | boolean> {
     // Сюда еще проверку времени кода прилепить
-    const activatedUser = await this.usersModel.updateOne({ "recoveryPasswordInformation.codeForRecovery": recoveryCode }, { $set: { "accountData.passwordHash": passwordHash } })
+    const activatedUser = await this.usersModel.updateOne({ "recoveryPasswordInformation.codeForRecovery": recoveryCode }, { $set: { "accountData.passwordHash": passwordHash, "accountData.passwordSalt": passwordSalt } })
     if (activatedUser.modifiedCount > 0) {
         return true
     }

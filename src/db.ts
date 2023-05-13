@@ -145,8 +145,8 @@ export const authDataModel = mongoose.model('authData', authDataSchema)
 export const emailSendModel = mongoose.model('emailSend', emailSendSchema)
 export const codeConfirmModel = mongoose.model('confirmAttemptLog', codeConfirmSchema)
 export const refreshTokenModel = mongoose.model('refreshToken', refreshTokenSchema)
-export const RecoveryPasswordModel = mongoose.model('recoveryPassword', recoveryPasswordSchema)
-export const NewPasswordModel = mongoose.model('newPassword', newPasswordSchema)
+export const recoveryPasswordModel = mongoose.model('recoveryPassword', recoveryPasswordSchema)
+export const newPasswordModel = mongoose.model('newPassword', newPasswordSchema)
 
 
 // export async function runDb () {
