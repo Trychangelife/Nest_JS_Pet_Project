@@ -173,10 +173,10 @@ export class AuthController {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
         }
     } 
-    @UseFilters(new HttpExceptionFilter())
+    //@UseFilters(new HttpExceptionFilter())
     @Post('new-password')
     async newPassword(@Req() req,@Body() newPasswordEntity: NewPassword) {
-        // Регистрируем обращение на наш эндпоинт
+        // Регистрируем обращение на наш эндпоинт 
         await this.authService.informationAboutNewPassword(req.ip, newPasswordEntity.recoveryCode);
         // Проверяем наличие 5 и более обращений за последних 10 секунд (для 429 ошибки)
         const checkAttemptNewPassword = await this.authService.counterAttemptNewPassword(req.ip, newPasswordEntity.recoveryCode);

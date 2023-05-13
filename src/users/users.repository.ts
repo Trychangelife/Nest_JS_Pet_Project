@@ -2,7 +2,7 @@
 import { sub } from "date-fns"
 import { Model } from "mongoose"
 import { usersModel } from "../db"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RecoveryNewPasswordType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
+import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, NewPasswordType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 
@@ -37,7 +37,7 @@ export class UsersRepository {
         @InjectModel('EmailSend') protected emailSendModel: Model<EmailSendDataType>,
         @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>,
         @InjectModel('RecoveryPassword') protected recoveryPasswordModel: Model<RecoveryPasswordType>,
-        @InjectModel('RecoveryNewPassword') protected recoveryNewPasswordModel: Model<RecoveryPasswordType>
+        @InjectModel('NewPassword') protected newPasswordModel: Model<NewPasswordType>
     ) {
 
     }
@@ -147,7 +147,7 @@ async counterAttemptNewPassword(ip: string, code?: string): Promise<boolean> {
     const dateResult = sub(new Date(), {
         seconds: 10
     })
-    const checkResultByIp = await this.recoveryNewPasswordModel.countDocuments({ $and: [{ ip: ip,  recoveryCode: code }, { timestampNewPassword: { $gt: dateResult } }] })
+    const checkResultByIp = await this.newPasswordModel.countDocuments({ $and: [{ ip: ip,  recoveryCode: code }, { timestampNewPassword: { $gt: dateResult } }] })
     if (checkResultByIp > 5) {
         return false
     }
@@ -229,7 +229,7 @@ async informationAboutPasswordRecovery(recoveryPasswordData: RecoveryPasswordTyp
     await this.recoveryPasswordModel.create(recoveryPasswordData)
     return true
 }
-async informationAboutNewPassword(recoveryNewPasswordData: RecoveryNewPasswordType): Promise<boolean> {
+async informationAboutNewPassword(recoveryNewPasswordData: NewPasswordType): Promise<boolean> {
     await this.recoveryPasswordModel.create(recoveryNewPasswordData)
     return true
 }
