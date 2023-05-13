@@ -148,6 +148,7 @@ async counterAttemptNewPassword(ip: string, code?: string): Promise<boolean> {
         seconds: 10
     })
     const checkResultByIp = await this.newPasswordModel.countDocuments({ $and: [{ ip: ip,  recoveryCode: code }, { timestampNewPassword: { $gt: dateResult } }] })
+    console.log(checkResultByIp)
     if (checkResultByIp > 5) {
         return false
     }
@@ -230,7 +231,7 @@ async informationAboutPasswordRecovery(recoveryPasswordData: RecoveryPasswordTyp
     return true
 }
 async informationAboutNewPassword(recoveryNewPasswordData: NewPasswordType): Promise<boolean> {
-    await this.recoveryPasswordModel.create(recoveryNewPasswordData)
+    await this.newPasswordModel.create(recoveryNewPasswordData)
     return true
 }
 }
