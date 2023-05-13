@@ -177,7 +177,8 @@ export class User {
         public email: string,
         public createdAt: string,
         public accountData: { passwordHash: string, passwordSalt: string},
-        public emailConfirmation: {codeForActivated: string, activatedStatus: boolean}) {}
+        public emailConfirmation: {codeForActivated: string, activatedStatus: boolean},
+        public recoveryPasswordInformation?: {codeForRecovery: string, createdDateRecoveryCode: string}) {}
 }
 
 export class DeviceAuthData {
@@ -204,6 +205,10 @@ export type UsersType = {
     emailConfirmation: {
         codeForActivated: string
         activatedStatus: boolean
+    }
+    recoveryPasswordInformation?: {
+        codeForRecovery: string
+        createdDateRecoveryCode: string
     }
 };
 
@@ -239,5 +244,10 @@ export type RefreshTokenStorageType = {
 export type PayloadType = {
     id: string
     deviceId: string
+}
+export type RecoveryPasswordType = {
+    ip: string
+    emailSendDate: Date
+    email: string
 }
 

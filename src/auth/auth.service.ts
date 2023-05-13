@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, UsersType } from "src/types/types"
+import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RecoveryPasswordType, UsersType } from "src/types/types"
 import { UsersRepository } from "src/users/users.repository"
 import { uuid } from "uuidv4"
 
@@ -28,6 +28,9 @@ export class AuthService {
     async counterAttemptEmail (ip: string, email: string): Promise <boolean> {
         return await this.usersRepository.counterAttemptEmail(ip, email)
     }
+    async counterAttemptRecoveryPassword (ip: string, email: string): Promise <boolean> {
+        return await this.usersRepository.counterAttemptRecoveryPassword(ip, email)
+    }
     async informationAboutAuth (ip: string, login: string): Promise <boolean> {
         const authData: AuthDataType = {
             ip,
@@ -51,5 +54,13 @@ export class AuthService {
             email
         }
         return await this.usersRepository.informationAboutEmailSend(emailSendData)
+    }
+    async informationAboutRecoveryPassword (ip: string, email: string): Promise <boolean> {
+        const recoveryPasswordData: RecoveryPasswordType = {
+            ip,
+            emailSendDate: new Date(),
+            email
+        }
+        return await this.usersRepository.informationAboutPasswordRecovery(recoveryPasswordData)
     }
 }

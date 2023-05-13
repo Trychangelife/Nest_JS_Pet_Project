@@ -29,6 +29,7 @@ export class JwtServiceClass {
             await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
             return refreshToken
         }
+        // Если нам отправили refresh token 
         else if (checkToken !== null) {
             const deviceId = checkToken.deviceId
             const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})

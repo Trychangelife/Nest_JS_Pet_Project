@@ -73,4 +73,15 @@ export class UsersService {
         }
 
     }
+    async passwordRecovery(email: string): Promise<boolean> {
+        const foundUser = await this.usersRepository.findUserByEmail(email)
+        if (foundUser !== null) {
+            const codeRecoveryPassword = uuidv4()
+            return await this.usersRepository.passwordRecovery(email, codeRecoveryPassword)
+        }
+        else {
+            return false
+        }
+        
+    }
 }

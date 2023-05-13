@@ -2,7 +2,7 @@
 import { sub } from "date-fns"
 import { Model } from "mongoose"
 import { usersModel } from "../db"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
+import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 
@@ -35,7 +35,8 @@ export class UsersRepository {
         @InjectModel('AuthData') protected authDataModel: Model<AuthDataType>,
         @InjectModel('CodeConfirm') protected codeConfirmModel: Model<ConfirmedAttemptDataType>,
         @InjectModel('EmailSend') protected emailSendModel: Model<EmailSendDataType>,
-        @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>
+        @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>,
+        @InjectModel('RecoveryPassword') protected recoveryPasswordModel: Model<RecoveryPasswordType>
     ) {
 
     }
@@ -121,6 +122,20 @@ async counterAttemptEmail(ip: string, email?: string): Promise<boolean> {
     }
     else { return true }
 }
+async counterAttemptRecoveryPassword(ip: string, email?: string): Promise<boolean> {
+    const dateResult = sub(new Date(), {
+        seconds: 10
+    })
+    const checkResultByIp = await this.recoveryPasswordModel.countDocuments({ $and: [{ ip: ip, email: email }, { emailSendDate: { $gt: dateResult } }] })
+    if (checkResultByIp > 5) {
+        return false
+    }
+    else { return true }
+}
+async passwordRecovery(email: string, codeRecoveryPassword: string): Promise<boolean> {
+    await this.usersModel.updateOne({ email: email }, { $set: { "recoveryPasswordInformation.codeForRecovery": codeRecoveryPassword, "recoveryPasswordInformation.createdDateRecoveryCode": new Date() } })
+    return true
+}
 
 // Эндпоинты для поиска по определенным условиям
 async findUserByEmail(email: string): Promise<UsersType | null> {
@@ -187,6 +202,10 @@ async informationAboutEmailSend(emailSendData: EmailSendDataType): Promise<boole
 }
 async informationAboutConfirmed(confirmedData: ConfirmedAttemptDataType): Promise<boolean> {
     await this.codeConfirmModel.create(confirmedData)
+    return true
+}
+async informationAboutPasswordRecovery(recoveryPasswordData: RecoveryPasswordType): Promise<boolean> {
+    await this.recoveryPasswordModel.create(recoveryPasswordData)
     return true
 }
 }

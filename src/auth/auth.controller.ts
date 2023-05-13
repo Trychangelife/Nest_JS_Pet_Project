@@ -10,7 +10,7 @@ import { Model } from "mongoose";
 import { JwtAuthGuard } from "../Auth_guards/jwt-auth.guard";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
 import { UserRegistrationFlow } from "../guard/users.registration.guard";
-import { AuthForm } from "../types/class-validator.form";
+import { AuthForm, EmailForRecoveryPassword } from "../types/class-validator.form";
 
 
 @Controller('auth')
@@ -152,6 +152,27 @@ export class AuthController {
             throw new HttpException("Sorry, you already logout, repeat authorization", HttpStatus.UNAUTHORIZED)
         }
     }
+    // If the inputModel has invalid email (for example 222^gmail.com)
+    @UseFilters(new HttpExceptionFilter())
+    @Post('password-recovery')
+    async passwordRecovery(@Req() req,@Body() user: EmailForRecoveryPassword) {
+        await this.authService.informationAboutRecoveryPassword(req.ip, user.email);
+        const checkAttemptRecoveryPassword = await this.authService.counterAttemptRecoveryPassword(req.ip, user.email);
+        if (checkAttemptRecoveryPassword) {
+            const createRecoveryPassword = await this.usersService.passwordRecovery(user.email)
+             // 	Even if current email is not registered (for prevent user's email detection)
+            if (createRecoveryPassword) {
+                await this.emailService.emailPasswordRecovery(user.email)
+                throw new HttpException("Just 204", HttpStatus.NO_CONTENT)
+            }
+            else {
+                throw new HttpException("Just 204", HttpStatus.NO_CONTENT)
+            }
+        }
+        else {
+            throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
+        }
+    }   
     @UseGuards(JwtAuthGuard)
     @Get('me')
     async aboutMe(@Request() req ) {

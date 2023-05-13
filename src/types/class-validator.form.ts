@@ -19,7 +19,12 @@ export class AuthForm {
     email: string
     loginOrEmail: string
 }
-
+export class EmailForRecoveryPassword {
+    @IsNotEmpty()
+    @IsOptional()
+    @Matches(emailRegex)
+    email: string
+}
 export class Comment {
     @MinLength(20)
     @MaxLength(300)

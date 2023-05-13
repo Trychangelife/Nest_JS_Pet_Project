@@ -1,6 +1,6 @@
 import { ObjectId, ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
-import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES,  } from "./types/types";
+import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES, RecoveryPasswordType,  } from "./types/types";
 
 
 
@@ -91,6 +91,10 @@ export const usersSchema = new mongoose.Schema<UsersType>({
     emailConfirmation: {
         codeForActivated: {type: String, required: true},
         activatedStatus: {type: String, required: true}
+    },
+    recoveryPasswordInformation: {
+        codeForRecovery: {type: String, required: false},
+        createdDateRecoveryCode: {type: String, required: false}
     }
 })
 export const registrationDataSchema = new mongoose.Schema<RegistrationDataType>({
@@ -121,6 +125,11 @@ export const refreshTokenSchema = new mongoose.Schema<RefreshTokenStorageType>({
     deviceId: {type: String, required: true},
     lastActiveDate: {type: Date, required: true}
 })
+export const recoveryPasswordSchema = new mongoose.Schema<RecoveryPasswordType>({
+    ip: {type: String, required: true},
+    emailSendDate: {type: Date, required: true},
+    email: {type: String, required: true}
+})
 
 export const bloggerModel = mongoose.model('bloggers', blogsSchema)
 export const postsModel = mongoose.model('posts', postSchema)
@@ -131,6 +140,7 @@ export const authDataModel = mongoose.model('authData', authDataSchema)
 export const emailSendModel = mongoose.model('emailSend', emailSendSchema)
 export const codeConfirmModel = mongoose.model('confirmAttemptLog', codeConfirmSchema)
 export const refreshTokenModel = mongoose.model('refreshToken', refreshTokenSchema)
+export const RecoveryPasswordModel = mongoose.model('recoveryPassword', recoveryPasswordSchema)
 
 
 // export async function runDb () {

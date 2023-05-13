@@ -24,4 +24,14 @@ export class EmailService {
             return false
         } 
     }
+    async emailPasswordRecovery(email: string): Promise<object | boolean> {
+        const foundUser = await this.usersModel.findOne({ email: email }).lean()
+        const statusAccount = await this.usersModel.findOne({email: email, 'emailConfirmation.activatedStatus': false}).lean()
+        if (foundUser !== null && statusAccount !== null) {
+            return await this.emailManager.sendEmailRecoveryPassword(foundUser)
+        }
+        else {
+            return false
+        } 
+    }
 }
