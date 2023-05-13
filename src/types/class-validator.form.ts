@@ -25,6 +25,14 @@ export class EmailForRecoveryPassword {
     @Matches(emailRegex)
     email: string
 }
+export class NewPassword  {
+    @MinLength(6)
+    @MaxLength(20)
+    @Matches(loginRegex)
+    newPassword: string
+    @IsNotEmpty()
+    recoveryCode: string
+}
 export class Comment {
     @MinLength(20)
     @MaxLength(300)

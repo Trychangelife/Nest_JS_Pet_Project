@@ -10,7 +10,7 @@ import { Model } from "mongoose";
 import { JwtAuthGuard } from "../Auth_guards/jwt-auth.guard";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
 import { UserRegistrationFlow } from "../guard/users.registration.guard";
-import { AuthForm, EmailForRecoveryPassword } from "../types/class-validator.form";
+import { AuthForm, EmailForRecoveryPassword, NewPassword } from "../types/class-validator.form";
 
 
 @Controller('auth')
@@ -168,6 +168,28 @@ export class AuthController {
             else {
                 throw new HttpException("Just 204", HttpStatus.NO_CONTENT)
             }
+        }
+        else {
+            throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
+        }
+    } 
+    @UseFilters(new HttpExceptionFilter())
+    @Post('new-password')
+    async newPassword(@Req() req,@Body() newPasswordEntity: NewPassword) {
+        // Регистрируем обращение на наш эндпоинт
+        await this.authService.informationAboutNewPassword(req.ip, newPasswordEntity.recoveryCode);
+        // Проверяем наличие 5 и более обращений за последних 10 секунд (для 429 ошибки)
+        const checkAttemptNewPassword = await this.authService.counterAttemptNewPassword(req.ip, newPasswordEntity.recoveryCode);
+        // True возвращается - значит все хорошо, пользователь нам не спамит
+        if (checkAttemptNewPassword) {
+                // Тут нужно реализовать создание нового пароля для юзера
+                const result = await this.usersService.createNewPassword(newPasswordEntity.newPassword, newPasswordEntity.recoveryCode)
+                if (result) {
+                    throw new HttpException("Just 204", HttpStatus.NO_CONTENT)
+                }
+                else {
+                    throw new HttpException("Just 204", HttpStatus.BAD_REQUEST)
+                }
         }
         else {
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)

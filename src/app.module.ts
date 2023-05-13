@@ -16,7 +16,7 @@ import { BlogsController } from './bloggers/bloggers.controller';
 import { PostController } from './posts/posts.controller';
 import { BlogsService } from './bloggers/bloggers.service';
 import { PostsService } from './posts/posts.service';
-import { authDataSchema, blogsSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema, registrationDataSchema, emailSendSchema, codeConfirmSchema, recoveryPasswordSchema } from './db';
+import { authDataSchema, blogsSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema, registrationDataSchema, emailSendSchema, codeConfirmSchema, recoveryPasswordSchema, recoveryNewPasswordSchema } from './db';
 import { UsersService } from './users/users.service';
 import { AuthService } from './auth/auth.service';
 import { CommentsService } from './comments/comments.service';
@@ -86,7 +86,8 @@ const uri:string = process.env.mongoURI
     {name: 'AuthData', schema: authDataSchema},
     {name: 'CodeConfirm', schema: codeConfirmSchema},
     {name: 'EmailSend', schema: emailSendSchema},
-    {name: 'RecoveryPassword', schema: recoveryPasswordSchema}
+    {name: 'RecoveryPassword', schema: recoveryPasswordSchema},
+    {name: 'RecoveryNewPassword', schema: recoveryNewPasswordSchema}
   ]),
   JwtModule.register({
     secret: process.env.JWT_SECRET,

@@ -2,7 +2,7 @@
 import { sub } from "date-fns"
 import { Model } from "mongoose"
 import { usersModel } from "../db"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
+import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RecoveryNewPasswordType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 
@@ -36,7 +36,8 @@ export class UsersRepository {
         @InjectModel('CodeConfirm') protected codeConfirmModel: Model<ConfirmedAttemptDataType>,
         @InjectModel('EmailSend') protected emailSendModel: Model<EmailSendDataType>,
         @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>,
-        @InjectModel('RecoveryPassword') protected recoveryPasswordModel: Model<RecoveryPasswordType>
+        @InjectModel('RecoveryPassword') protected recoveryPasswordModel: Model<RecoveryPasswordType>,
+        @InjectModel('RecoveryNewPassword') protected recoveryNewPasswordModel: Model<RecoveryPasswordType>
     ) {
 
     }
@@ -59,6 +60,16 @@ async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
         return createdUser
     }
 
+}
+async createNewPassword(passwordHash: string, recoveryCode: string): Promise <null | boolean> {
+    // Сюда еще проверку времени кода прилепить
+    const activatedUser = await this.usersModel.updateOne({ "recoveryPasswordInformation.codeForRecovery": recoveryCode }, { $set: { "accountData.passwordHash": passwordHash } })
+    if (activatedUser.modifiedCount > 0) {
+        return true
+    }
+    else {
+        return false
+    }
 }
 async deleteUser(id: string): Promise<boolean> { 
     const result = await this.usersModel.deleteOne({ id: id })
@@ -127,6 +138,16 @@ async counterAttemptRecoveryPassword(ip: string, email?: string): Promise<boolea
         seconds: 10
     })
     const checkResultByIp = await this.recoveryPasswordModel.countDocuments({ $and: [{ ip: ip, email: email }, { emailSendDate: { $gt: dateResult } }] })
+    if (checkResultByIp > 5) {
+        return false
+    }
+    else { return true }
+}
+async counterAttemptNewPassword(ip: string, code?: string): Promise<boolean> {
+    const dateResult = sub(new Date(), {
+        seconds: 10
+    })
+    const checkResultByIp = await this.recoveryNewPasswordModel.countDocuments({ $and: [{ ip: ip,  recoveryCode: code }, { timestampNewPassword: { $gt: dateResult } }] })
     if (checkResultByIp > 5) {
         return false
     }
@@ -206,6 +227,10 @@ async informationAboutConfirmed(confirmedData: ConfirmedAttemptDataType): Promis
 }
 async informationAboutPasswordRecovery(recoveryPasswordData: RecoveryPasswordType): Promise<boolean> {
     await this.recoveryPasswordModel.create(recoveryPasswordData)
+    return true
+}
+async informationAboutNewPassword(recoveryNewPasswordData: RecoveryNewPasswordType): Promise<boolean> {
+    await this.recoveryPasswordModel.create(recoveryNewPasswordData)
     return true
 }
 }

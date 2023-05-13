@@ -1,6 +1,6 @@
 import { ObjectId, ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
-import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES, RecoveryPasswordType,  } from "./types/types";
+import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES, RecoveryPasswordType, RecoveryNewPasswordType,  } from "./types/types";
 
 
 
@@ -130,6 +130,11 @@ export const recoveryPasswordSchema = new mongoose.Schema<RecoveryPasswordType>(
     emailSendDate: {type: Date, required: true},
     email: {type: String, required: true}
 })
+export const recoveryNewPasswordSchema = new mongoose.Schema<RecoveryNewPasswordType>({
+    ip: {type: String, required: true},
+    timestampNewPassword: {type: Date, required: true},
+    recoveryCode: {type: String, required: true}
+})
 
 export const bloggerModel = mongoose.model('bloggers', blogsSchema)
 export const postsModel = mongoose.model('posts', postSchema)
@@ -141,6 +146,7 @@ export const emailSendModel = mongoose.model('emailSend', emailSendSchema)
 export const codeConfirmModel = mongoose.model('confirmAttemptLog', codeConfirmSchema)
 export const refreshTokenModel = mongoose.model('refreshToken', refreshTokenSchema)
 export const RecoveryPasswordModel = mongoose.model('recoveryPassword', recoveryPasswordSchema)
+export const RecoveryNewPasswordModel = mongoose.model('recoveryNewPassword', recoveryNewPasswordSchema)
 
 
 // export async function runDb () {

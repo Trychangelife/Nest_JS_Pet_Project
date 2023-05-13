@@ -250,4 +250,8 @@ export type RecoveryPasswordType = {
     emailSendDate: Date
     email: string
 }
-
+export type RecoveryNewPasswordType = {
+    ip: string
+    recoveryCode: string
+    timestampNewPassword: Date
+}

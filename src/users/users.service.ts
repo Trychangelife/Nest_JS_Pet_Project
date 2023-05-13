@@ -18,6 +18,12 @@ export class UsersService {
         }
         return await this.usersRepository.allUsers(skip, pageSize, pageNumber)
     }
+    async createNewPassword(password: string, recoveryCode: string): Promise <null | boolean> {
+
+        const passwordSalt = await bcrypt.genSalt(10)
+        const passwordHash = await this._generateHash(password, passwordSalt)
+        return await this.usersRepository.createNewPassword(passwordHash, recoveryCode)
+    }
     async createUser(password: string, login: string,  email: string, ip: string): Promise<UsersType | null | boolean> {
 
         const passwordSalt = await bcrypt.genSalt(10)
