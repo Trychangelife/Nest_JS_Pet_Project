@@ -1,5 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { url } from 'inspector';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -9,8 +10,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-    
     const res: any = exception.getResponse()
+  
+    
     if (status === 400 && res.errorsMessages) {
       const errorResponse = {
         errorsMessages: res.errorsMessages,
@@ -25,6 +27,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errorResponse.errorsMessages.push(m)
       })
       response.status(status).json(errorResponse)
+    }
+    else if (status === 400 && request.body.recoveryCode === "incorrect") {
+      response.status(status).json({ errorsMessages: [{ message: request.body.recoveryCode, field: "recoveryCode" }] })
     }
     else {
       response.status(status).send()

@@ -29,8 +29,6 @@ export class NewPassword  {
     @MinLength(6)
     @MaxLength(20)
     newPassword: string
-    @IsNotEmpty()
-    @IsUUID()
     recoveryCode: string
 }
 export class Comment {

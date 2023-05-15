@@ -178,6 +178,7 @@ export class AuthController {
     async newPassword(@Req() req,@Body() newPasswordEntity: NewPassword) {
         // Регистрируем обращение на наш эндпоинт 
         await this.authService.informationAboutNewPassword(req.ip, newPasswordEntity.recoveryCode);
+        console.log("Есть вход в new-password")
         // Проверяем наличие 5 и более обращений за последних 10 секунд (для 429 ошибки)
         const checkAttemptNewPassword = await this.authService.counterAttemptNewPassword(req.ip, newPasswordEntity.recoveryCode);
         // True возвращается - значит все хорошо, пользователь нам не спамит
@@ -185,13 +186,16 @@ export class AuthController {
                 // Тут нужно реализовать создание нового пароля для юзера
                 const result = await this.usersService.createNewPassword(newPasswordEntity.newPassword, newPasswordEntity.recoveryCode)
                 if (result) {
+                    console.log("204")
                     throw new HttpException("Just 204", HttpStatus.NO_CONTENT)
                 }
                 else {
+                    console.log("400")
                     throw new HttpException(`{ errorsMessages: [{ message: Any<String>, field: "${newPasswordEntity.recoveryCode}" }] }`, HttpStatus.BAD_REQUEST)
                 }
         }
         else {
+            console.log("429")
             throw new HttpException("To many requests", HttpStatus.TOO_MANY_REQUESTS)
         }
     }   
