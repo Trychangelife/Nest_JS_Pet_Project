@@ -147,7 +147,7 @@ async counterAttemptNewPassword(ip: string, code?: string): Promise<boolean> {
     const dateResult = sub(new Date(), {
         seconds: 10
     })
-    const checkResultByIp = await this.newPasswordModel.countDocuments({ $and: [{ ip: ip,  recoveryCode: code }, { timestampNewPassword: { $gt: dateResult } }] })
+    const checkResultByIp = await this.newPasswordModel.countDocuments({ $and: [{ ip: ip}, { timestampNewPassword: { $gt: dateResult } }] })
     console.log(checkResultByIp)
     if (checkResultByIp > 5) {
         return false
