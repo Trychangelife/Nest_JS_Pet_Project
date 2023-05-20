@@ -37,3 +37,8 @@ export class Comment {
     content: string
    
 }
+
+export class LikesDTO {
+    @IsNotEmpty()
+    likeStatus: string
+}

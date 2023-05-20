@@ -1,18 +1,12 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Put, Req, Res, UseFilters, UseGuards } from "@nestjs/common";
-import { IsNotEmpty, MaxLength, MinLength } from "class-validator";
 import { JwtAuthGuard } from "../Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "../Auth_guards/jwt.service";
-import { CommentsType, LIKES } from "../types/types";
 import { CommentsService } from "./comments.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { Comment } from "../types/class-validator.form";
+import { Comment, LikesDTO } from "../types/class-validator.form";
+import { HttpExceptionFilterForLikes } from "src/exception_filters/exception_likes";
 
 
-
-export class LikesDTO {
-    @IsNotEmpty()
-    likeStatus: string
-}
 
 
 @Controller('comments')
@@ -75,16 +69,17 @@ export class CommentsController {
             throw new HttpException('FORBIDDEN',HttpStatus.FORBIDDEN)
         }
     }
+    //@UseFilters(new HttpExceptionFilterForLikes())
     @UseGuards(JwtAuthGuard)
     @Put(':commentId/like-status')
-    async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req) {
+    async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req, @Res() res) {
         const like_dislike: object | string = await this.commentsService.like_dislike(params.commentId, likeStatus, req.user!.id, req.user!.login);
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
         }
         else if (like_dislike === "400") {
             throw new HttpException({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 },HttpStatus.BAD_REQUEST)
-            //res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 });
+            //res.status(400).json({ errorsMessages: [{ errorsMessages: [{ message: "Any<String>", field: "likeStatus" }] }]});
         }
         else {
             throw new HttpException('Comment NOT FOUND',HttpStatus.NOT_FOUND)

@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { commentsVievModel } from "src/posts/posts.repository"
+import { LikesDTO } from "src/types/class-validator.form"
 import { CommentsType, LIKES, UsersType } from "src/types/types"
-import { LikesDTO } from "./comments.controller"
 
 @Injectable()
 export class CommentsRepository {
@@ -30,7 +30,7 @@ export class CommentsRepository {
         myStatus = "None"
     }
     const targetCommentWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, /*likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}*/}}
+        $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}}}
     ]).match({id: commentId})
     if (targetCommentWithAggregation == null) {
         console.log(targetCommentWithAggregation)

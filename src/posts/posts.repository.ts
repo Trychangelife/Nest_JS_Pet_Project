@@ -2,7 +2,6 @@ import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { id } from "date-fns/locale"
 import { Aggregate, Model } from "mongoose"
-import { LikesDTO } from "src/comments/comments.controller"
 import { BlogsType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
 
 export const postViewModel = {
@@ -21,12 +20,10 @@ export const commentsVievModel = {
     id: 1,
     content: 1,
     commentatorInfo: {userId: 1, userLogin: 1},
-    createdAt: 1
-    //postId: 0,
-    //__v: 0,
-    //likesInfo:0,
-    //likeStorage: 0,
-    //dislikeStorage: 0
+    createdAt: 1,
+    likesInfo:1,
+    //likeStorage: 1,
+    //dislikeStorage: 1
 }
 
 @Injectable()
@@ -189,7 +186,7 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
     if (findPosts !== null) {
     const findComments = await this.commentsModel.find({postId: postId}, commentsVievModel).skip(skip).limit(limit).lean()
     const commentsWithAggregation = await this.commentsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, postId: 1 /* likesInfo: 0*/}}
+        $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, postId: 1, likesInfo: 1}}
     ]).sort({createdAt: ascOrDesc}).match({postId: postId})
     const commentsWithAggregation1 = await this.commentsModel.find({postId: postId},commentsVievModel
     ).skip(skip).limit(limit).lean().sort({createdAt: ascOrDesc})
@@ -201,20 +198,20 @@ async takeCommentByIdPost (postId: string, skip: number, limit: number, page: nu
         // {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)
         // }}; 
 
-        let comment = {...commentsWithAggregation1[index],/* likesInfo: {...commentsWithAggregation[index].likesInfo}*/};
-    //     const checkOnDislike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"dislikeStorage.userId": userId}]}).lean()
-    //     const checkOnLike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"likeStorage.userId": userId}]}).lean()
-    //     let myStatus = ''
-    //      if (checkOnLike) {
-    //     myStatus = "Like"
-    // }
-    //         else if (checkOnDislike) {
-    //     myStatus = "Dislike"
-    // }
-    //         else {
-    //     myStatus = "None"
-    // }
-    // comment.likesInfo.myStatus = myStatus
+        let comment = {...commentsWithAggregation1[index], likesInfo: {...commentsWithAggregation[index].likesInfo}};
+        const checkOnDislike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"dislikeStorage.userId": userId}]}).lean()
+        const checkOnLike = await this.commentsModel.findOne({$and: [{id: comment.id}, {"likeStorage.userId": userId}]}).lean()
+        let myStatus = ''
+         if (checkOnLike) {
+        myStatus = "Like"
+    }
+            else if (checkOnDislike) {
+        myStatus = "Dislike"
+    }
+            else {
+        myStatus = "None"
+    }
+    comment.likesInfo.myStatus = myStatus
     delete comment.postId
         arrayForReturn.push(comment)
     }
