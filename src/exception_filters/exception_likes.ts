@@ -13,9 +13,11 @@ export class HttpExceptionFilterForLikes implements ExceptionFilter {
     const res: any = exception.getResponse()
     
     if (status === 400) {
+        //У нас в нашем случае только одно поле которое принимает эндпоинт - поэтому кроме likeStatus там полей нет.
         response.status(status).json({ errorsMessages: [{ message: "passes body incorrect", field: "likeStatus" }] })
     }
     else {
+        //Если ошибка не 400, то нужно вернуть корректный статус например 404
         response.status(status).send()
     }
 }
