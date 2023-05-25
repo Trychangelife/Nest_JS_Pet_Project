@@ -1,4 +1,5 @@
-import { MinLength, MaxLength, IsOptional, Matches, IsNotEmpty, IsUUID } from "class-validator"
+import { MinLength, MaxLength, IsOptional, Matches, IsNotEmpty, IsUUID, IsEnum } from "class-validator"
+import { LIKES } from "./types"
 
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 const loginRegex = /^[a-zA-Z0-9_-]*$/
@@ -39,6 +40,6 @@ export class Comment {
 }
 
 export class LikesDTO {
-    @IsNotEmpty()
+    @IsEnum(LIKES)
     likeStatus: string
 }

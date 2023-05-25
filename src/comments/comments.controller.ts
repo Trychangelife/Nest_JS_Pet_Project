@@ -69,8 +69,9 @@ export class CommentsController {
             throw new HttpException('FORBIDDEN',HttpStatus.FORBIDDEN)
         }
     }
-    //@UseFilters(new HttpExceptionFilterForLikes())
+    
     @UseGuards(JwtAuthGuard)
+    @UseFilters(new HttpExceptionFilterForLikes())
     @Put(':commentId/like-status')
     async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req, @Res() res) {
         const like_dislike: object | string = await this.commentsService.like_dislike(params.commentId, likeStatus, req.user!.id, req.user!.login);

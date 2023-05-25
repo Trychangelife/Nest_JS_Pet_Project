@@ -15,8 +15,8 @@ export class HttpExceptionFilterForLikes implements ExceptionFilter {
     if (status === 400) {
         response.status(status).json({ errorsMessages: [{ message: "passes body incorrect", field: "likeStatus" }] })
     }
-    else if (status === 404) {
-        response.status(400).json({ errorsMessages: [{ message: "passes body incorrect", field: "likeStatus" }] })
+    else {
+        response.status(status).send()
     }
 }
 }
