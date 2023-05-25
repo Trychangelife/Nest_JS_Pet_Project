@@ -101,7 +101,7 @@ export class Post {
         public content: string, 
         public blogId: string,
         public blogName: string,
-        public createdAt: Date,
+        public createdAt: string,
         public extendedLikesInfo: {
             likesCount: number,
             dislikesCount: number,
@@ -134,7 +134,7 @@ export type PostsType = {
     content: string;
     blogId: string;
     blogName: string;
-    createdAt: Date;
+    createdAt: string;
     extendedLikesInfo: {
         likesCount: number;
         dislikesCount: number;

@@ -90,7 +90,6 @@ export class PostController {
             throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
         }
     }
-    // Здесь не хватает юзера (проверить после занесения юзера в nestjs)
     @UseGuards(JwtAuthGuard)
     @UseFilters(new HttpExceptionFilter())
     @Post(':postId/comments')

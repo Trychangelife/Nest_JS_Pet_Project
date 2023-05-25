@@ -43,7 +43,7 @@ export class PostsService {
             const foundBlogger = await this.dataSource.query(`SELECT * FROM "Bloggers" WHERE id = $1`, [bloggerId])
         if (foundBlogger.length >= 1 && bloggerId) {
             // CREATE ON CLASS
-            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger[0].name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger[0].name, (new Date()).toISOString(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
             console.log(newPost)
             return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
         }
@@ -55,13 +55,13 @@ export class PostsService {
         const foundBloggerW = await this.bloggerModel.findOne({ id: bloggerIdUrl }).lean()
         if (bloggerIdUrl && foundBloggerW !== null) {
             // Построено на классе
-            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerIdUrl, foundBloggerW.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerIdUrl, foundBloggerW.name, (new Date()).toISOString(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
         
             return await this.postsRepository.releasePost(newPost, bloggerIdUrl)
         }
         else if (foundBlogger !== null && bloggerId) {
             // Построено на классе
-            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger.name, new Date(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new Post(uuidv4(), title, content, shortDescription, bloggerId, foundBlogger.name,(new Date()).toISOString(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
     
             return await this.postsRepository.releasePost(newPost, bloggerId, bloggerIdUrl)
         }

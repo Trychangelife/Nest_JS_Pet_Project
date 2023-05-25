@@ -10,9 +10,10 @@ export const postViewModel = {
     title: 1,
     shortDescription: 1,
     content: 1,
-    bloggerId: 1,
-    bloggerName: 1,
-    createdAt: 1
+    blogId: 1,
+    blogName: 1,
+    createdAt: 1,
+    extendedLikesInfo: 1
 }
 
 export const commentsVievModel = {
@@ -42,31 +43,31 @@ async allPosts(skip: number, limit: number, page?: number, userId?: string): Pro
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
     const arrayForReturn = []
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, /*extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}*/}}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
     ])
-    // for (let index = 0; index < targetPostWithAggregation.length; index++) {
-    //     let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
-    //     }};
-    //     const checkOnDislike = await this.postsModel.findOne({$and: [{id: post.id}, {"dislikeStorage.userId": userId}]}).lean()
-    //     const checkOnLike = await this.postsModel.findOne({$and: [{id: post.id}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean()
-    //     let myStatus = ''
-    //      if (checkOnLike) {
-    //     myStatus = "Like"
-    // }
-    //         else if (checkOnDislike) {
-    //     myStatus = "Dislike"
-    // }
-    //         else {
-    //     myStatus = "None"
-    // }
-    //     post.extendedLikesInfo.myStatus = myStatus
-    //     arrayForReturn.push(post)
-    // }
+    for (let index = 0; index < targetPostWithAggregation.length; index++) {
+        let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
+        }};
+        const checkOnDislike = await this.postsModel.findOne({$and: [{id: post.id}, {"dislikeStorage.userId": userId}]}).lean()
+        const checkOnLike = await this.postsModel.findOne({$and: [{id: post.id}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean()
+        let myStatus = ''
+         if (checkOnLike) {
+        myStatus = "Like"
+    }
+            else if (checkOnDislike) {
+        myStatus = "Dislike"
+    }
+            else {
+        myStatus = "None"
+    }
+        post.extendedLikesInfo.myStatus = myStatus
+        arrayForReturn.push(post)
+    }
     
     
 
     // ВЕРНУТЬ ЗДЕСЬ В ITEMS arrayForReturn и РАСКОМЕНТИТЬ СВЕРХУ
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: targetPostWithAggregation }
+    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn.reverse() }
 }
 async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
@@ -84,7 +85,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     }
     
     const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, bloggerId: 1, bloggerName: 1, createdAt: 1, /*extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}*/}
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus, newestLikes: {addedAt: 1, userId: 1, login: 1}}}
     }
     ]).match({id: postId})
     if (targetPostWithAggregation == null) {
@@ -101,19 +102,19 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
         
     }
 }
-async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number, page?: number, userId?: string): Promise<object | undefined> {
+async allPostsSpecificBlogger(blogId: string, skip: number, pageSize?: number, page?: number, userId?: string): Promise<object | undefined> {
 
 
-    const totalCount = await this.postsModel.count({ bloggerId: bloggerId })
-    const checkBloggerExist = await this.bloggerModel.count({ id: bloggerId })
+    const totalCount = await this.postsModel.count({ blogId: blogId })
+    const checkBloggerExist = await this.bloggerModel.count({ id: blogId })
     if (checkBloggerExist < 1) { return undefined }
     if (page !== undefined && pageSize !== undefined) {
-        const postsBloggerWithPaginator = await this.postsModel.find({ blogId: bloggerId }, postViewModel).skip(skip).limit(pageSize).lean()
+        const postsBloggerWithPaginator = await this.postsModel.find({ blogId: blogId }, postViewModel).skip(skip).limit(pageSize).lean()
         const pagesCount = Math.ceil(totalCount / pageSize)
         const arrayForReturn = []
         const targetPostWithAggregation = await this.postsModel.aggregate([{
-        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, /*extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}*/}}
-    ]).match({bloggerId: bloggerId})
+        $project: {_id: 0 ,id: 1, title: 1, shortDescription: 1, content: 1, blogId: 1, blogName: 1, createdAt: 1, extendedLikesInfo: {likesCount: 1, dislikesCount: 1, myStatus: 1, newestLikes: {addedAt: 1, userId: 1, login: 1}}}}
+    ]).match({blogId: blogId})
     for (let index = 0; index < targetPostWithAggregation.length; index++) {
         let post = {...targetPostWithAggregation[index], extendedLikesInfo: {...targetPostWithAggregation[index].extendedLikesInfo, newestLikes: targetPostWithAggregation[index].extendedLikesInfo.newestLikes.reverse().slice(0,3)
         }};
@@ -133,27 +134,27 @@ async allPostsSpecificBlogger(bloggerId: string, skip: number, pageSize?: number
         arrayForReturn.push(post)
     }
         if (page > 0 || pageSize > 0) {
-            return { pagesCount, page: page, pageSize: pageSize, totalCount, items: arrayForReturn }
+            return { pagesCount, page: page, pageSize: pageSize, totalCount, items: arrayForReturn.reverse() }
         }
         else {
-            const postsBloggerWithOutPaginator = await this.postsModel.find({ blogId: bloggerId }).lean()
+            const postsBloggerWithOutPaginator = await this.postsModel.find({ blogId: blogId }).lean()
             return { pagesCount: 0, page: page, pageSize: pageSize, totalCount, items: postsBloggerWithOutPaginator }
         }
 
     }
 }
-async releasePost(newPosts: PostsType, bloggerId: string, bloggerIdUrl?: string): Promise<object | string> {
-    const findBlogger = await this.bloggerModel.count({ id: bloggerId })
+async releasePost(newPosts: PostsType, blogId: string, bloggerIdUrl?: string): Promise<object | string> {
+    const findBlogger = await this.bloggerModel.count({ id: blogId })
     if (findBlogger < 1) { return "400" }
     await this.postsModel.create(newPosts)
     const result: PostsType | null = await this.postsModel.findOne({ id: newPosts.id }, postViewModel).lean()
     if (result !== null) { return result }
     else { return "400" }
 }
-async changePost(postId: string, title: string, shortDescription: string, content: string, bloggerId: string): Promise<string | object> {
+async changePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<string | object> {
 
     const foundPost = await this.postsModel.findOne({ id: postId }, postViewModel).lean()
-    const foundBlogger = await this.bloggerModel.findOne({ id: bloggerId }).lean()
+    const foundBlogger = await this.bloggerModel.findOne({ id: blogId }).lean()
     if (foundPost !== null && foundBlogger !== null) {
         await this.postsModel.updateOne({ id: postId }, { $set: { title: title, shortDescription: shortDescription, content: content, } })
         return foundPost
