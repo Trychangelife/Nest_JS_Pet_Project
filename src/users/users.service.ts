@@ -11,12 +11,12 @@ export class UsersService {
 
     constructor(protected usersRepository: UsersRepository, protected emailService: EmailService){
     }
-    async allUsers(pageSize: number, pageNumber: number): Promise<object> {
+    async allUsers(pageSize: number, pageNumber: number, sortDirection: string, sortBy: string, searchEmailTerm: string, searchLoginTerm: string): Promise<object> {
         let skip = 0
         if (pageNumber && pageSize) {
             skip = (pageNumber - 1) * pageSize
         }
-        return await this.usersRepository.allUsers(skip, pageSize, pageNumber)
+        return await this.usersRepository.allUsers(skip, pageSize, sortDirection, sortBy ,pageNumber, searchEmailTerm, searchLoginTerm)
     }
     async createNewPassword(password: string, recoveryCode: string): Promise <null | boolean> {
 
@@ -35,7 +35,7 @@ export class UsersService {
             dateRegistation: new Date(), 
             email
         }
-        await this.usersRepository.informationAboutRegistration(registrationData)
+        //await this.usersRepository.informationAboutRegistration(registrationData)
         const checkScam = await this.usersRepository.ipAddressIsScam(ip)
         if (checkScam == true) {
             if (await this.usersRepository.findUserByLogin(login) !== null || await this.usersRepository.findUserByEmail(email) !== null ) {

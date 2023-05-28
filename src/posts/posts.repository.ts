@@ -1,8 +1,7 @@
-import { Injectable, Next } from "@nestjs/common"
+import { Injectable} from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
-import { id } from "date-fns/locale"
-import { Aggregate, Model } from "mongoose"
-import { BlogsType, CommentsType, LIKES, Post, PostsType, UsersType } from "src/types/types"
+import { Model } from "mongoose"
+import { BlogsType, CommentsType, LIKES, PostsType, UsersType } from "src/types/types"
 
 export const postViewModel = {
     _id: 0,
@@ -68,7 +67,7 @@ async allPosts(skip: number, limit: number, page?: number, userId?: string): Pro
 
     // ВЕРНУТЬ ЗДЕСЬ В ITEMS arrayForReturn и РАСКОМЕНТИТЬ СВЕРХУ
     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn.reverse() }
-}
+} 
 async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
     const checkOnDislike = (await this.postsModel.findOne({$and: [{id: postId}, {"dislikeStorage.userId": userId}]}).lean())

@@ -7,6 +7,7 @@ import { UsersService } from "./users.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
 import { UserRegistrationFlow } from "../guard/users.registration.guard";
 import { AuthForm } from "../types/class-validator.form";
+import { BasicAuthGuard } from "src/Auth_guards/basic_auth_guard";
 
 class CreateUser {
   @IsEmail()
@@ -24,17 +25,17 @@ export class UsersController {
     constructor(protected usersService: UsersService) {
     }
 
-    
+    @UseGuards(BasicAuthGuard)
     @Get()
-    async getAllUsers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string, sortBy: string, sortDirection: string}) {
-        const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
-        const resultUsers = await this.usersService.allUsers(paginationData.pageSize, paginationData.pageNumber);
+    async getAllUsers(@Query() query: {searchEmailTerm: string, searchLoginTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}) {
+        const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string, query.searchEmailTerm as string, query.searchLoginTerm as string);
+        const resultUsers = await this.usersService.allUsers(paginationData.pageSize, paginationData.pageNumber, paginationData.sortDirection, paginationData.sortBy, paginationData.searchEmailTerm, paginationData.searchLoginTerm);
         return resultUsers
     }
     @Post()
+    @UseGuards(BasicAuthGuard)
     @UseGuards(UserRegistrationFlow)
     @UseFilters(new HttpExceptionFilter())
-    // Проверить, IP скорее всего не работает
     async createUser(@Body() user: AuthForm,  @Request() req: {ip: string}) {
         const result: UsersType | boolean = await this.usersService.createUser(user.password, user.login, user.email, req.ip);
         if (result == false) {
@@ -44,6 +45,7 @@ export class UsersController {
           return result
         }
     }
+    @UseGuards(BasicAuthGuard)
     @Delete(':id')
     async deleteUserById(@Param('id') id: string) {
         const afterDelete = await this.usersService.deleteUser(id as string);

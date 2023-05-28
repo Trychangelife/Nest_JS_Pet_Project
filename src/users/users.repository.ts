@@ -42,12 +42,30 @@ export class UsersRepository {
 
     }
 
-async allUsers(skip: number, limit: number, page?: number): Promise<object> {
-    const fullData = await this.usersModel.find({}, userViewModel).skip(skip).limit(limit)
-    const totalCount = await this.usersModel.count({})
-    const pagesCount = Math.ceil(totalCount / limit)
-    return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: fullData }
-}
+    async allUsers(skip: number, limit: number, sortDirection: string, sortingParam: string, page: number,  searchLoginTerm: string, searchEmailTerm: string,): Promise<object> {
+        // Условия поиска для FIND в Mongo DB
+        const query:any = {}
+        if (searchEmailTerm) {
+            const emailQuery = { email: { $regex: searchEmailTerm, $options: 'i' } };
+            query.$or = [{ ...emailQuery }];
+          }
+          if (searchLoginTerm) {
+            const loginQuery = { login: { $regex: searchLoginTerm, $options: 'i' } };
+            query.$or = query.$or ? [...query.$or, loginQuery] : [loginQuery];
+          }
+        // Опции для пагинации (некоторые переменные находятся в [] - особенность mongoose восприятия переменных в данных запросах)
+        const options = { 
+            sort: { [sortingParam]: [sortDirection] },
+            limit: limit,
+            skip: skip,
+        };
+    
+        const fullData = await this.usersModel.find(query, userViewModel, options)
+        // Передаем в .count query - иначе он будет считать полностью страницу, без условий - что не является корректным
+        const totalCount = await this.usersModel.count(query)
+        const pagesCount = Math.ceil(totalCount / limit)
+        return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: fullData }
+    }
 async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
     await this.usersModel.create(newUser)
     const checkUniqueLogin = await this.usersModel.count({ login: newUser.login })
