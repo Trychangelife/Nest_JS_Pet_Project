@@ -91,10 +91,9 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
         return undefined
     }
     else {
-        return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)
-        }}; 
+        //return targetPostWithAggregation
         try {
-           
+            return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)}}; 
         } finally {
             return targetPostWithAggregation[0]
         }

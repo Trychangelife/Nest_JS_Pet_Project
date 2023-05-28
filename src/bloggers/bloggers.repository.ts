@@ -10,7 +10,7 @@ const modelViewBloggers = {
     description: 1,
     websiteUrl: 1,
     createdAt: 1,
-
+    isMembership: 1
 }
 
 @Injectable()
@@ -20,15 +20,20 @@ export class BlogsRepository {
         
     }
 
-    async allBloggers(skip: number, limit?: number, searchNameTerm?: string | null, page?: number): Promise<object> {
+    async allBloggers(skip: number, limit?: number, searchNameTerm?: string | null, page?: number, sortBy?: string, sortDirection?: string): Promise<object> {
+        const options = { 
+            sort: { [sortBy]: [sortDirection] },
+            limit: limit,
+            skip: skip, 
+        };
         if (page !== undefined && limit !== undefined) {
-            const cursor = await this.blogsModel.find({}, modelViewBloggers).skip(skip).limit(limit)
+            const cursor = await this.blogsModel.find({}, modelViewBloggers, options)
             const totalCount = await this.blogsModel.count({})
             const pagesCount = Math.ceil(totalCount / limit)
             const fullData = await this.blogsModel.find({}, modelViewBloggers)
 
             if (searchNameTerm !== null) {
-                const cursorWithRegEx = await this.blogsModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers).skip(skip).limit(limit)
+                const cursorWithRegEx = await this.blogsModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers, options)
                 const totalCountWithRegex = cursorWithRegEx.length
                 const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
                 return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
@@ -54,7 +59,7 @@ export class BlogsRepository {
     }
     async createBlogger(newBlogger: BlogsType): Promise<BlogsType | null> {
         await this.blogsModel.create(newBlogger)
-        return await this.blogsModel.findOne({ id: newBlogger.id }, modelViewBloggers)
+        return await this.blogsModel.findOne({ id: newBlogger.id }, modelViewBloggers).lean()
     }
     async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
         const result = await this.blogsModel.updateOne({ id: id }, { $set: { name: name, youtubeUrl: youtubeUrl } })

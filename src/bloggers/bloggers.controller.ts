@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseFilters, UseGuards } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtServiceClass } from "../Auth_guards/jwt.service";
@@ -7,6 +7,8 @@ import { BlogsService } from "./bloggers.service";
 import { BasicAuthGuard } from "../Auth_guards/basic_auth_guard";
 import { constructorPagination } from "../pagination.constructor";
 import { BlogsType, PostsType } from "../types/types";
+import { Blogs, PostTypeValidator } from "src/types/class-validator.form";
+import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
 
 @Controller('blogs')
 export class BlogsController {
@@ -19,22 +21,22 @@ export class BlogsController {
       @InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
     }
 
-    @Delete('/del')
-    async deleteAllBlogs() {
-      const afterDelete = await this.blogsService.deleteAllBlogs();
-      if (afterDelete) {
-        return HttpStatus.OK
-      }
-      else {
-        return HttpStatus.BAD_REQUEST
-      }
-    }
+    // @Delete('/del')
+    // async deleteAllBlogs() {
+    //   const afterDelete = await this.blogsService.deleteAllBlogs();
+    //   if (afterDelete) {
+    //     return HttpStatus.OK
+    //   }
+    //   else {
+    //     return HttpStatus.BAD_REQUEST
+    //   }
+    // }
 
     @Get()
-    async getAllBloggers(@Query() query: {SearchNameTerm: string, PageNumber: string, PageSize: string, sortBy: string, sortDirection: string}) {
-      const searchNameTerm = typeof query.SearchNameTerm === 'string' ? query.SearchNameTerm : null;
-      const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
-      const full: object = await this.blogsService.allBloggers(paginationData.pageSize, paginationData.pageNumber, searchNameTerm);
+    async getAllBloggers(@Query() query: {searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}) {
+      const searchNameTerm = typeof query.searchNameTerm === 'string' ? query.searchNameTerm : null;
+      const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
+      const full: object = await this.blogsService.allBloggers(paginationData.pageSize, paginationData.pageNumber, searchNameTerm, paginationData.sortBy, paginationData.sortDirection);
       return full
     }
 
@@ -45,7 +47,7 @@ export class BlogsController {
             return findBlogger
         }
         else {
-            throw new HttpException('Opps check input params',HttpStatus.BAD_REQUEST)
+            throw new HttpException('Blog not found',HttpStatus.NOT_FOUND)
         }
     }
 
@@ -75,8 +77,9 @@ export class BlogsController {
       
     }
     @UseGuards(BasicAuthGuard)
+    @UseFilters(new HttpExceptionFilter())
     @Post()
-    async createBlogger(@Body() bloggersType: BlogsType) {
+    async createBlogger(@Body() bloggersType: Blogs) {
   
       const createrPerson: BlogsType | null = await this.blogsService.createBlogger(bloggersType.name, bloggersType.websiteUrl, bloggersType.description );
       if (createrPerson !== null) {
@@ -86,9 +89,10 @@ export class BlogsController {
         throw new HttpException('Opps check input Data',HttpStatus.BAD_REQUEST)
       }
     }
-  
+    @UseGuards(BasicAuthGuard)
+    @UseFilters(new HttpExceptionFilter())
     @Post(':id/posts')
-    async createPostByBloggerId(@Param() params, @Body() post: PostsType) {
+    async createPostByBloggerId(@Param() params, @Body() post: PostTypeValidator) {
       const blogger = await this.blogsModel.count({ id: params.id }); 
       if (blogger < 1) { throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND) }
   
@@ -96,9 +100,10 @@ export class BlogsController {
       return createPostForSpecificBlogger;
   
     }
- 
+    @UseGuards(BasicAuthGuard)
+    @UseFilters(new HttpExceptionFilter())
     @Put(':id')
-    async updateBlogger(@Param() params, @Body() bloggersType: BlogsType) {
+    async updateBlogger(@Param() params, @Body() bloggersType: Blogs) {
       const alreadyChanges: string = await this.blogsService.changeBlogs(params.id, bloggersType.name, bloggersType.websiteUrl);
       if (alreadyChanges === 'update') {
         throw new HttpException('Update succefully', HttpStatus.NO_CONTENT)
@@ -107,7 +112,7 @@ export class BlogsController {
         throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND)
       }
     }
-
+    @UseGuards(BasicAuthGuard)
     @Delete(':id')
     async deleteOneBlogger(@Param() params) {
       const afterDelete = await this.blogsService.deleteBlogger(params.id);

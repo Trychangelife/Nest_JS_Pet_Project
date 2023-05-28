@@ -13,12 +13,12 @@ export class BlogsService {
     constructor (protected bloggerRepository: BlogsRepository) {
     }
 
-    async allBloggers(pageSize: number, pageNumber: number, searchNameTerm?: string | null): Promise<object> {
+    async allBloggers(pageSize: number, pageNumber: number, searchNameTerm?: string | null, sortBy?: string, sortDirection?: string): Promise<object> {
         let skip = 0
         if (pageNumber && pageSize) {
             skip = (pageNumber - 1) * pageSize
         }
-        const bloggers = await this.bloggerRepository.allBloggers(skip, pageSize, searchNameTerm, pageNumber)
+        const bloggers = await this.bloggerRepository.allBloggers(skip, pageSize, searchNameTerm, pageNumber, sortBy, sortDirection)
         return bloggers
     }
     async targetBloggers(id: string): Promise<object | undefined> {
@@ -27,7 +27,7 @@ export class BlogsService {
     }
     async createBlogger(name: string, websiteUrl: string, description: string): Promise<BlogsType | null> {
         // Построено на классе
-        const newBlogs = new BlogsClass(uuidv4(), name, description, websiteUrl, new Date(), true)
+        const newBlogs = new BlogsClass(uuidv4(), name, description, websiteUrl, (new Date()).toISOString(), false)
         const createdBlogs = await this.bloggerRepository.createBlogger(newBlogs)
         return createdBlogs
     }

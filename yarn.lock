@@ -5328,7 +5328,7 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-reflect-metadata@^0.1.13:
+reflect-metadata@^0.1.12, reflect-metadata@^0.1.13:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
   integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
@@ -6116,6 +6116,13 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
+
+typegoose@^5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/typegoose/-/typegoose-5.7.0.tgz#58d6951dda93d8d75aed91a1c26b836a810ab6e0"
+  integrity sha512-9tgMX17WEkM2Je8SGWDy4obvkgir6kLCzj0Poj19YTXqbx3HVE/H0gQv2/RvuNtAPXVLYervTDPq4D0L8+Oxfw==
+  dependencies:
+    reflect-metadata "^0.1.12"
 
 typeorm@^0.3.12:
   version "0.3.12"

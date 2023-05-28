@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseEnumPipe, Post, Put, Query, Req, UseFilters, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseEnumPipe, Post, Put, Query, Req, Res, UseFilters, UseGuards } from "@nestjs/common";
 import { BasicAuthGuard } from "../Auth_guards/basic_auth_guard";
 import { JwtAuthGuard } from "../Auth_guards/jwt-auth.guard";
 import { JwtServiceClass } from "../Auth_guards/jwt.service";
@@ -6,7 +6,7 @@ import { constructorPagination } from "../pagination.constructor";
 import { LIKES, PostsType, UsersType } from "../types/types";
 import { PostsService } from "./posts.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { Comment } from "../types/class-validator.form";
+import { Comment, PostTypeValidator } from "../types/class-validator.form";
 
 @Controller('posts')
 export class PostController {
@@ -14,7 +14,7 @@ export class PostController {
     constructor(protected postsService: PostsService, protected jwtServiceClass: JwtServiceClass) {
     }
     @Get()
-    async getAllPosts(@Query() query: {SearchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Req() req) {
+    async getAllPosts(@Query() query: {searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
@@ -52,23 +52,27 @@ export class PostController {
         
     }
     @UseGuards(BasicAuthGuard)
+    @UseFilters(new HttpExceptionFilter())
     @Post()
-    async createPost(@Body() post: PostsType) {
-        const giveMePost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.blogId);
-        if (giveMePost == null) {
+    async createPost(@Body() post: PostTypeValidator, @Res() res) {
+        const createdPost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.blogId);
+        if (createdPost == null) {
             throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
             // res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "blogId" }], resultCode: 1 });
         }
         else {
-            throw new HttpException(giveMePost ,HttpStatus.CREATED);
+            res.status(201).send(createdPost)
+            //throw new HttpException(createdPost ,HttpStatus.CREATED);
         }
     }
     @UseGuards(BasicAuthGuard)
+    @UseFilters(new HttpExceptionFilter())
     @Put(':postId')
-    async updatePost(@Param() params, @Body() post: PostsType) {
+    async updatePost(@Param() params, @Body() post: PostTypeValidator) {
         const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.blogId);
         if (afterChanged !== "404" && afterChanged !== '400') {
-            throw new HttpException(afterChanged,HttpStatus.ACCEPTED)
+            //throw new HttpException(afterChanged,HttpStatus.ACCEPTED)
+            throw new HttpException(afterChanged,HttpStatus.NO_CONTENT)
         }
         else if (afterChanged === "400") {
             throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
@@ -81,10 +85,12 @@ export class PostController {
     }
     @UseGuards(BasicAuthGuard)
     @Delete(':id')
-    async deletePostById(@Param() params,) {
+    async deletePostById(@Param() params, @Res() res) {
         const deleteObj: boolean = await this.postsService.deletePost(params.id);
+        console.log("here")
         if (deleteObj === true) {
-           return HttpStatus.NO_CONTENT
+           //return HttpStatus.NO_CONTENT
+           throw new HttpException('Post was DELETED',HttpStatus.NO_CONTENT)
         }
         else {
             throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
@@ -104,7 +110,7 @@ export class PostController {
 
     } 
     @Get(':postId/comments')
-    async getCommentsByPostId(@Query() query: {SearchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
+    async getCommentsByPostId(@Query() query: {searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)

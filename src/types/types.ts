@@ -25,7 +25,7 @@ export type extendedLikesInfo = {
 
 @Schema()
 export class BlogsClass {
-    constructor(public  id: string, public name: string, public description: string ,public websiteUrl: string, public createdAt: Date, public isMembership: boolean ) {
+    constructor(public  id: string, public name: string, public description: string ,public websiteUrl: string, public createdAt: string, public isMembership: boolean ) {
     }
 }
 export type BlogsType = {
@@ -33,7 +33,7 @@ export type BlogsType = {
     name: string;
     description: string;
     websiteUrl: string;
-    createdAt: Date;
+    createdAt: string;
     isMembership: boolean;
 
 }
