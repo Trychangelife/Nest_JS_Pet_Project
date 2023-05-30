@@ -93,8 +93,10 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
     else {
         //return targetPostWithAggregation
         try {
+            //return targetPostWithAggregation[0]
             return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)}}; 
-        } finally {
+        } catch {
+            console.log(targetPostWithAggregation[0], "Try Catch сработал")
             return targetPostWithAggregation[0]
         }
         

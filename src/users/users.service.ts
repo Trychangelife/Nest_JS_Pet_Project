@@ -35,7 +35,7 @@ export class UsersService {
             dateRegistation: new Date(), 
             email
         }
-        //await this.usersRepository.informationAboutRegistration(registrationData)
+        await this.usersRepository.informationAboutRegistration(registrationData)
         const checkScam = await this.usersRepository.ipAddressIsScam(ip)
         if (checkScam == true) {
             if (await this.usersRepository.findUserByLogin(login) !== null || await this.usersRepository.findUserByEmail(email) !== null ) {

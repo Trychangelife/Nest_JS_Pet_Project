@@ -6,7 +6,7 @@ import { constructorPagination } from "../pagination.constructor";
 import { LIKES, PostsType, UsersType } from "../types/types";
 import { PostsService } from "./posts.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { Comment, PostTypeValidator } from "../types/class-validator.form";
+import { Comment, PostTypeValidator, PostTypeValidatorForCreate } from "../types/class-validator.form";
 
 @Controller('posts')
 export class PostController {
@@ -54,7 +54,7 @@ export class PostController {
     @UseGuards(BasicAuthGuard)
     @UseFilters(new HttpExceptionFilter())
     @Post()
-    async createPost(@Body() post: PostTypeValidator, @Res() res) {
+    async createPost(@Body() post: PostTypeValidatorForCreate, @Res() res) {
         const createdPost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.blogId);
         if (createdPost == null) {
             throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
@@ -68,7 +68,7 @@ export class PostController {
     @UseGuards(BasicAuthGuard)
     @UseFilters(new HttpExceptionFilter())
     @Put(':postId')
-    async updatePost(@Param() params, @Body() post: PostTypeValidator) {
+    async updatePost(@Param() params, @Body() post: PostTypeValidatorForCreate) {
         const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.blogId);
         if (afterChanged !== "404" && afterChanged !== '400') {
             //throw new HttpException(afterChanged,HttpStatus.ACCEPTED)

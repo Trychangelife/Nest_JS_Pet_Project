@@ -16,7 +16,7 @@ export class JwtServiceClass {
     }
     
     async accessToken(user: UsersType) {
-        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10m'})
+        const accessToken = this.jwtService.sign({ id: user.id }, {secret: process.env.JWT_SECRET, expiresIn: '10s'})
         return accessToken
     }
     async refreshToken(user: UsersType, ip: string, titleDevice: string, rToken?: string): Promise<string> {
@@ -25,20 +25,20 @@ export class JwtServiceClass {
         // Условия если пользователь уже авторизовался с этого устройства и нужно лишь заменить RefreshToken + Сохранить DeviceID
         if (checkUserAgent !== null ) {
             const deviceId = checkUserAgent.deviceId
-            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
             await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
             return refreshToken
         }
         // Если нам отправили refresh token 
         else if (checkToken !== null) {
             const deviceId = checkToken.deviceId
-            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
             await this.refreshTokenModel.updateOne({ userId: user.id, deviceId: deviceId }, { $set: { lastActiveDate: new Date (), refreshToken: refreshToken } })
             return refreshToken
         }
         else {
             const deviceId = uuid()
-            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20m'})
+            const refreshToken = this.jwtService.sign({ id: user.id, deviceId: deviceId }, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '20s'})
             const newRefreshTokenForStorage: RefreshTokenStorageType = {
                 userId: user.id,
                 refreshToken: refreshToken,

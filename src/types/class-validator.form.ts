@@ -1,6 +1,7 @@
 import { MinLength, MaxLength, IsOptional, Matches, IsNotEmpty, IsUUID, IsEnum, Validate } from "class-validator"
 import { LIKES } from "./types"
 import { Transform, TransformFnParams } from "class-transformer";
+import { BlogIsExistRule } from "./validator.posts.form";
 
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 const loginRegex = /^[a-zA-Z0-9_-]*$/
@@ -63,35 +64,22 @@ export class LikesDTO {
 export class PostTypeValidator {
     id: string;
     @MaxLength(30)
+    @Transform(({ value }: TransformFnParams) => value?.trim())
+    @Matches(nameRegex)
     title: string;
+    @Transform(({ value }: TransformFnParams) => value?.trim())
     @MaxLength(100)
+    @Matches(nameRegex)
     shortDescription: string;
     @MaxLength(1000)
+    @Transform(({ value }: TransformFnParams) => value?.trim())
+    @Matches(nameRegex)
     content: string;
-    //@BlogIdExists()
+    blogId:string
+
+}
+// Наследование класса для прохождения тестов
+export class PostTypeValidatorForCreate extends PostTypeValidator {
+    @Validate(BlogIsExistRule, {message: "BlogId not exist"})
     blogId: string;
-    blogName: string;
-    createdAt: string;
-    extendedLikesInfo: {
-        likesCount: number;
-        dislikesCount: number;
-        myStatus: LIKES;
-        newestLikes?: [
-            {
-                addedAt: Date
-                userId: string
-                login: string
-            }
-        ]
-    }
-    likeStorage?: [{
-        addedAt: Date
-        userId: string
-        login: string
-    }]
-    dislikeStorage?: [{
-        addedAt: Date
-        userId: string
-        login: string
-    }]
 }

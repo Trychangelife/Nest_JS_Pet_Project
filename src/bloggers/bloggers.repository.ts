@@ -49,12 +49,12 @@ export class BlogsRepository {
 
     }
     async targetBloggers(id: string): Promise<object | undefined> {
-        const blogger: BlogsType | null = await this.blogsModel.findOne({ id: id }, modelViewBloggers)
+        const blogger: BlogsType | null = await this.blogsModel.findOne({ id: id }, modelViewBloggers).lean()
         if (blogger !== null) {
             return blogger
         }
         else {
-            return
+            false
         }
     }
     async createBlogger(newBlogger: BlogsType): Promise<BlogsType | null> {

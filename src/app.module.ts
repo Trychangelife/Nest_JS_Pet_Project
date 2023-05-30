@@ -34,6 +34,7 @@ import { FullDeleteModule } from './Full delete/full_delete.module';
 import { SecurityDeviceController } from './security_devices/security.controller';
 import { SecurityDeviceService } from './security_devices/security.service';
 import { SecurityDeviceRepository } from './security_devices/security.repository';
+import { BlogIsExistRule } from './types/validator.posts.form';
 
 
 const options = {
@@ -105,7 +106,7 @@ const uri:string = process.env.mongoURI
     UsersService, UsersRepository,
     AuthService,
     CommentsService, CommentsRepository,
-    EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService, SecurityDeviceRepository
+    EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService, SecurityDeviceRepository, BlogIsExistRule
 ]
 })
 export class AppModule {}
