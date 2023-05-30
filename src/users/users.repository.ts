@@ -142,8 +142,9 @@ async counterAttemptConfirm(ip: string, code?: string): Promise<boolean> {
     }
 }
 async counterAttemptEmail(ip: string, email?: string): Promise<boolean> {
+    //Здесь 15 сек т.к отправка Email может занимать длительное время и 5 запросов не успевают за 10 сек.
     const dateResult = sub(new Date(), {
-        seconds: 10
+        seconds: 15
     })
     const checkResultByIp = await this.emailSendModel.countDocuments({ $and: [{ ip: ip, email: email }, { emailSendDate: { $gt: dateResult } }] })
     if (checkResultByIp > 5) {
