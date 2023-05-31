@@ -1,6 +1,6 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectDataSource } from "@nestjs/typeorm"
-import { PostsType } from "src/types/types"
+import { PostsType } from "src/utils/types"
 import { DataSource } from "typeorm"
 
 export const postViewModel = {

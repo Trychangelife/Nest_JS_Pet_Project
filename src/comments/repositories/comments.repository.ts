@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { commentsVievModel } from "src/posts/posts.repository"
-import { LikesDTO } from "src/types/class-validator.form"
-import { CommentsType, LIKES, UsersType } from "src/types/types"
+import { commentsVievModel } from "src/posts/repositories/posts.repository"
+import { LikesDTO } from "src/utils/class-validator.form"
+import { CommentsType, LIKES, UsersType } from "src/utils/types"
 
 @Injectable()
 export class CommentsRepository {

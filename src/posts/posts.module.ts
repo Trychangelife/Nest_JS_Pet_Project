@@ -4,12 +4,12 @@ import { AuthModule } from "src/auth/auth.module";
 import { BlogsModule } from "src/bloggers/bloggers.module";
 import { UsersModule } from "src/users/users.module";
 import { PostController } from "./posts.controller";
-import { PostRepository } from "./posts.repository";
-import { PostsService } from "./posts.service";
+import { PostRepository } from "./repositories/posts.repository";
+import { PostsService } from "./application/posts.service";
 import { JwtService } from "@nestjs/jwt";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
-import { BlogsRepository } from "src/bloggers/bloggers.repository";
-import { BlogsService } from "src/bloggers/bloggers.service";
+import { JwtServiceClass } from "src/guards/jwt.service";
+import { BlogsRepository } from "src/bloggers/repositories/bloggers.repository";
+import { BlogsService } from "src/bloggers/application/bloggers.service";
 import { postSchema, blogsSchema, commentsSchema, refreshTokenSchema, usersSchema } from "src/db";
 
 

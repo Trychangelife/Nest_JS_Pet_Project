@@ -3,11 +3,11 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { commentsSchema, refreshTokenSchema, usersSchema } from "src/db";
 import { UsersModule } from "src/users/users.module";
 import { CommentsController } from "./comments.controller";
-import { CommentsRepository } from "./comments.repository";
-import { CommentsService } from "./comments.service";
+import { CommentsRepository } from "./repositories/comments.repository";
+import { CommentsService } from "./application/comments.service";
 import { JwtService } from "@nestjs/jwt";
-import { JwtAuthGuard } from "src/Auth_guards/jwt-auth.guard";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
+import { JwtAuthGuard } from "src/guards/jwt-auth.guard";
+import { JwtServiceClass } from "src/guards/jwt.service";
 
 @Module({
     imports: [UsersModule ,MongooseModule.forFeature([{name: 'Comments', schema: commentsSchema}, 

@@ -1,7 +1,7 @@
 import { Controller, Delete, HttpCode, HttpException, HttpStatus } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { AuthDataType, BlogsType, CommentsType, ConfirmedAttemptDataType, EmailSendDataType, NewPasswordType, PostsType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "src/types/types";
+import { AuthDataType, BlogsType, CommentsType, ConfirmedAttemptDataType, EmailSendDataType, NewPasswordType, PostsType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "src/utils/types";
 
 @Controller('testing')
 export class FullDataController {

@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Schema } from "@nestjs/mongoose";
 import { ObjectId } from "mongodb"; 
 
 

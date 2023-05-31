@@ -1,16 +1,16 @@
 import { EmailService } from "../email/email.service";
-import { UsersRepository } from "../users/users.repository";
-import { UsersService } from "../users/users.service";
-import { AuthService } from "./auth.service";
+import { UsersRepository } from "../users/application/repositories/users.repository";
+import { UsersService } from "../users/application/users.service";
+import { AuthService } from "./application/auth.service";
 import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, Request, Res, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
-import { RefreshTokenStorageType, UsersType } from "../types/types";
-import { JwtServiceClass } from "../Auth_guards/jwt.service";
+import { RefreshTokenStorageType, UsersType } from "../utils/types";
+import { JwtServiceClass } from "../guards/jwt.service";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { JwtAuthGuard } from "../Auth_guards/jwt-auth.guard";
+import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { UserRegistrationFlow } from "../guard/users.registration.guard";
-import { AuthForm, EmailForRecoveryPassword, NewPassword } from "../types/class-validator.form";
+import { UserRegistrationFlow } from "../guards/users.registration.guard";
+import { AuthForm, EmailForRecoveryPassword, NewPassword } from "../utils/class-validator.form";
 
 
 @Controller('auth')

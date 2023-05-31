@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { UsersType } from "src/types/types"
+import { UsersType } from "src/utils/types"
 import { EmailManager } from "./email.manager"
 
 @Injectable()

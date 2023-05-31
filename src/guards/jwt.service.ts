@@ -3,9 +3,9 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { JwtService} from '@nestjs/jwt'
-import { PayloadType, RefreshTokenStorageType, UsersType } from "src/types/types";
+import { PayloadType, RefreshTokenStorageType, UsersType } from "src/utils/types";
 import { uuid } from "uuidv4";
-import { deviceView } from "src/security_devices/security.repository";
+import { deviceView } from "src/security_devices/repostitories/security.repository";
 
 
 @Injectable()

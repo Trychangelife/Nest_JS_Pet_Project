@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
-import { UsersRepository } from "src/users/users.repository";
+import { UsersRepository } from "src/users/application/repositories/users.repository";
 import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
+import { AuthService } from "./application/auth.service";
 import { authDataSchema, blogsSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";
 import { MongooseModule } from "@nestjs/mongoose";
-import { UsersService } from "src/users/users.service";
+import { UsersService } from "src/users/application/users.service";
 import { EmailService } from "src/email/email.service";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
+import { JwtServiceClass } from "src/guards/jwt.service";
 import { JwtModule, JwtService } from "@nestjs/jwt"
 import { EmailManager } from "src/email/email.manager";
 import { EmailAdapter } from "src/email/email.adapter";

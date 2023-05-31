@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { CommentsType, LIKES } from "src/types/types"
-import { CommentsRepository } from "./comments.repository"
-import { LikesDTO } from "src/types/class-validator.form"
+import { CommentsType, LIKES } from "src/utils/types"
+import { CommentsRepository } from "../repositories/comments.repository"
+import { LikesDTO } from "src/utils/class-validator.form"
 
 @Injectable()
 export class CommentsService {

@@ -1,8 +1,8 @@
 
-import { BlogsRepository } from "./bloggers.repository"
+import { BlogsRepository } from "../repositories/bloggers.repository"
 import { v4 as uuidv4 } from "uuid"
 import { Injectable, Scope } from "@nestjs/common"
-import { BlogsClass, BlogsType } from "src/types/types"
+import { BlogsClass, BlogsType } from "src/utils/types"
 
 
 

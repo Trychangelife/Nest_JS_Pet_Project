@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { UsersType } from "src/types/types"
+import { UsersType } from "src/utils/types"
 import { EmailAdapter } from "./email.adapter"
 
 

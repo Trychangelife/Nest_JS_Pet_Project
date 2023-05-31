@@ -1,5 +1,5 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { UsersRepository } from "src/users/users.repository";
+import { UsersRepository } from "src/users/application/repositories/users.repository";
 
 
 

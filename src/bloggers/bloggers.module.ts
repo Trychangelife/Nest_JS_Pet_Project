@@ -2,12 +2,12 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { blogsSchema, commentsSchema, postSchema, refreshTokenSchema, usersSchema } from "src/db";
 import { BlogsController } from "./bloggers.controller";
-import { BlogsRepository } from "./bloggers.repository";
-import { BlogsService } from "./bloggers.service";
+import { BlogsRepository } from "./repositories/bloggers.repository";
+import { BlogsService } from "./application/bloggers.service";
 import { JwtService } from "@nestjs/jwt";
-import { JwtServiceClass } from "src/Auth_guards/jwt.service";
-import { PostRepository } from "src/posts/posts.repository";
-import { PostsService } from "src/posts/posts.service";
+import { JwtServiceClass } from "src/guards/jwt.service";
+import { PostRepository } from "src/posts/repositories/posts.repository";
+import { PostsService } from "src/posts/application/posts.service";
 
 
 

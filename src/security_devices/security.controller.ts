@@ -1,10 +1,10 @@
 import { Controller, Delete, Get, HttpException, HttpStatus, Param, Req } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { JwtServiceClass } from "../Auth_guards/jwt.service";
-import { PayloadType, RefreshTokenStorageType } from "../types/types";
-import { UsersRepository } from "../users/users.repository";
-import { SecurityDeviceService } from "./security.service";
+import { JwtServiceClass } from "../guards/jwt.service";
+import { PayloadType, RefreshTokenStorageType } from "../utils/types";
+import { UsersRepository } from "../users/application/repositories/users.repository";
+import { SecurityDeviceService } from "./application/security.service";
 
 @Controller('security')
 export class SecurityDeviceController {

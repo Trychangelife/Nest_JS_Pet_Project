@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common"
 import * as bcrypt from "bcrypt"
 import { ObjectId } from "mongodb"
-import { EmailService } from "../email/email.service"
-import { RegistrationDataType, User, UsersType } from "../types/types"
-import { UsersRepository } from "./users.repository"
+import { EmailService } from "../../email/email.service"
+import { RegistrationDataType, User, UsersType } from "../../utils/types"
+import { UsersRepository } from "./repositories/users.repository"
 import { v4 as uuidv4 } from "uuid"
 
 @Injectable()

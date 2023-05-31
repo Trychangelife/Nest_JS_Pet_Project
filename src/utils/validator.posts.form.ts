@@ -24,7 +24,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { registerDecorator, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { BlogsService } from 'src/bloggers/bloggers.service';
+import { BlogsService } from 'src/bloggers/application/bloggers.service';
 
 
 export function BlogIsExist(validationOptions?: ValidationOptions) {

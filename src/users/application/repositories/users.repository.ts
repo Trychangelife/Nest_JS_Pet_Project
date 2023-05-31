@@ -1,8 +1,8 @@
 
 import { sub } from "date-fns"
 import { Model } from "mongoose"
-import { usersModel } from "../db"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, NewPasswordType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../types/types"
+import { usersModel } from "../../../db"
+import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, NewPasswordType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "../../../utils/types"
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 
