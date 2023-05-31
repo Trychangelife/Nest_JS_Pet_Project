@@ -31,7 +31,6 @@ export async function bootstrap() {
       throw new BadRequestException(customErrors)
     }  
   }))
-  app.use('/public', express.static(join(__dirname, '..', 'public'))); // <-
   await app.listen(process.env.PORT);
   console.log(`Server listening on port: ${process.env.PORT}`);
 }
