@@ -3,27 +3,39 @@ import { BasicAuthGuard } from "../guards/basic_auth_guard";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { JwtServiceClass } from "../guards/jwt.service";
 import { constructorPagination } from "../utils/pagination.constructor";
-import { LIKES, PostsType, UsersType } from "../utils/types";
+import { LIKES } from "../utils/types";
 import { PostsService } from "./application/posts.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { Comment, PostTypeValidator, PostTypeValidatorForCreate } from "../utils/class-validator.form";
+import { Comment } from "../utils/class-validator.form";
+import { PostTypeValidatorForCreate } from "src/posts/dto/PostTypeValidator";
+import { CommandBus } from "@nestjs/cqrs";
+import { GetAllPostsCommand } from "./application/use-cases/get_all_posts";
+import { GetSinglePostCommand } from "./application/use-cases/get_single_post";
+import { CreatePostCommand } from "./application/use-cases/create_post";
+import { UpdatePostCommand } from "./application/use-cases/update_post";
+import { DeletePostCommand } from "./application/use-cases/delete_post";
 
 @Controller('posts')
 export class PostController {
 
-    constructor(protected postsService: PostsService, protected jwtServiceClass: JwtServiceClass) {
+    constructor(
+        protected postsService: PostsService,
+        protected jwtServiceClass: JwtServiceClass,
+        private commandBus: CommandBus,
+    ) {
     }
+    // TASK - Pagination doesn't work, need to be fixed
     @Get()
-    async getAllPosts(@Query() query: {searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Req() req) {
+    async getAllPosts(@Query() query: { searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string }, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
-            const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber, userId);
+            const getAllPosts: object = await this.commandBus.execute(new GetAllPostsCommand(paginationData.pageSize, paginationData.pageNumber, userId));
             return getAllPosts;
         } catch (error) {
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
-            const getAllPosts: object = await this.postsService.allPosts(paginationData.pageSize, paginationData.pageNumber);
+            const getAllPosts: object = await this.commandBus.execute(new GetAllPostsCommand(paginationData.pageSize, paginationData.pageNumber));
             return getAllPosts;
         }
     }
@@ -33,31 +45,32 @@ export class PostController {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
-            const takePost: object | undefined = await this.postsService.targetPosts(params.id, userId);
+            const takePost: object | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id, userId))
+          
             if (takePost !== undefined) {
                 return takePost
             }
             else {
-                throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+                throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
             }
         } catch (error) {
-            const takePost: object | undefined = await this.postsService.targetPosts(params.id);
+            const takePost: object | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id))
             if (takePost !== undefined) {
                 return takePost
             }
             else {
-                throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+                throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
             }
         }
-        
+
     }
     @UseGuards(BasicAuthGuard)
     @UseFilters(new HttpExceptionFilter())
     @Post()
     async createPost(@Body() post: PostTypeValidatorForCreate, @Res() res) {
-        const createdPost: string | object | null = await this.postsService.releasePost(post.title,post.content, post.shortDescription, post.blogId);
+        const createdPost: string | object | null = await this.commandBus.execute(new CreatePostCommand(post.title, post.content, post.shortDescription, post.blogId));
         if (createdPost == null) {
-            throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
+            throw new HttpException('Something wrong, check input data', HttpStatus.BAD_REQUEST)
             // res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "blogId" }], resultCode: 1 });
         }
         else {
@@ -69,31 +82,30 @@ export class PostController {
     @UseFilters(new HttpExceptionFilter())
     @Put(':postId')
     async updatePost(@Param() params, @Body() post: PostTypeValidatorForCreate) {
-        const afterChanged: object | string = await this.postsService.changePost(params.postId, post.title, post.shortDescription, post.content, post.blogId);
+        const afterChanged: object | string = await this.commandBus.execute(new UpdatePostCommand(params.postId, post.title, post.shortDescription, post.content, post.blogId));
         if (afterChanged !== "404" && afterChanged !== '400') {
             //throw new HttpException(afterChanged,HttpStatus.ACCEPTED)
-            throw new HttpException(afterChanged,HttpStatus.NO_CONTENT)
+            throw new HttpException(afterChanged, HttpStatus.NO_CONTENT)
         }
         else if (afterChanged === "400") {
-            throw new HttpException('Something wrong, check input data',HttpStatus.BAD_REQUEST)
+            throw new HttpException('Something wrong, check input data', HttpStatus.BAD_REQUEST)
             //res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 });
         }
         else {
-            throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+            throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
         }
 
     }
     @UseGuards(BasicAuthGuard)
     @Delete(':id')
     async deletePostById(@Param() params, @Res() res) {
-        const deleteObj: boolean = await this.postsService.deletePost(params.id);
-        console.log("here")
+        const deleteObj: boolean = await this.commandBus.execute(new DeletePostCommand(params.id));
         if (deleteObj === true) {
-           //return HttpStatus.NO_CONTENT
-           throw new HttpException('Post was DELETED',HttpStatus.NO_CONTENT)
+            //return HttpStatus.NO_CONTENT
+            throw new HttpException('Post was DELETED', HttpStatus.NO_CONTENT)
         }
         else {
-            throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+            throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
         }
     }
     @UseGuards(JwtAuthGuard)
@@ -105,40 +117,40 @@ export class PostController {
             return newComment
         }
         else {
-            throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+            throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
         }
 
-    } 
+    }
     @Get(':postId/comments')
-    async getCommentsByPostId(@Query() query: {searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}, @Param() params, @Req() req) {
+    async getCommentsByPostId(@Query() query: { searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string }, @Param() params, @Req() req) {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
-            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize,userId, paginationData.sortBy, paginationData.sortDirection);
-                if (newComment) {
-                    return newComment
+            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize, userId, paginationData.sortBy, paginationData.sortDirection);
+            if (newComment) {
+                return newComment
             }
-                else {
-                     throw new HttpException("Post doesn't exists",HttpStatus.NOT_FOUND)
-        }
+            else {
+                throw new HttpException("Post doesn't exists", HttpStatus.NOT_FOUND)
+            }
         } catch (error) {
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
             const userIdMok = 'just'
             const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize, userIdMok, paginationData.sortBy, paginationData.sortDirection);
-        if (newComment) {
-            return newComment
-        }
-        else {
-            throw new HttpException("Post doesn't exists",HttpStatus.NOT_FOUND)
-        }
+            if (newComment) {
+                return newComment
+            }
+            else {
+                throw new HttpException("Post doesn't exists", HttpStatus.NOT_FOUND)
+            }
         }
     }
 
     @UseGuards(JwtAuthGuard)
     @Put(':postId/like-status')
     async like_dislike(
-        @Param('postId') postId: string, 
+        @Param('postId') postId: string,
         @Body('likeStatus', new ParseEnumPipe(LIKES, {
             errorHttpStatusCode: HttpStatus.BAD_REQUEST,
             exceptionFactory: error => {
@@ -153,14 +165,14 @@ export class PostController {
         //await this.postsService.targetPosts()
         const like_dislike: object | string = await this.postsService.like_dislike(postId, likeStatus, req.user!.id, req.user!.login);
         if (like_dislike !== "404" && like_dislike !== '400') {
-            throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
+            throw new HttpException(like_dislike, HttpStatus.NO_CONTENT)
         }
         else if (like_dislike === "400") {
-            throw new HttpException({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 },HttpStatus.BAD_REQUEST)
+            throw new HttpException({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 }, HttpStatus.BAD_REQUEST)
             //res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "bloggerId" }], resultCode: 1 });
         }
         else {
-            throw new HttpException('Post NOT FOUND',HttpStatus.NOT_FOUND)
+            throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
         }
-}
+    }
 }

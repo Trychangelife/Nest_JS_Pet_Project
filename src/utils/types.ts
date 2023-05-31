@@ -23,12 +23,6 @@ export type extendedLikesInfo = {
     newestLikes: NewestLikes
 }
 
-@Schema()
-export class BlogsClass {
-    constructor(public  id: string, public name: string, public description: string ,public websiteUrl: string, public createdAt: string, public isMembership: boolean ) {
-    }
-}
-
 export class Comments {
     constructor(
         public id: string, 
@@ -83,73 +77,6 @@ export type CommentsType = {
     }]
 };
 
-@Schema()
-export class Post {
-    constructor(
-        public id: string, 
-        public title: string, 
-        public shortDescription: string, 
-        public content: string, 
-        public blogId: string,
-        public blogName: string,
-        public createdAt: string,
-        public extendedLikesInfo: {
-            likesCount: number,
-            dislikesCount: number,
-            myStatus: LIKES,
-            newestLikes?: [
-                {
-                    addedAt: Date,
-                    userId: string,
-                    login: string
-                }
-            ]
-        },
-        public likeStorage?: [{
-            addedAt: Date,
-            userId: string,
-            login: string
-        }],
-        public dislikeStorage?: [{
-            addedAt: Date,
-            userId: string,
-            login: string
-        }]
-        ) {
-    }
-}
-export type PostsType = {
-    id: string;
-    title: string;
-    shortDescription: string;
-    content: string;
-    blogId: string;
-    blogName: string;
-    createdAt: string;
-    extendedLikesInfo: {
-        likesCount: number;
-        dislikesCount: number;
-        myStatus: LIKES;
-        newestLikes?: [
-            {
-                addedAt: Date
-                userId: string
-                login: string
-            }
-        ]
-    }
-    likeStorage?: [{
-        addedAt: Date
-        userId: string
-        login: string
-    }]
-    dislikeStorage?: [{
-        addedAt: Date
-        userId: string
-        login: string
-    }]
-    
-};
 export class CreateUser {
  
     email: string

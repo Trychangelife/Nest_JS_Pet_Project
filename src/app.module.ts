@@ -41,6 +41,12 @@ import { GetTargetBlogUseCase } from './bloggers/application/use-cases/get_targe
 import { CreateBlogUseCase } from './bloggers/application/use-cases/create_blog';
 import { UpdateBlogUseCase } from './bloggers/application/use-cases/update_blog';
 import { DeleteBlogUseCase } from './bloggers/application/use-cases/delete_single_blog';
+import { GetAllPostsUseCase } from './posts/application/use-cases/get_all_posts';
+import { GetSinglePostUseCase } from './posts/application/use-cases/get_single_post';
+import { GetAllPostsSpecificBlogUseCase } from './posts/application/use-cases/get_all_posts_specific_blog';
+import { CreatePostUseCase } from './posts/application/use-cases/create_post';
+import { UpdatePostUseCase } from './posts/application/use-cases/update_post';
+import { DeletePostUseCase } from './posts/application/use-cases/delete_post';
 
 
 
@@ -51,7 +57,8 @@ const options = {
 };
 const uri:string = process.env.mongoURI
 
-const useCases = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase]
+const useCasesBlogs = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase]
+const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpecificBlogUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase]
 
 @Module({
   imports: [
@@ -116,7 +123,8 @@ const useCases = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, U
     AuthService,
     CommentsService, CommentsRepository,
     EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService, SecurityDeviceRepository, BlogIsExistRule,
-    ...useCases
+    ...useCasesBlogs,
+    ...useCasesPosts
 ]
 })
 export class AppModule {}

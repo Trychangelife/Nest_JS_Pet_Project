@@ -1,7 +1,7 @@
 import { CommandHandler } from "@nestjs/cqrs"
 import { BlogsType } from "src/bloggers/dto/BlogsType"
 import { BlogsRepository } from "src/bloggers/repositories/bloggers.repository"
-import { BlogsClass } from "src/utils/types"
+import { BlogsClass } from "src/bloggers/dto/BlogsClass"
 import { v4 as uuidv4 } from "uuid"
 
 

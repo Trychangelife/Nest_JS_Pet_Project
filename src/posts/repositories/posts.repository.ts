@@ -1,7 +1,8 @@
 import { Injectable} from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { CommentsType, LIKES, PostsType, UsersType } from "src/utils/types"
+import { CommentsType, LIKES, UsersType } from "src/utils/types"
+import { PostsType } from "src/posts/dto/PostsType"
 import { BlogsType } from "src/bloggers/dto/BlogsType"
 
 export const postViewModel = {

@@ -6,9 +6,9 @@ import { PostsService } from "../posts/application/posts.service";
 import { BlogsService } from "./application/bloggers.service";
 import { BasicAuthGuard } from "../guards/basic_auth_guard";
 import { constructorPagination } from "../utils/pagination.constructor";
-import { PostsType } from "../utils/types";
+import { PostsType } from "src/posts/dto/PostsType";
 import { BlogsType } from "src/bloggers/dto/BlogsType";
-import { Blogs, PostTypeValidator } from "src/utils/class-validator.form";
+import { PostTypeValidator } from "src/posts/dto/PostTypeValidator";
 import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { GetAllBlogsCommand } from "./application/use-cases/get_all_blogs";
@@ -16,6 +16,9 @@ import { GetTargetBlogCommand } from "./application/use-cases/get_target_blog";
 import { CreateBlogCommand } from "./application/use-cases/create_blog";
 import { UpdateBlogCommand } from "./application/use-cases/update_blog";
 import { DeleteBlogCommand } from "./application/use-cases/delete_single_blog";
+import { Blogs } from "src/bloggers/dto/Blog_validator_type";
+import { GetAllPostsSpecificBlogCommand } from "src/posts/application/use-cases/get_all_posts_specific_blog";
+import { CreatePostCommand } from "src/posts/application/use-cases/create_post";
 
 @Controller('blogs')
 export class BlogsController {
@@ -54,7 +57,7 @@ export class BlogsController {
         const token = req.headers.authorization.split(' ')[1]
         const userId = await this.jwtServiceClass.getUserByAccessToken(token)
         const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
-        const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize, userId);
+        const findBlogger: object | undefined = await this.commandBus.execute(new GetAllPostsSpecificBlogCommand(params.bloggerId, paginationData.pageNumber, paginationData.pageSize, userId));
        if (findBlogger !== undefined) {
         return findBlogger
       }
@@ -63,7 +66,8 @@ export class BlogsController {
       }
       } catch (error) {
         const paginationData = constructorPagination(query.PageSize as string, query.PageNumber as string, query.sortBy as string, query.sortDirection as string);
-      const findBlogger: object | undefined = await this.postsService.allPostsSpecificBlogger(params.bloggerId, paginationData.pageNumber, paginationData.pageSize);
+      const findBlogger: object | undefined = await this.commandBus.execute(new GetAllPostsSpecificBlogCommand(params.bloggerId, paginationData.pageNumber, paginationData.pageSize));
+      
       if (findBlogger !== undefined) {
         return findBlogger
       }
@@ -93,7 +97,7 @@ export class BlogsController {
       const blogger = await this.commandBus.execute(new GetTargetBlogCommand(params.id))
       if (blogger == undefined || blogger == null) { throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND) }
   
-      const createPostForSpecificBlogger: string | object | null = await this.postsService.releasePost(post.title, post.content, post.shortDescription, post.blogId, params.id);
+      const createPostForSpecificBlogger: string | object | null = await this.commandBus.execute(new CreatePostCommand(post.title, post.content, post.shortDescription, post.blogId, params.id));
       return createPostForSpecificBlogger;
   
     }
