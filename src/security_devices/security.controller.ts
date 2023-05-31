@@ -24,7 +24,6 @@ export class SecurityDeviceController {
             throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)
         }
         const resultAllDevice = await this.securityService.returnAllDevices(userId)
-        console.log(resultAllDevice)
         return resultAllDevice
     }
     //DELETE - удаление всех других (кроме текущей) сессий
@@ -32,15 +31,12 @@ export class SecurityDeviceController {
     async terminateAllSession(@Req() req ) {
         const refreshToken = req.cookies["refreshToken"];
         const userAgent = req.headers['user-agent'] 
-        //console.log(refreshToken, 'Поступил запрос на удаление всех девайсов')
         if (!refreshToken) 
         {throw new HttpException('Refresh token not found, where you cookie?', HttpStatus.UNAUTHORIZED)}
         const userId = await this.jwtServiceClass.getUserByRefreshToken(refreshToken)
         const checkRefreshToken = await this.jwtServiceClass.checkRefreshToken(refreshToken)
-        //console.log({userId: userId, checkRefreshToken: checkRefreshToken})
         if (!checkRefreshToken) {throw new HttpException('Refresh token expired or incorect', HttpStatus.UNAUTHORIZED)}
         const payload: PayloadType = await this.jwtServiceClass.getJwtPayload(refreshToken)
-        //console.log({payload:payload})
         await this.securityService.terminateAllSession(userId, payload.deviceId)
         throw new HttpException("All session terminate", HttpStatus.NO_CONTENT);
         

@@ -11,13 +11,8 @@ import { SecurityDeviceRepository } from "./repostitories/security.repository";
 
 @Module({
     imports: [
-    // UsersModule, AuthModule, BlogsModule, 
     MongooseModule.forFeature([
-    // {name: 'Posts', schema: postSchema},
-    // {name: 'Blogs', schema: blogsSchema}, 
-    // {name: 'Comments', schema: commentsSchema},
     {name: 'RefreshToken', schema: refreshTokenSchema},
-    // {name: 'Users', schema: usersSchema}
 ])
 ],
     controllers: [SecurityDeviceController],
