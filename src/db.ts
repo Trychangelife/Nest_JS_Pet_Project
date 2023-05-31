@@ -1,6 +1,7 @@
 import { ObjectId, ServerApiVersion } from "mongodb";
 import mongoose from "mongoose";
-import { BlogsType, PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES, RecoveryPasswordType, NewPasswordType  } from "./utils/types";
+import { PostsType, RefreshTokenStorageType, ConfirmedAttemptDataType, CommentsType, UsersType,  RegistrationDataType, AuthDataType, EmailSendDataType, LIKES, RecoveryPasswordType, NewPasswordType  } from "./utils/types";
+import { BlogsType } from "./bloggers/dto/BlogsType";
 
 
 

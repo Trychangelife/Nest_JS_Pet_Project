@@ -1,4 +1,4 @@
-import { Schema } from "@nestjs/mongoose";
+import { Schema} from "@nestjs/mongoose";
 import { ObjectId } from "mongodb"; 
 
 
@@ -27,15 +27,6 @@ export type extendedLikesInfo = {
 export class BlogsClass {
     constructor(public  id: string, public name: string, public description: string ,public websiteUrl: string, public createdAt: string, public isMembership: boolean ) {
     }
-}
-export type BlogsType = {
-    id: string;
-    name: string;
-    description: string;
-    websiteUrl: string;
-    createdAt: string;
-    isMembership: boolean;
-
 }
 
 export class Comments {

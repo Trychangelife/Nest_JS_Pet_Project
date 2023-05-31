@@ -6,7 +6,8 @@ import { PostsService } from "../posts/application/posts.service";
 import { BlogsService } from "./application/bloggers.service";
 import { BasicAuthGuard } from "../guards/basic_auth_guard";
 import { constructorPagination } from "../utils/pagination.constructor";
-import { BlogsType, PostsType } from "../utils/types";
+import { PostsType } from "../utils/types";
+import { BlogsType } from "src/bloggers/dto/BlogsType";
 import { Blogs, PostTypeValidator } from "src/utils/class-validator.form";
 import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
 
