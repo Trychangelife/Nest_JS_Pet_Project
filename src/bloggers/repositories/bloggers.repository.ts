@@ -20,7 +20,7 @@ export class BlogsRepository {
         
     }
 
-    async allBloggers(skip: number, limit?: number, searchNameTerm?: string | null, page?: number, sortBy?: string, sortDirection?: string): Promise<object> {
+    async getAllBlogs(skip: number, limit?: number, searchNameTerm?: string | null, page?: number, sortBy?: string, sortDirection?: string): Promise<object> {
         const options = { 
             sort: { [sortBy]: [sortDirection] },
             limit: limit,
@@ -61,8 +61,8 @@ export class BlogsRepository {
         await this.blogsModel.create(newBlogger)
         return await this.blogsModel.findOne({ id: newBlogger.id }, modelViewBloggers).lean()
     }
-    async changeBlogger(id: string, name: any, youtubeUrl: string): Promise<boolean> {
-        const result = await this.blogsModel.updateOne({ id: id }, { $set: { name: name, youtubeUrl: youtubeUrl } })
+    async changeBlogger(id: string, name: any, websiteUrl: string, description: string): Promise<boolean> {
+        const result = await this.blogsModel.updateOne({ id: id }, { $set: { name: name, websiteUrl: websiteUrl, description: description } })
         return result.matchedCount === 1
     }
     async deleteBlogger(id: string): Promise<boolean> {

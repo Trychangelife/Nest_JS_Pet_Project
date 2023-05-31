@@ -35,6 +35,13 @@ import { SecurityDeviceService } from './security_devices/application/security.s
 import { SecurityDeviceRepository } from './security_devices/repostitories/security.repository';
 import { BlogIsExistRule } from './utils/validator.posts.form';
 import { BlogsRepositorySql } from './bloggers/repositories/bloggers.sql.repository';
+import { GetAllBlogsUseCase } from './bloggers/application/use-cases/get_all_blogs';
+import { CqrsModule } from '@nestjs/cqrs';
+import { GetTargetBlogUseCase } from './bloggers/application/use-cases/get_target_blog';
+import { CreateBlogUseCase } from './bloggers/application/use-cases/create_blog';
+import { UpdateBlogUseCase } from './bloggers/application/use-cases/update_blog';
+import { DeleteBlogUseCase } from './bloggers/application/use-cases/delete_single_blog';
+
 
 
 const options = {
@@ -43,6 +50,8 @@ const options = {
   serverApi: ServerApiVersion.v1,
 };
 const uri:string = process.env.mongoURI
+
+const useCases = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase]
 
 @Module({
   imports: [
@@ -95,7 +104,7 @@ const uri:string = process.env.mongoURI
     signOptions: {
         expiresIn: '24h'
     }
-})],
+}), CqrsModule],
   controllers: [AppController, BlogsController, PostController, UsersController, AuthController, CommentsController, FullDataController, SecurityDeviceController],
   providers: [AppService,
     BlogsService, 
@@ -106,7 +115,8 @@ const uri:string = process.env.mongoURI
     UsersService, UsersRepository,
     AuthService,
     CommentsService, CommentsRepository,
-    EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService, SecurityDeviceRepository, BlogIsExistRule
+    EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService, SecurityDeviceRepository, BlogIsExistRule,
+    ...useCases
 ]
 })
 export class AppModule {}

@@ -23,8 +23,10 @@
 // }
 
 import { Injectable } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { registerDecorator, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
 import { BlogsService } from 'src/bloggers/application/bloggers.service';
+import { GetTargetBlogCommand } from 'src/bloggers/application/use-cases/get_target_blog';
 
 
 export function BlogIsExist(validationOptions?: ValidationOptions) {
@@ -41,11 +43,11 @@ export function BlogIsExist(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ name: 'BlogIsExist', async: false })
 @Injectable()
 export class BlogIsExistRule implements ValidatorConstraintInterface {
-  constructor(private blogService: BlogsService) {}
+  constructor(private commandBus: CommandBus) {}
 
   async validate(value: string) {
     try {
-      const blog = await this.blogService.targetBloggers(value)
+      const blog = await this.commandBus.execute(new GetTargetBlogCommand(value))
       if(blog) {
         return true
       } else return false

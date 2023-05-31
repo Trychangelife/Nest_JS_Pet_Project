@@ -10,6 +10,12 @@ import { PostsType } from "../utils/types";
 import { BlogsType } from "src/bloggers/dto/BlogsType";
 import { Blogs, PostTypeValidator } from "src/utils/class-validator.form";
 import { HttpExceptionFilter } from "src/exception_filters/exception_filter";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
+import { GetAllBlogsCommand } from "./application/use-cases/get_all_blogs";
+import { GetTargetBlogCommand } from "./application/use-cases/get_target_blog";
+import { CreateBlogCommand } from "./application/use-cases/create_blog";
+import { UpdateBlogCommand } from "./application/use-cases/update_blog";
+import { DeleteBlogCommand } from "./application/use-cases/delete_single_blog";
 
 @Controller('blogs')
 export class BlogsController {
@@ -18,32 +24,22 @@ export class BlogsController {
       protected blogsService: BlogsService, 
       protected postsService: PostsService,
       protected jwtServiceClass: JwtServiceClass,
-
-      @InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
+      private commandBus: CommandBus,
+      //private queryBus: QueryBus,
+    ) {
     }
-
-    // @Delete('/del')
-    // async deleteAllBlogs() {
-    //   const afterDelete = await this.blogsService.deleteAllBlogs();
-    //   if (afterDelete) {
-    //     return HttpStatus.OK
-    //   }
-    //   else {
-    //     return HttpStatus.BAD_REQUEST
-    //   }
-    // }
 
     @Get()
     async getAllBloggers(@Query() query: {searchNameTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}) {
       const searchNameTerm = typeof query.searchNameTerm === 'string' ? query.searchNameTerm : null;
       const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
-      const full: object = await this.blogsService.allBloggers(paginationData.pageSize, paginationData.pageNumber, searchNameTerm, paginationData.sortBy, paginationData.sortDirection);
+      const full: object = await this.commandBus.execute(new GetAllBlogsCommand(paginationData.pageSize, paginationData.pageNumber, searchNameTerm, paginationData.sortBy, paginationData.sortDirection));
       return full
     }
 
     @Get(':id')
     async getBloggerById(@Param('id') id: string) {
-      const findBlogger: object | undefined = await this.blogsService.targetBloggers(id);
+      const findBlogger: object | undefined = await this.commandBus.execute(new GetTargetBlogCommand(id))
         if (findBlogger !== undefined) {
             return findBlogger
         }
@@ -82,7 +78,7 @@ export class BlogsController {
     @Post()
     async createBlogger(@Body() bloggersType: Blogs) {
   
-      const createrPerson: BlogsType | null = await this.blogsService.createBlogger(bloggersType.name, bloggersType.websiteUrl, bloggersType.description );
+      const createrPerson: BlogsType | null = await this.commandBus.execute(new CreateBlogCommand(bloggersType.name, bloggersType.websiteUrl, bloggersType.description ));
       if (createrPerson !== null) {
         return createrPerson
       }
@@ -94,8 +90,8 @@ export class BlogsController {
     @UseFilters(new HttpExceptionFilter())
     @Post(':id/posts')
     async createPostByBloggerId(@Param() params, @Body() post: PostTypeValidator) {
-      const blogger = await this.blogsModel.count({ id: params.id }); 
-      if (blogger < 1) { throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND) }
+      const blogger = await this.commandBus.execute(new GetTargetBlogCommand(params.id))
+      if (blogger == undefined || blogger == null) { throw new HttpException('Blogger NOT FOUND',HttpStatus.NOT_FOUND) }
   
       const createPostForSpecificBlogger: string | object | null = await this.postsService.releasePost(post.title, post.content, post.shortDescription, post.blogId, params.id);
       return createPostForSpecificBlogger;
@@ -105,7 +101,8 @@ export class BlogsController {
     @UseFilters(new HttpExceptionFilter())
     @Put(':id')
     async updateBlogger(@Param() params, @Body() bloggersType: Blogs) {
-      const alreadyChanges: string = await this.blogsService.changeBlogs(params.id, bloggersType.name, bloggersType.websiteUrl);
+      const alreadyChanges: string = await this.commandBus.execute(new UpdateBlogCommand(params.id, bloggersType.name, bloggersType.websiteUrl, bloggersType.description));
+      console.log(params.id, bloggersType.name, bloggersType.websiteUrl)
       if (alreadyChanges === 'update') {
         throw new HttpException('Update succefully', HttpStatus.NO_CONTENT)
       }
@@ -116,7 +113,7 @@ export class BlogsController {
     @UseGuards(BasicAuthGuard)
     @Delete(':id')
     async deleteOneBlogger(@Param() params) {
-      const afterDelete = await this.blogsService.deleteBlogger(params.id);
+      const afterDelete = await this.commandBus.execute(new DeleteBlogCommand(params.id));
       if (afterDelete === "204") {
         throw new HttpException('Delete succefully',HttpStatus.NO_CONTENT)
       }

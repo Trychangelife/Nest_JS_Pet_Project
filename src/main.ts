@@ -4,8 +4,7 @@ import { AppModule } from './app.module';
 import  cookieParser from 'cookie-parser';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator'
-import express from 'express';
-import { join } from 'path';
+
 
 
  
