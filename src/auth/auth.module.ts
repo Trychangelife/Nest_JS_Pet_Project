@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { UsersRepository } from "src/users/application/repositories/users.repository";
+import { UsersRepository } from "src/users/repositories/users.repository";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./application/auth.service";
 import { authDataSchema, blogsSchema, codeConfirmSchema, commentsSchema, emailSendSchema, postSchema, refreshTokenSchema, registrationDataSchema, usersSchema } from "src/db";

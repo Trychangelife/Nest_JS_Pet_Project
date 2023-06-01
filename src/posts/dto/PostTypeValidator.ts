@@ -1,6 +1,6 @@
 import { MaxLength, Matches, Validate, Length } from "class-validator";
 import { Transform, TransformFnParams } from "class-transformer";
-import { BlogIsExistRule } from "../../utils/validator.posts.form";
+import { BlogIsExistRule } from "../validator.posts.form";
 
 const nameRegex = /^[a-zA-Zа-яА-Я\s-]+$/;
 

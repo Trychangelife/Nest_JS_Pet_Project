@@ -1,10 +1,7 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { RefreshTokenStorageType, UsersType } from "../../utils/types"
-import { CommentsType } from "src/comments/dto/CommentsType"
-import { PostsType } from "src/posts/dto/PostsType"
-import { BlogsType } from "src/bloggers/dto/BlogsType"
+import { RefreshTokenStorageType } from "../../utils/types"
 
 export const deviceView = {
     _id: 0,
@@ -31,7 +28,6 @@ export class SecurityDeviceRepository {
             await this.refreshTokenModel.deleteOne({ deviceId: device.deviceId });
           }
         }
-        const foundAllDevice1 = await this.refreshTokenModel.find({ userId: userId }).lean();
         return true;
       }
     async terminateTargetSessionById (userId: string, deviceId: string): Promise <boolean> {

@@ -24,7 +24,7 @@ import { CommentsController } from './comments/comments.controller';
 import { UsersController } from './users/users.controller';
 import { EmailService } from './email/email.service';
 import { JwtServiceClass } from './guards/jwt.service';
-import { UsersRepository } from './users/application/repositories/users.repository';
+import { UsersRepository } from './users/repositories/users.repository';
 import { CommentsRepository } from './comments/repositories/comments.repository';
 import { EmailManager } from './email/email.manager';
 import { EmailAdapter } from './email/email.adapter';
@@ -33,7 +33,7 @@ import { FullDeleteModule } from './full_delete_for_dev/full_delete.module';
 import { SecurityDeviceController } from './security_devices/security.controller';
 import { SecurityDeviceService } from './security_devices/application/security.service';
 import { SecurityDeviceRepository } from './security_devices/repostitories/security.repository';
-import { BlogIsExistRule } from './utils/validator.posts.form';
+import { BlogIsExistRule } from './posts/validator.posts.form';
 import { BlogsRepositorySql } from './bloggers/repositories/bloggers.sql.repository';
 import { GetAllBlogsUseCase } from './bloggers/application/use-cases/get_all_blogs';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -54,6 +54,10 @@ import { GetCommentUseCase } from './comments/application/use-cases/Get_comment_
 import { DeleteCommentUseCase } from './comments/application/use-cases/Delete_comment_by_id';
 import { UpdateCommentUseCase } from './comments/application/use-cases/Update_Comment_By_Comment_Id';
 import { LikeDislikeCommentUseCase } from './comments/application/use-cases/Like_dislike_for_comment';
+import { GetAllDevicesUseCase } from './security_devices/application/use-cases/Get_all_devices';
+import { TerminateAllSessionUseCase } from './security_devices/application/use-cases/Terminate_all_session';
+import { TerminateSessionByIdUseCase } from './security_devices/application/use-cases/Terminate_target_session_by_id';
+import { FoundUserByDeviceIdUseCase } from './security_devices/application/use-cases/Found_user_by_device_id';
 
 
 
@@ -67,6 +71,7 @@ const uri:string = process.env.mongoURI
 const useCasesBlogs = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase]
 const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpecificBlogUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase, CreateCommentForSpecificPostUseCase, GetCommentByPostIdUseCase, LikeDislikeForPostUseCase]
 const useCasesComments = [GetCommentUseCase, DeleteCommentUseCase, UpdateCommentUseCase, LikeDislikeCommentUseCase]
+const useCasesDevices = [GetAllDevicesUseCase, TerminateAllSessionUseCase,TerminateSessionByIdUseCase, FoundUserByDeviceIdUseCase]
 
 @Module({
   imports: [
@@ -132,7 +137,9 @@ const useCasesComments = [GetCommentUseCase, DeleteCommentUseCase, UpdateComment
     CommentsService, CommentsRepository,
     EmailService, EmailManager, EmailAdapter, FullDeleteModule, SecurityDeviceService, SecurityDeviceRepository, BlogIsExistRule,
     ...useCasesBlogs,
-    ...useCasesPosts
+    ...useCasesPosts,
+    ...useCasesComments,
+    ...useCasesDevices
 ]
 })
 export class AppModule {}

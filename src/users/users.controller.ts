@@ -2,11 +2,11 @@ import { BadRequestException, Injectable, Ip, Request, UseFilters, UseGuards } f
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 import { constructorPagination } from "../utils/pagination.constructor";
-import { UsersType } from "../utils/types";
+import { UsersType } from "src/users/dto/UsersType";
 import { UsersService } from "./application/users.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
 import { UserRegistrationFlow } from "../guards/users.registration.guard";
-import { AuthForm } from "../utils/class-validator.form";
+import { AuthForm } from "src/auth/dto/AuthForm_validator";
 import { BasicAuthGuard } from "src/guards/basic_auth_guard";
 
 class CreateUser {

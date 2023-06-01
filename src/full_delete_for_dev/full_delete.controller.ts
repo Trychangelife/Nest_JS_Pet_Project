@@ -1,7 +1,9 @@
 import { Controller, Delete, HttpCode, HttpException, HttpStatus } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, NewPasswordType, RecoveryPasswordType, RefreshTokenStorageType, RegistrationDataType, UsersType } from "src/utils/types";
+import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType, RegistrationDataType } from "src/utils/types";
+import { NewPasswordType, RecoveryPasswordType } from "src/auth/dto/RecoveryPasswordType";
+import { UsersType } from "src/users/dto/UsersType";
 import { CommentsType } from "src/comments/dto/CommentsType";
 import { PostsType } from "src/posts/dto/PostsType";
 import { BlogsType } from "src/bloggers/dto/BlogsType";

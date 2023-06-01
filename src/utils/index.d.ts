@@ -1,4 +1,4 @@
-import { UsersType } from "./Types";
+import { UsersType } from "../users/dto/UsersType";
 
 declare global {
     namespace Express {

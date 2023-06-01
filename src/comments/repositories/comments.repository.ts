@@ -3,7 +3,8 @@ import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { commentsVievModel } from "src/posts/repositories/posts.repository"
 import { LikesDTO } from "src/utils/class-validator.form"
-import { LIKES, UsersType } from "src/utils/types"
+import { LIKES } from "src/utils/types"
+import { UsersType } from "src/users/dto/UsersType"
 import { CommentsType } from "src/comments/dto/CommentsType"
 
 @Injectable()
