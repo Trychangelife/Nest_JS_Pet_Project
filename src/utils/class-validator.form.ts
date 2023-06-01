@@ -35,13 +35,6 @@ export class NewPassword  {
     newPassword: string
     recoveryCode: string
 }
-export class Comment {
-    @MinLength(20)
-    @MaxLength(300)
-    content: string
-   
-}
-
 export class LikesDTO {
     @IsEnum(LIKES)
     likeStatus: string

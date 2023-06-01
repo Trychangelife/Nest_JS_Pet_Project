@@ -50,6 +50,10 @@ import { DeletePostUseCase } from './posts/application/use-cases/delete_post';
 import { CreateCommentForSpecificPostUseCase } from './posts/application/use-cases/create_comment_for_specific_post';
 import { GetCommentByPostIdUseCase } from './posts/application/use-cases/get_comments_by_postID';
 import { LikeDislikeForPostUseCase } from './posts/application/use-cases/like_dislike_for_post';
+import { GetCommentUseCase } from './comments/application/use-cases/Get_comment_by_id';
+import { DeleteCommentUseCase } from './comments/application/use-cases/Delete_comment_by_id';
+import { UpdateCommentUseCase } from './comments/application/use-cases/Update_Comment_By_Comment_Id';
+import { LikeDislikeCommentUseCase } from './comments/application/use-cases/Like_dislike_for_comment';
 
 
 
@@ -62,6 +66,7 @@ const uri:string = process.env.mongoURI
 
 const useCasesBlogs = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase]
 const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpecificBlogUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase, CreateCommentForSpecificPostUseCase, GetCommentByPostIdUseCase, LikeDislikeForPostUseCase]
+const useCasesComments = [GetCommentUseCase, DeleteCommentUseCase, UpdateCommentUseCase, LikeDislikeCommentUseCase]
 
 @Module({
   imports: [

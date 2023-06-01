@@ -1,7 +1,8 @@
 import { Injectable, Next } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { CommentsType, RefreshTokenStorageType, UsersType } from "../../utils/types"
+import { RefreshTokenStorageType, UsersType } from "../../utils/types"
+import { CommentsType } from "src/comments/dto/CommentsType"
 import { PostsType } from "src/posts/dto/PostsType"
 import { BlogsType } from "src/bloggers/dto/BlogsType"
 

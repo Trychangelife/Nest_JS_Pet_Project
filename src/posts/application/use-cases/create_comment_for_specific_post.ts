@@ -1,6 +1,8 @@
 import { CommandHandler } from "@nestjs/cqrs"
 import { PostRepository } from "src/posts/repositories/posts.repository"
-import { Comments, CommentsType, LIKES } from "src/utils/types"
+import { LIKES } from "src/utils/types"
+import { Comments } from "src/comments/dto/CommentsClass"
+import { CommentsType } from "src/comments/dto/CommentsType"
 import { v4 as uuidv4 } from "uuid"
 
 export class CreateCommentForSpecificPostCommand {

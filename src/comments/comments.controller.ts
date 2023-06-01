@@ -3,8 +3,14 @@ import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { JwtServiceClass } from "../guards/jwt.service";
 import { CommentsService } from "./application/comments.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { Comment, LikesDTO } from "../utils/class-validator.form";
+import { LikesDTO } from "../utils/class-validator.form";
+import { Comment } from "src/comments/dto/Comment_validator_type";
 import { HttpExceptionFilterForLikes } from "src/exception_filters/exception_likes";
+import { CommandBus } from "@nestjs/cqrs";
+import { GetCommentCommand } from "./application/use-cases/Get_comment_by_id";
+import { DeleteCommentCommand } from "./application/use-cases/Delete_comment_by_id";
+import { UpdateCommentCommand } from "./application/use-cases/Update_Comment_By_Comment_Id";
+import { LikeDislikeCommentCommand } from "./application/use-cases/Like_dislike_for_comment";
 
 
 
@@ -12,14 +18,17 @@ import { HttpExceptionFilterForLikes } from "src/exception_filters/exception_lik
 @Controller('comments')
 export class CommentsController {
 
-    constructor(protected commentsService: CommentsService, protected jwtServiceClass: JwtServiceClass) {
+    constructor(
+        protected commentsService: CommentsService, 
+        protected jwtServiceClass: JwtServiceClass,
+        private commandBus: CommandBus) {
     }
     @Get(':id')
     async getCommentById(@Param() params, @Req() req) {
     try {
         const token = req.headers.authorization.split(' ')[1]
         const userId = await this.jwtServiceClass.getUserByAccessToken(token)
-        const result = await this.commentsService.getCommentsById(params.id, userId);
+        const result = await this.commandBus.execute(new GetCommentCommand(params.id, userId));
         if (result !== null && result !== undefined) {
             return result
         }
@@ -27,7 +36,7 @@ export class CommentsController {
             throw new HttpException('Comments NOT FOUND',HttpStatus.NOT_FOUND)
         }
     } catch (error) {
-        const result = await this.commentsService.getCommentsById(params.id);
+        const result = await this.commandBus.execute(new GetCommentCommand(params.id))
         if (result !== null && result !== undefined) {
             return result
         }
@@ -42,7 +51,7 @@ export class CommentsController {
     @Put(':commentId')
     @HttpCode(204)
     async updateCommentByCommentId(@Param() params, @Body() content: Comment, @Req() req, @Res() res) {
-        const result = await this.commentsService.updateCommentByCommentId(params.commentId, content.content, req.user!.id);
+        const result = await this.commandBus.execute(new UpdateCommentCommand(params.commentId, content.content, req.user!.id));
         if (result) {
             res.send('update done')
         }
@@ -57,8 +66,8 @@ export class CommentsController {
     @Delete(':Id')
     @HttpCode(204)
     async deleteCommentById(@Param() params, @Req() req, @Res() res) {
-        const resultDelete = await this.commentsService.deleteCommentByCommentId(params.Id, req.user!.id);
-        console.log(resultDelete)
+        const resultDelete = await this.commandBus.execute(new DeleteCommentCommand(params.Id, req.user!.id));
+        
         if (resultDelete) {
             res.send('delete done')
         }
@@ -74,7 +83,7 @@ export class CommentsController {
     @UseFilters(new HttpExceptionFilterForLikes())
     @Put(':commentId/like-status')
     async like_dislike(@Param() params, @Body() likeStatus: LikesDTO, @Req() req, @Res() res) {
-        const like_dislike: object | string = await this.commentsService.like_dislike(params.commentId, likeStatus, req.user!.id, req.user!.login);
+        const like_dislike: object | string = await this.commandBus.execute(new LikeDislikeCommentCommand(params.commentId, likeStatus, req.user!.id, req.user!.login));
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike,HttpStatus.NO_CONTENT)
         }

@@ -23,62 +23,7 @@ export type extendedLikesInfo = {
     newestLikes: NewestLikes
 }
 
-export class Comments {
-    constructor(
-        public id: string, 
-        public content: string, 
-        public commentatorInfo: {
-            userId: string;
-            userLogin: string;
-        },
-        public createdAt: string,
-        public postId: string,
-        public likesInfo: {
-            likesCount: number,
-            dislikesCount: number,
-            myStatus: LIKES,
-        },
-        public likeStorage?: [{
-            addedAt: Date,
-            userId: string,
-            login: string
-        }],
-        public dislikeStorage?: [{
-            addedAt: Date,
-            userId: string,
-            login: string
-        }]) {
-            
-    }
-}
-export type CommentsType = {
-    id: string;
-    content: string;
-    commentatorInfo: {
-        userId: string;
-        userLogin: string;
-    };
-    createdAt: string;
-    postId: string;
-    likesInfo: {
-        likesCount: number;
-        dislikesCount: number;
-        myStatus: LIKES;
-    }
-    likeStorage?: [{
-        addedAt: Date
-        userId: string
-        login: string
-    }]
-    dislikeStorage?: [{
-        addedAt: Date
-        userId: string
-        login: string
-    }]
-};
-
 export class CreateUser {
- 
     email: string
     login: string
     id: string
@@ -86,7 +31,6 @@ export class CreateUser {
     createdAt: string
 
 }
-@Schema()
 export class User { 
     constructor(
         public _id: ObjectId, 

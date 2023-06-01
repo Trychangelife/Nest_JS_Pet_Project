@@ -6,7 +6,7 @@ import { constructorPagination } from "../utils/pagination.constructor";
 import { LIKES } from "../utils/types";
 import { PostsService } from "./application/posts.service";
 import { HttpExceptionFilter } from "../exception_filters/exception_filter";
-import { Comment } from "../utils/class-validator.form";
+import { Comment } from "src/comments/dto/Comment_validator_type";
 import { PostTypeValidatorForCreate } from "src/posts/dto/PostTypeValidator";
 import { CommandBus } from "@nestjs/cqrs";
 import { GetAllPostsCommand } from "./application/use-cases/get_all_posts";
