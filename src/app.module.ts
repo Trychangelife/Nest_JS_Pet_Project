@@ -47,6 +47,9 @@ import { GetAllPostsSpecificBlogUseCase } from './posts/application/use-cases/ge
 import { CreatePostUseCase } from './posts/application/use-cases/create_post';
 import { UpdatePostUseCase } from './posts/application/use-cases/update_post';
 import { DeletePostUseCase } from './posts/application/use-cases/delete_post';
+import { CreateCommentForSpecificPostUseCase } from './posts/application/use-cases/create_comment_for_specific_post';
+import { GetCommentByPostIdUseCase } from './posts/application/use-cases/get_comments_by_postID';
+import { LikeDislikeForPostUseCase } from './posts/application/use-cases/like_dislike_for_post';
 
 
 
@@ -58,7 +61,7 @@ const options = {
 const uri:string = process.env.mongoURI
 
 const useCasesBlogs = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase]
-const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpecificBlogUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase]
+const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpecificBlogUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase, CreateCommentForSpecificPostUseCase, GetCommentByPostIdUseCase, LikeDislikeForPostUseCase]
 
 @Module({
   imports: [

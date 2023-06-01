@@ -12,14 +12,14 @@ import { PostClass } from "src/posts/dto/PostClass"
 import { BlogsType } from "src/bloggers/dto/BlogsType"
 
 
-@Injectable()
+//@Injectable()
 export class PostsService {
 
     constructor (
-        protected postsRepository: PostRepository, 
-        @InjectModel('Blogs') protected bloggerModel: Model<BlogsType>,
-        @InjectModel('Posts') protected postsModel: Model<PostsType>,
-        @InjectDataSource() protected dataSource: DataSource
+        //protected postsRepository: PostRepository, 
+        //@InjectModel('Blogs') protected bloggerModel: Model<BlogsType>,
+        //@InjectModel('Posts') protected postsModel: Model<PostsType>,
+        //@InjectDataSource() protected dataSource: DataSource
         ) {}
 
     // async allPosts(pageSize: number, pageNumber: number, userId?: string): Promise<object> {
@@ -79,27 +79,27 @@ export class PostsService {
     //     return await this.postsRepository.deletePost(deleteId)
 
     // }
-    async createCommentForSpecificPost(postId: string, content: string, userId: string, userLogin: string): Promise<CommentsType | boolean> {
-        const foundPost = await this.postsModel.findOne({ id: postId })
-        if(foundPost) {
-        // CREATE ON CLASS
-        const createdComment = new Comments(uuidv4(), content, {userId: userId, userLogin: userLogin}, (new Date()).toISOString(), postId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
-        return this.postsRepository.createCommentForSpecificPost(createdComment)
-    }
-        if (foundPost == null) {
-            return false}
-            else {
-                return false
-            }
-    }
-    async takeCommentByIdPost (postId: string, page: number, pageSize: number, userId?: string, sortBy?: string, sortDirection?: string): Promise<object | boolean> {
-        let skip = 0
-        if (page && pageSize) {
-            skip = (page - 1) * pageSize
-        }
-        return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page, userId, sortBy, sortDirection)
-    }
-    async like_dislike (postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
-        return await this.postsRepository.like_dislike(postId, likeStatus, userId, login)
-    }
+    // async createCommentForSpecificPost(postId: string, content: string, userId: string, userLogin: string): Promise<CommentsType | boolean> {
+    //     const foundPost = await this.postsModel.findOne({ id: postId })
+    //     if(foundPost) {
+    //     // CREATE ON CLASS
+    //     const createdComment = new Comments(uuidv4(), content, {userId: userId, userLogin: userLogin}, (new Date()).toISOString(), postId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+    //     return this.postsRepository.createCommentForSpecificPost(createdComment)
+    // }
+    //     if (foundPost == null) {
+    //         return false}
+    //         else {
+    //             return false
+    //         }
+    // }
+    // async takeCommentByIdPost (postId: string, page: number, pageSize: number, userId?: string, sortBy?: string, sortDirection?: string): Promise<object | boolean> {
+    //     let skip = 0
+    //     if (page && pageSize) {
+    //         skip = (page - 1) * pageSize
+    //     }
+    //     return await this.postsRepository.takeCommentByIdPost(postId, skip, pageSize, page, userId, sortBy, sortDirection)
+    // }
+    // async like_dislike (postId: string, likeStatus: LIKES, userId: string, login: string): Promise<string | object> {
+    //     return await this.postsRepository.like_dislike(postId, likeStatus, userId, login)
+    // }
 }

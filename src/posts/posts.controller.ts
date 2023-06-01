@@ -14,6 +14,9 @@ import { GetSinglePostCommand } from "./application/use-cases/get_single_post";
 import { CreatePostCommand } from "./application/use-cases/create_post";
 import { UpdatePostCommand } from "./application/use-cases/update_post";
 import { DeletePostCommand } from "./application/use-cases/delete_post";
+import { CreateCommentForSpecificPostCommand } from "./application/use-cases/create_comment_for_specific_post";
+import { GetCommentByPostIdCommand } from "./application/use-cases/get_comments_by_postID";
+import { LikeDislikeForPostCommand } from "./application/use-cases/like_dislike_for_post";
 
 @Controller('posts')
 export class PostController {
@@ -112,7 +115,7 @@ export class PostController {
     @UseFilters(new HttpExceptionFilter())
     @Post(':postId/comments')
     async createCommentForPost(@Param('postId') postId: string, @Body() content: Comment, @Req() req) {
-        const newComment = await this.postsService.createCommentForSpecificPost(postId, content.content, req.user!.id, req.user!.login);
+        const newComment = await this.commandBus.execute(new CreateCommentForSpecificPostCommand(postId, content.content, req.user!.id, req.user!.login));
         if (newComment) {
             return newComment
         }
@@ -127,7 +130,7 @@ export class PostController {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
-            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize, userId, paginationData.sortBy, paginationData.sortDirection);
+            const newComment = await this.commandBus.execute(new GetCommentByPostIdCommand(params.postId, paginationData.pageNumber, paginationData.pageSize, userId, paginationData.sortBy, paginationData.sortDirection));
             if (newComment) {
                 return newComment
             }
@@ -137,7 +140,7 @@ export class PostController {
         } catch (error) {
             const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string);
             const userIdMok = 'just'
-            const newComment = await this.postsService.takeCommentByIdPost(params.postId, paginationData.pageNumber, paginationData.pageSize, userIdMok, paginationData.sortBy, paginationData.sortDirection);
+            const newComment = await this.commandBus.execute(new GetCommentByPostIdCommand(params.postId, paginationData.pageNumber, paginationData.pageSize, userIdMok, paginationData.sortBy, paginationData.sortDirection));
             if (newComment) {
                 return newComment
             }
@@ -163,7 +166,7 @@ export class PostController {
             }
         })) likeStatus: LIKES, @Req() req) {
         //await this.postsService.targetPosts()
-        const like_dislike: object | string = await this.postsService.like_dislike(postId, likeStatus, req.user!.id, req.user!.login);
+        const like_dislike: object | string = await this.commandBus.execute(new LikeDislikeForPostCommand(postId, likeStatus, req.user!.id, req.user!.login));
         if (like_dislike !== "404" && like_dislike !== '400') {
             throw new HttpException(like_dislike, HttpStatus.NO_CONTENT)
         }
