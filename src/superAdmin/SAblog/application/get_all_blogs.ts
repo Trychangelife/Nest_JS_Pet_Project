@@ -1,5 +1,6 @@
 import { CommandHandler } from "@nestjs/cqrs"
 import { BlogsSuperAdminRepository } from "../repositories/blogs.SA.repository"
+import { BanStatus } from "../dto/banStatus"
 
 
 export class GetAllBlogsSuperAdminCommand {

@@ -12,10 +12,10 @@ const modelViewBloggers = {
     websiteUrl: 1,
     createdAt: 1,
     isMembership: 1,
-    blogOwnerInfo: {
-        userId: 1,
-        userLogin: 1
-    }
+    // blogOwnerInfo: {
+    //     userId: 1,
+    //     userLogin: 1
+    // }
 }
 
 @Injectable()

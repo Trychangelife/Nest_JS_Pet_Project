@@ -72,6 +72,7 @@ import { SuperAdminUsersRepository } from './superAdmin/SAusers/repositories/Sup
 import { GetAllUsersAsSuperAdminUseCase } from './superAdmin/SAusers/application/useCases/get_all_user_SA';
 import { DeleteUserAsSuperAdminUseCase } from './superAdmin/SAusers/application/useCases/delete_user_SA';
 import { BanUserAsSuperAdminUseCase } from './superAdmin/SAusers/application/useCases/ban_user_SA';
+import { BindingBlogSuperAdminUseCase } from './superAdmin/SAblog/application/binding_blog';
 
 
 
@@ -88,7 +89,7 @@ const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpec
 const useCasesComments = [GetCommentUseCase, DeleteCommentUseCase, UpdateCommentUseCase, LikeDislikeCommentUseCase]
 const useCasesDevices = [GetAllDevicesUseCase, TerminateAllSessionUseCase,TerminateSessionByIdUseCase, FoundUserByDeviceIdUseCase]
 const useCasesByBloggers = [CreateBlogByBloggerUseCase, GetAllBlogsforBloggerUseCase]
-const useCasesSuperAdminBlogs = [GetAllBlogsSuperAdminUseCase]
+const useCasesSuperAdminBlogs = [GetAllBlogsSuperAdminUseCase, BindingBlogSuperAdminUseCase]
 const useCasesSuperAdminUsers = [CreateUserSAUseCase]
 const useCasesUsers = [GetUserByUserIdUseCase]
 

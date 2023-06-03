@@ -7,6 +7,7 @@ import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { usersModel } from "src/db"
 import { RegistrationDataType, AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType } from "src/utils/types"
+import { BanStatus } from "src/superAdmin/SAblog/dto/banStatus"
 
 const userViewModel = {
     _id: 0,
@@ -49,14 +50,14 @@ export class SuperAdminUsersRepository {
 
     }
 
-    async allUsers(skip: number, limit: number, sortDirection: string, sortingParam: string, page: number,  searchLoginTerm: string, searchEmailTerm: string,): Promise<object> {
+    async allUsers(skip: number, limit: number, sortDirection: string, sortingParam: string, page: number,  searchLoginTerm: string, searchEmailTerm: string, banStatus: BanStatus): Promise<object> {
         // Условия поиска для FIND в Mongo DB
         const query:any = {}
         if (searchEmailTerm) {
             const emailQuery = { email: { $regex: searchEmailTerm, $options: 'i' } };
             query.$or = [{ ...emailQuery }];
           }
-          if (searchLoginTerm) {
+        if (searchLoginTerm) {
             const loginQuery = { login: { $regex: searchLoginTerm, $options: 'i' } };
             query.$or = query.$or ? [...query.$or, loginQuery] : [loginQuery];
           }
@@ -66,7 +67,18 @@ export class SuperAdminUsersRepository {
             limit: limit,
             skip: skip,
         };
-    
+        if (banStatus === "banned") {
+            const cursorWithRegEx = await this.usersModel.find({ "banInfo.isBanned": true }, userViewModel, options)
+            const totalCountWithRegex = cursorWithRegEx.length
+            const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
+            return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
+        }
+        if (banStatus === "notBanned") {
+            const cursorWithRegEx = await this.usersModel.find({ "banInfo.isBanned": false }, userViewModel, options)
+            const totalCountWithRegex = cursorWithRegEx.length
+            const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
+            return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
+        }
         const fullData = await this.usersModel.find(query, userViewModel, options)
         // Передаем в .count query - иначе он будет считать полностью страницу, без условий - что не является корректным
         const totalCount = await this.usersModel.count(query)

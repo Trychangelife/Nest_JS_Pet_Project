@@ -11,6 +11,7 @@ import { GetAllUsersAsSuperAdminCommand } from "./application/useCases/get_all_u
 import { DeleteUserAsSuperAdminCommand } from "./application/useCases/delete_user_SA";
 import { BanUserAsSuperAdminCommand } from "./application/useCases/ban_user_SA";
 import { BanUserInputModel } from "./dto/banUserInputModel";
+import { BanStatus } from "../SAblog/dto/banStatus";
 
 @Controller('sa/users')
 export class SuperAdminUsersController {
@@ -39,9 +40,9 @@ export class SuperAdminUsersController {
 
     @UseGuards(BasicAuthGuard)
     @Get()
-    async getAllUsers(@Query() query: {searchEmailTerm: string, searchLoginTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string}) {
+    async getAllUsers(@Query() query: {searchEmailTerm: string, searchLoginTerm: string, pageNumber: string, pageSize: string, sortBy: string, sortDirection: string, banStatus: BanStatus}) {
         const paginationData = constructorPagination(query.pageSize as string, query.pageNumber as string, query.sortBy as string, query.sortDirection as string, query.searchEmailTerm as string, query.searchLoginTerm as string);
-        const resultUsers = await this.commandBus.execute(new GetAllUsersAsSuperAdminCommand(paginationData.pageSize, paginationData.pageNumber, paginationData.sortDirection, paginationData.sortBy, paginationData.searchEmailTerm, paginationData.searchLoginTerm));
+        const resultUsers = await this.commandBus.execute(new GetAllUsersAsSuperAdminCommand(paginationData.pageSize, paginationData.pageNumber, paginationData.sortDirection, paginationData.sortBy, paginationData.searchEmailTerm, paginationData.searchLoginTerm, query.banStatus));
         return resultUsers
     }
     @UseGuards(BasicAuthGuard)
