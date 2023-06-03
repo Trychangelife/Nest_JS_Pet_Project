@@ -36,7 +36,7 @@ export class AuthController {
         if (checkIP) {
             const user = await this.usersService.checkCredentials(DataUser.loginOrEmail, DataUser.password);
             const foundUser = await this.usersRepository.findUserByLogin(DataUser.loginOrEmail);
-            if (!user) {
+            if (!user || foundUser.banInfo.isBanned == true) {
                 throw new HttpException("UNAUTHORIZED", HttpStatus.UNAUTHORIZED)
             }
             else if (foundUser && user) {
