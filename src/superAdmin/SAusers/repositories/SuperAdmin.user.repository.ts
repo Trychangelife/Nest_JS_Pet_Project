@@ -101,14 +101,27 @@ async deleteUser(id: string): Promise<boolean> {
     return result.deletedCount === 1
 }
 async banUser(id: string, reason: string, isBanned: boolean): Promise<boolean> { 
-    const banUser = await this.usersModel.updateOne({ id: id }, { $set: { "banInfo.isBanned": isBanned, "banInfo.banDate": (new Date().toISOString()), "banInfo.banReason": reason } })
-    if (banUser.modifiedCount > 0) {
-
-        return true
+    if (isBanned == true) {
+        const banUser = await this.usersModel.updateOne({ id: id }, { $set: { "banInfo.isBanned": isBanned, "banInfo.banDate": (new Date().toISOString()), "banInfo.banReason": reason } })
+        if (banUser.modifiedCount > 0) {
+    
+            return true
+        }
+        else {
+            return false
+        }
     }
     else {
-        return false
+        const banUser = await this.usersModel.updateOne({ id: id }, { $set: { "banInfo.isBanned": isBanned, "banInfo.banDate": null, "banInfo.banReason": null } })
+        if (banUser.modifiedCount > 0) {
+    
+            return true
+        }
+        else {
+            return false
+        }
     }
+    
 }
 
 // Основная часть закончена, вспомогательные эндпоинты
