@@ -11,7 +11,7 @@ import { Comments } from "src/comments/dto/CommentsClass"
 import { CommentsType } from "src/comments/dto/CommentsType"
 import { PostsType } from "src/posts/dto/PostsType"
 import { PostClass } from "src/posts/dto/PostClass"
-import { BlogsType } from "src/bloggers/dto/BlogsType"
+import { BlogsType } from "src/blogs/dto/BlogsType"
 
 
 //@Injectable()

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { registerDecorator, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { BlogsService } from 'src/bloggers/application/bloggers.service';
-import { GetTargetBlogCommand } from 'src/bloggers/application/use-cases/get_target_blog';
+import { BlogsService } from 'src/blogs/application/blogs.service';
+import { GetTargetBlogCommand } from 'src/blogs/application/use-cases/get_target_blog';
 
 
 export function BlogIsExist(validationOptions?: ValidationOptions) {

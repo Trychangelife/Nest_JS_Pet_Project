@@ -6,7 +6,7 @@ import { NewPasswordType, RecoveryPasswordType } from "src/auth/dto/RecoveryPass
 import { UsersType } from "src/users/dto/UsersType";
 import { CommentsType } from "src/comments/dto/CommentsType";
 import { PostsType } from "src/posts/dto/PostsType";
-import { BlogsType } from "src/bloggers/dto/BlogsType";
+import { BlogsType } from "src/blogs/dto/BlogsType";
 
 @Controller('testing')
 export class FullDataController {

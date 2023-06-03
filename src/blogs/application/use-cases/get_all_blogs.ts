@@ -1,19 +1,18 @@
 import { CommandHandler } from "@nestjs/cqrs"
-import { BlogsByBloggerRepository } from "src/bloggers/repositories/bloggers.repository"
 import { BlogsRepository } from "src/blogs/repositories/blogs.repository"
 
 
-export class GetAllBlogsforBloggerCommand {
+export class GetAllBlogsCommand {
     constructor(public pageSize: number, public pageNumber: number, public searchNameTerm?: string | null, public sortBy?: string, public sortDirection?: string) {
         
     }
 }
 
-@CommandHandler(GetAllBlogsforBloggerCommand)
-export class GetAllBlogsforBloggerUseCase {
-    constructor (protected bloggerRepository: BlogsByBloggerRepository ) {}
+@CommandHandler(GetAllBlogsCommand)
+export class GetAllBlogsUseCase {
+    constructor (protected bloggerRepository: BlogsRepository ) {}
 
-    async execute(command: GetAllBlogsforBloggerCommand): Promise<object> {
+    async execute(command: GetAllBlogsCommand): Promise<object> {
         let skip = 0
         if (command.pageNumber && command.pageSize) {
             skip = (command.pageNumber - 1) * command.pageSize

@@ -5,7 +5,7 @@ import { LIKES } from "src/utils/types"
 import { UsersType } from "src/users/dto/UsersType"
 import { CommentsType } from "src/comments/dto/CommentsType"
 import { PostsType } from "src/posts/dto/PostsType"
-import { BlogsType } from "src/bloggers/dto/BlogsType"
+import { BlogsType } from "src/blogs/dto/BlogsType"
 
 export const postViewModel = {
     _id: 0,

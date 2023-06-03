@@ -5,7 +5,7 @@ import { RecoveryPasswordType, NewPasswordType } from "./auth/dto/RecoveryPasswo
 import { UsersType } from "./users/dto/UsersType";
 import { CommentsType } from "./comments/dto/CommentsType";
 import { PostsType } from "./posts/dto/PostsType";
-import { BlogsType } from "./bloggers/dto/BlogsType";
+import { BlogsType } from "./blogs/dto/BlogsType";
 
 
 
@@ -16,7 +16,11 @@ export const blogsSchema = new mongoose.Schema<BlogsType>({
     description: {type:String, required: true},
     websiteUrl: {type:String, required:true},
     createdAt: {type: String, required: true},
-    isMembership: {type: Boolean, required: true}
+    isMembership: {type: Boolean, required: true},
+    blogOwnerInfo: {
+        userId: {type: String},
+        userLogin: {type: String}
+    }
 
 })
 export const postSchema = new mongoose.Schema<PostsType>({
@@ -102,6 +106,11 @@ export const usersSchema = new mongoose.Schema<UsersType>({
     recoveryPasswordInformation: {
         codeForRecovery: {type: String, required: false},
         createdDateRecoveryCode: {type: String, required: false}
+    },
+    banInfo: {
+        isBanned: {type: Boolean},
+        banDate: {type: String},
+        banReason: {type: String}
     }
 })
 export const registrationDataSchema = new mongoose.Schema<RegistrationDataType>({
@@ -143,7 +152,7 @@ export const newPasswordSchema = new mongoose.Schema<NewPasswordType>({
     recoveryCode: {type: String, required: true}
 })
 
-export const bloggerModel = mongoose.model('bloggers', blogsSchema)
+export const bloggerModel = mongoose.model('blogs', blogsSchema)
 export const postsModel = mongoose.model('posts', postSchema)
 export const usersModel = mongoose.model('users', usersSchema)
 export const commentsModel = mongoose.model('comments', commentsSchema)

@@ -1,12 +1,12 @@
 
 import { sub } from "date-fns"
 import { Model } from "mongoose"
-import { usersModel } from "../../db"
-import { AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType, RegistrationDataType } from "../../utils/types"
 import { NewPasswordType, RecoveryPasswordType } from "src/auth/dto/RecoveryPasswordType"
 import { UsersType } from "src/users/dto/UsersType"
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
+import { usersModel } from "src/db"
+import { RegistrationDataType, AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType } from "src/utils/types"
 
 const userViewModel = {
     _id: 0,
@@ -14,6 +14,11 @@ const userViewModel = {
     email: 1,
     login: 1 ,
     createdAt: 1,
+    banInfo: {
+        isBanned: 1,
+        banDate: 1,
+        banReason: 1
+    }
 }
 const userViewModelForMe = {
 _id: 0,
@@ -29,7 +34,7 @@ const aggregate = usersModel.aggregate([
     ])
     
 @Injectable()
-export class UsersRepository {
+export class SuperAdminUsersRepository {
 
     constructor (
         @InjectModel('Users') public usersModel: Model<UsersType>,
@@ -94,6 +99,16 @@ async createNewPassword(passwordHash: string, passwordSalt: string ,recoveryCode
 async deleteUser(id: string): Promise<boolean> { 
     const result = await this.usersModel.deleteOne({ id: id })
     return result.deletedCount === 1
+}
+async banUser(id: string, reason: string, isBanned: boolean): Promise<boolean> { 
+    const banUser = await this.usersModel.updateOne({ id: id }, { $set: { "banInfo.isBanned": isBanned, "banInfo.banDate": (new Date().toISOString()), "banInfo.banReason": reason } })
+    if (banUser.modifiedCount > 0) {
+
+        return true
+    }
+    else {
+        return false
+    }
 }
 
 // Основная часть закончена, вспомогательные эндпоинты

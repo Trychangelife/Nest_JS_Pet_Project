@@ -5,5 +5,8 @@ export type BlogsType = {
     websiteUrl: string;
     createdAt: string;
     isMembership: boolean;
-
+    blogOwnerInfo?: {
+        userId: string,
+        userLogin: string
+    }
 };

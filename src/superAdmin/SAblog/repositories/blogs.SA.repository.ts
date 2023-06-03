@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { BlogsType } from "src/blogs/dto/BlogsType"
-import { BloggersType } from "../dto/Bloggers.Blogs.Type"
 
 const modelViewBloggers = {
     _id: 0,
@@ -11,15 +10,11 @@ const modelViewBloggers = {
     description: 1,
     websiteUrl: 1,
     createdAt: 1,
-    isMembership: 1,
-    blogOwnerInfo: {
-        userId: 1,
-        userLogin: 1
-    }
+    isMembership: 1
 }
 
 @Injectable()
-export class BlogsByBloggerRepository {
+export class BlogsSuperAdminRepository {
 
     constructor(@InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
         
@@ -62,7 +57,7 @@ export class BlogsByBloggerRepository {
             false
         }
     }
-    async createBlogger(newBlogger: BloggersType): Promise<BloggersType | null> {
+    async createBlogger(newBlogger: BlogsType): Promise<BlogsType | null> {
         await this.blogsModel.create(newBlogger)
         return await this.blogsModel.findOne({ id: newBlogger.id }, modelViewBloggers).lean()
     }

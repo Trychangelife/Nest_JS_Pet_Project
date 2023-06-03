@@ -1,23 +1,29 @@
 import { CommandHandler } from "@nestjs/cqrs"
-import { BlogsType } from "src/bloggers/dto/BlogsType"
-import { BlogsRepository } from "src/bloggers/repositories/bloggers.repository"
-import { BlogsClass } from "src/bloggers/dto/BlogsClass"
 import { v4 as uuidv4 } from "uuid"
+import { BloggersType } from "src/bloggers/dto/Bloggers.Blogs.Type"
+import { BloggersClass } from "src/bloggers/dto/Bloggers.Blogs.Class"
+import { BlogsByBloggerRepository } from "src/bloggers/repositories/bloggers.repository"
 
 
-export class CreateBlogCommand {
-    constructor(public name: string, public websiteUrl: string, public description: string) {
+export class CreateBlogByBloggerCommand {
+    constructor(
+        public name: string, 
+        public websiteUrl: string, 
+        public description: string,
+        public userId: string,
+        public userLogin: string) {
         
     }
 }
 
-@CommandHandler(CreateBlogCommand)
-export class CreateBlogUseCase {
-    constructor (protected bloggerRepository: BlogsRepository ) {}
+@CommandHandler(CreateBlogByBloggerCommand)
+export class CreateBlogByBloggerUseCase {
+    constructor (protected bloggerRepository: BlogsByBloggerRepository ) {}
 
-    async execute(command: CreateBlogCommand): Promise<BlogsType | null> {
+    async execute(command: CreateBlogByBloggerCommand): Promise<BloggersType | null> {
         // Построено на классе
-        const newBlogs = new BlogsClass(uuidv4(), command.name, command.description, command.websiteUrl, (new Date()).toISOString(), false)
+        const newBlogs = new BloggersClass(uuidv4(), command.name, command.description, command.websiteUrl, (new Date()).toISOString(), false, {userId: command.userId, userLogin: command.userLogin})
+        //console.log(newBlogs)
         const createdBlogs = await this.bloggerRepository.createBlogger(newBlogs)
         return createdBlogs
     }

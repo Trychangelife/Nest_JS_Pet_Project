@@ -19,4 +19,9 @@ export type UsersType = {
         codeForRecovery: string;
         createdDateRecoveryCode: string;
     };
+    banInfo?: {
+        isBanned: boolean,
+        banDate: string,
+        banReason: string
+    }
 };
