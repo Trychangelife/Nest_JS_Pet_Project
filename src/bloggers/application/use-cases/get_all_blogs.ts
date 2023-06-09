@@ -4,7 +4,7 @@ import { BlogsRepository } from "src/blogs/repositories/blogs.repository"
 
 
 export class GetAllBlogsforBloggerCommand {
-    constructor(public pageSize: number, public pageNumber: number, public searchNameTerm?: string | null, public sortBy?: string, public sortDirection?: string) {
+    constructor(public pageSize: number, public pageNumber: number, public searchNameTerm?: string | null, public sortBy?: string, public sortDirection?: string, public userId?: string) {
         
     }
 }
@@ -18,7 +18,7 @@ export class GetAllBlogsforBloggerUseCase {
         if (command.pageNumber && command.pageSize) {
             skip = (command.pageNumber - 1) * command.pageSize
         }
-        const blogs = await this.bloggerRepository.getAllBlogs(skip, command.pageSize, command.searchNameTerm, command.pageNumber, command.sortBy, command.sortDirection)
+        const blogs = await this.bloggerRepository.getAllBlogsForSpecificBlogger(skip, command.pageSize, command.searchNameTerm, command.pageNumber, command.sortBy, command.sortDirection, command.userId)
         return blogs
     }
 }

@@ -22,35 +22,35 @@ const modelViewBloggers = {
 export class BlogsByBloggerRepository {
 
     constructor(@InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
-        
+
     }
 
-    async getAllBlogs(skip: number, limit?: number, searchNameTerm?: string | null, page?: number, sortBy?: string, sortDirection?: string): Promise<object> {
-        const options = { 
+    async getAllBlogsForSpecificBlogger(skip: number, limit?: number, searchNameTerm?: string | null, page?: number, sortBy?: string, sortDirection?: string, userId?: string): Promise<object> {
+        const options = {
             sort: { [sortBy]: [sortDirection] },
             limit: limit,
-            skip: skip, 
+            skip: skip,
         };
-        if (page !== undefined && limit !== undefined) {
-            const cursor = await this.blogsModel.find({}, modelViewBloggers, options)
-            const totalCount = await this.blogsModel.count({})
-            const pagesCount = Math.ceil(totalCount / limit)
-            const fullData = await this.blogsModel.find({}, modelViewBloggers)
+        const cursor = await this.blogsModel.find({ "blogOwnerInfo.userId": userId }, modelViewBloggers, options)
+        const totalCount = await this.blogsModel.count({ "blogOwnerInfo.userId": userId })
+        const pagesCount = Math.ceil(totalCount / limit)
+        const fullData = await this.blogsModel.find({ "blogOwnerInfo.userId": userId }, modelViewBloggers)
 
-            if (searchNameTerm !== null) {
-                const cursorWithRegEx = await this.blogsModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers, options)
-                const totalCountWithRegex = cursorWithRegEx.length
-                const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
-                return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
-            }
-            if (skip > 0 || limit > 0) {
-                return { pagesCount, page: page, pageSize: limit, totalCount, items: cursor }
-            }
-            else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
+        if (searchNameTerm !== null) {
+            const cursorWithRegEx = await this.blogsModel.find({
+                $and: [
+                    { "blogOwnerInfo.userId": userId },
+                    { "name": { $regex: searchNameTerm, $options: "i" } }
+                ]
+            }, modelViewBloggers, options);
+            const totalCountWithRegex = cursorWithRegEx.length
+            const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
+            return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
         }
-        else {
-            return await this.blogsModel.find({}, modelViewBloggers)
+        if (skip > 0 || limit > 0) {
+            return { pagesCount, page: page, pageSize: limit, totalCount, items: cursor }
         }
+        else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
 
     }
     async targetBloggers(id: string): Promise<object | undefined> {
@@ -70,12 +70,12 @@ export class BlogsByBloggerRepository {
         const result = await this.blogsModel.updateOne({ id: id }, { $set: { name: name, websiteUrl: websiteUrl, description: description } })
         return result.matchedCount === 1
     }
-    async deleteBlogger(id: string): Promise<boolean> {
-        const result = await this.blogsModel.deleteOne({ id: id })
+    async deleteBlogForSpecificBlogger(blogId: string, userId: string): Promise<boolean> {
+        const result = await this.blogsModel.deleteOne({ id: blogId, "blogOwnerInfo.userId": userId })
         return result.deletedCount === 1
     }
     async deleteAllBlogs(): Promise<boolean> {
         const afterDelete = await this.blogsModel.deleteMany({})
         return afterDelete.acknowledged
-    } 
+    }
 }

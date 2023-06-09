@@ -3,7 +3,9 @@ import { BlogsRepository } from "src/blogs/repositories/blogs.repository"
 
 
 export class GetTargetBlogCommand {
-    constructor(public blogId: string) {
+    constructor(
+        public blogId: string,
+        public userId?: string) {
         
     }
 }
@@ -15,7 +17,7 @@ export class GetTargetBlogUseCase {
 
     async execute(command: GetTargetBlogCommand): Promise<object | undefined> {
 
-        return this.bloggerRepository.targetBloggers(command.blogId)
+        return this.bloggerRepository.targetBloggers(command.blogId, command.userId)
     }
 }
 

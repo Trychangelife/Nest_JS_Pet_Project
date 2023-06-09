@@ -35,8 +35,7 @@ export class CommentsRepository {
         $project: {_id: 0 ,id: 1, content: 1, commentatorInfo: {userId: 1, userLogin: 1}, createdAt: 1, likesInfo: {likesCount: 1, dislikesCount: 1, myStatus: myStatus}}}
     ]).match({id: commentId})
     if (targetCommentWithAggregation == null) {
-        console.log(targetCommentWithAggregation)
-        return undefined
+        return null
     }
     else {
         return targetCommentWithAggregation[0]; 

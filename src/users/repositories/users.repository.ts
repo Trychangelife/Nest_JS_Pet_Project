@@ -189,13 +189,14 @@ async findUserById(userId: string): Promise<UsersType | null> {
     const foundUserById = await this.usersModel.findOne({id: userId}).lean()
     return foundUserById
 }
-async findUserByLogin(login: string): Promise<UsersType | null> {
+async findUserByLogin(login: string, description?: string): Promise<UsersType | null> {
+    if (description === "full"){ return await this.usersModel.findOne({login: login})}
     const foundUser: UsersType = await this.usersModel.findOne({ login: login }).lean()
     return foundUser
 }
 
 
-async findUserByLoginForMe(login: string): Promise<any[] | UsersType> {
+async findUserByLoginForMe(login: string ): Promise<any[] | UsersType> {
     const foundUser2 = await this.usersModel.aggregate([
         {$match: {login: login}},
         {$project: {_id: 0, userId: "$id", email: 1, login: 1}}

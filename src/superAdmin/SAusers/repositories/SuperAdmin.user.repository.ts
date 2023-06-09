@@ -8,6 +8,7 @@ import { InjectModel } from "@nestjs/mongoose"
 import { usersModel } from "src/db"
 import { RegistrationDataType, AuthDataType, ConfirmedAttemptDataType, EmailSendDataType, RefreshTokenStorageType } from "src/utils/types"
 import { BanStatus } from "src/superAdmin/SAblog/dto/banStatus"
+import { BlogsType } from "src/blogs/dto/BlogsType"
 
 const userViewModel = {
     _id: 0,
@@ -45,7 +46,8 @@ export class SuperAdminUsersRepository {
         @InjectModel('EmailSend') protected emailSendModel: Model<EmailSendDataType>,
         @InjectModel('RefreshToken') protected refreshTokenModel: Model<RefreshTokenStorageType>,
         @InjectModel('RecoveryPassword') protected recoveryPasswordModel: Model<RecoveryPasswordType>,
-        @InjectModel('NewPassword') protected newPasswordModel: Model<NewPasswordType>
+        @InjectModel('NewPassword') protected newPasswordModel: Model<NewPasswordType>,
+        @InjectModel('Blogs') protected blogModel: Model<BlogsType>
     ) {
 
     }
@@ -131,6 +133,27 @@ async banUser(id: string, reason: string, isBanned: boolean): Promise<boolean> {
         }
         else {
             return false
+        }
+    }
+    
+}
+async checkBanStatus(userId: string | null, blogId: string | null): Promise<boolean | null> { 
+    if (userId !== null) {
+        const foundUser = await this.usersModel.findOne({ id: userId }, userViewModel).lean()
+        try {
+            return foundUser.banInfo.isBanned
+        } catch (error) {
+            return null
+        }
+        
+    }
+    if (blogId !== null) {
+        const foundBlog: BlogsType = await this.blogModel.findOne({id: blogId}).lean()
+        const foundUser = await this.usersModel.findOne({ id: foundBlog.blogOwnerInfo.userId }, userViewModel).lean()
+        try {
+            return foundUser.banInfo.isBanned
+        } catch (error) {
+            return null
         }
     }
     

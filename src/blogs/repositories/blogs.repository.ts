@@ -49,7 +49,11 @@ export class BlogsRepository {
         }
 
     }
-    async targetBloggers(id: string): Promise<object | undefined> {
+    async targetBloggers(id: string, userId?: string): Promise<object | undefined> {
+        if (userId) {
+            const fullDateWithOutProject = await this.blogsModel.findOne({"blogOwnerInfo.userId": userId}).lean()
+            return fullDateWithOutProject
+        }
         const blogger: BlogsType | null = await this.blogsModel.findOne({ id: id }, modelViewBloggers).lean()
         if (blogger !== null) {
             return blogger

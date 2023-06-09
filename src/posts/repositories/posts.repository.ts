@@ -6,6 +6,7 @@ import { UsersType } from "src/users/dto/UsersType"
 import { CommentsType } from "src/comments/dto/CommentsType"
 import { PostsType } from "src/posts/dto/PostsType"
 import { BlogsType } from "src/blogs/dto/BlogsType"
+import { post } from "typegoose"
 
 export const postViewModel = {
     _id: 0,
@@ -72,7 +73,8 @@ async allPosts(skip: number, limit: number, page?: number, userId?: string): Pro
     // ВЕРНУТЬ ЗДЕСЬ В ITEMS arrayForReturn и РАСКОМЕНТИТЬ СВЕРХУ
     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: arrayForReturn.reverse() }
 } 
-async targetPosts(postId: string, userId?: string): Promise<object | undefined> {
+async targetPosts(postId: string, userId?: string, description?: string): Promise<PostsType | undefined> {
+    if (description === "full") { return await this.postsModel.findOne({id: postId}).lean()}
     const targetPost: PostsType | null = await this.postsModel.findOne({ id: postId }, postViewModel)
     const checkOnDislike = (await this.postsModel.findOne({$and: [{id: postId}, {"dislikeStorage.userId": userId}]}).lean())
     const checkOnLike = (await this.postsModel.findOne({$and: [{id: postId}, {"extendedLikesInfo.newestLikes.userId": userId}]}).lean())
@@ -100,7 +102,7 @@ async targetPosts(postId: string, userId?: string): Promise<object | undefined> 
             //return targetPostWithAggregation[0]
             return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)}}; 
         } catch {
-            console.log(targetPostWithAggregation[0], "Try Catch сработал")
+            console.log(targetPostWithAggregation[0], "Try Catch сработал в target post")
             return targetPostWithAggregation[0]
         }
         
@@ -170,8 +172,13 @@ async changePost(postId: string, title: string, shortDescription: string, conten
         return "404"
     }
 }
-async deletePost(deleteId: string): Promise<boolean> {
-    const result = await this.postsModel.deleteOne({ id: deleteId })
+async deletePost(blogId: string, postId?: string): Promise<boolean> {
+    if (postId) {
+        const result = await this.postsModel.deleteOne({ id: postId, blogId: blogId  })
+        return result.deletedCount === 1
+    }
+    // Тут изменил ранее поиск был по BlogID - но вроде некорректно
+    const result = await this.postsModel.deleteOne({ id: postId })
     return result.deletedCount === 1
 }
 async createCommentForSpecificPost(createdComment: CommentsType): Promise<CommentsType | boolean> {

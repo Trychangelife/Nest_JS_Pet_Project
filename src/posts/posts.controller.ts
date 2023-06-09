@@ -17,6 +17,9 @@ import { DeletePostCommand } from "./application/use-cases/delete_post";
 import { CreateCommentForSpecificPostCommand } from "./application/use-cases/create_comment_for_specific_post";
 import { GetCommentByPostIdCommand } from "./application/use-cases/get_comments_by_postID";
 import { LikeDislikeForPostCommand } from "./application/use-cases/like_dislike_for_post";
+import { CheckBanStatusSuperAdminCommand } from "src/superAdmin/SAusers/application/useCases/check_banStatus";
+import { PostsType } from "./dto/PostsType";
+import { CheckForbiddenCommand } from "./application/use-cases/check_forbidden";
 
 @Controller('posts')
 export class PostController {
@@ -48,17 +51,19 @@ export class PostController {
         try {
             const token = req.headers.authorization.split(' ')[1]
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
-            const takePost: object | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id, userId))
-          
-            if (takePost !== undefined) {
+            const takePost: PostsType | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id, userId))
+            const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(null, takePost?.blogId))
+            if (takePost !== undefined && checkBan !== true && checkBan !== null) {
                 return takePost
             }
             else {
                 throw new HttpException('Post NOT FOUND', HttpStatus.NOT_FOUND)
             }
         } catch (error) {
-            const takePost: object | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id))
-            if (takePost !== undefined) {
+            const takePost: PostsType | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id))
+            const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(null, takePost?.blogId))
+            if (takePost !== undefined && checkBan !== true && checkBan !== null) {
+                
                 return takePost
             }
             else {
@@ -84,7 +89,7 @@ export class PostController {
     @UseGuards(BasicAuthGuard)
     @UseFilters(new HttpExceptionFilter())
     @Put(':postId')
-    async updatePost(@Param() params, @Body() post: PostTypeValidatorForCreate) {
+    async updatePost(@Param() params, @Body() post: PostTypeValidatorForCreate, @Req() req) {
         const afterChanged: object | string = await this.commandBus.execute(new UpdatePostCommand(params.postId, post.title, post.shortDescription, post.content, post.blogId));
         if (afterChanged !== "404" && afterChanged !== '400') {
             //throw new HttpException(afterChanged,HttpStatus.ACCEPTED)

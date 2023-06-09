@@ -1,26 +1,21 @@
 import { CommandHandler } from "@nestjs/cqrs"
-import { BlogsRepository } from "src/blogs/repositories/blogs.repository"
+import { BlogsByBloggerRepository } from "src/bloggers/repositories/bloggers.repository"
 
 
 
-export class DeleteBlogCommand {
-    constructor(public id: string) {
+export class DeleteBlogForSpecificBloggerCommand {
+    constructor(public blogId: string, public userId: string) {
         
     }
 }
 
-@CommandHandler(DeleteBlogCommand)
-export class DeleteBlogUseCase {
-    constructor (protected bloggerRepository: BlogsRepository ) {}
+@CommandHandler(DeleteBlogForSpecificBloggerCommand)
+export class DeleteBlogForSpecificBloggerUseCase {
+    constructor (protected bloggerRepository: BlogsByBloggerRepository ) {}
 
-    async execute(command: DeleteBlogCommand): Promise<string> {
-        const result = await this.bloggerRepository.deleteBlogger(command.id)
-        if (result == true) {
-            return "204"
-        }
-        else {
-            return "404"
-        }
+    async execute(command: DeleteBlogForSpecificBloggerCommand): Promise<boolean> {
+        const result = await this.bloggerRepository.deleteBlogForSpecificBlogger(command.blogId, command.userId)
+        return result
     }
 }
 

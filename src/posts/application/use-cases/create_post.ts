@@ -14,9 +14,10 @@ export class CreatePostCommand {
     constructor(
         public title: string, 
         public content: string, 
-        public shortDescription: string, 
+        public shortDescription: string,
+        public userId: string, 
         public bloggerId?: string, 
-        public bloggerIdUrl?: string) {
+        public bloggerIdUrl?: string,) {
         
     }
 }
@@ -34,7 +35,7 @@ export class CreatePostUseCase {
             const foundBlogger = await this.dataSource.query(`SELECT * FROM "Bloggers" WHERE id = $1`, [command.bloggerId])
         if (foundBlogger.length >= 1 && command.bloggerId) {
             // CREATE ON CLASS
-            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerId, foundBlogger[0].name, (new Date()).toISOString(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerId, foundBlogger[0].name, (new Date()).toISOString(),foundBlogger.blogOwnerInfo.userId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
             console.log(newPost)
             return await this.postsRepository.releasePost(newPost, command.bloggerId, command.bloggerIdUrl)
         }
@@ -46,13 +47,13 @@ export class CreatePostUseCase {
         const foundBloggerW = await this.bloggerModel.findOne({ id: command.bloggerIdUrl }).lean()
         if (command.bloggerIdUrl && foundBloggerW !== null) {
             // Построено на классе
-            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerIdUrl, foundBloggerW.name, (new Date()).toISOString(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerIdUrl, foundBloggerW.name, (new Date()).toISOString(), foundBlogger.blogOwnerInfo.userId,{likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
         
             return await this.postsRepository.releasePost(newPost, command.bloggerIdUrl)
         }
         else if (foundBlogger !== null && command.bloggerId) {
             // Построено на классе
-            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerId, foundBlogger.name,(new Date()).toISOString(), {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerId, foundBlogger.name,(new Date()).toISOString(), foundBlogger.blogOwnerInfo.userId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
     
             return await this.postsRepository.releasePost(newPost, command.bloggerId, command.bloggerIdUrl)
         }

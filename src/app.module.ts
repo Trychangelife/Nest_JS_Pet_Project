@@ -73,6 +73,12 @@ import { GetAllUsersAsSuperAdminUseCase } from './superAdmin/SAusers/application
 import { DeleteUserAsSuperAdminUseCase } from './superAdmin/SAusers/application/useCases/delete_user_SA';
 import { BanUserAsSuperAdminUseCase } from './superAdmin/SAusers/application/useCases/ban_user_SA';
 import { BindingBlogSuperAdminUseCase } from './superAdmin/SAblog/application/binding_blog';
+import { DeleteBlogForSpecificBloggerUseCase } from './bloggers/application/use-cases/delete_single_blog';
+import { CreatePostByBloggerUseCase } from './bloggers/application/use-cases/create_Post';
+import { UpdateBlogByBloggerUseCase } from './bloggers/application/use-cases/update_blog';
+import { DeletePostByBloggerUseCase } from './bloggers/application/use-cases/delete_post_by_id';
+import { CheckBanStatusSuperAdminUseCase } from './superAdmin/SAusers/application/useCases/check_banStatus';
+import { CheckForbiddenUseCase } from './posts/application/use-cases/check_forbidden';
 
 
 
@@ -88,10 +94,11 @@ const useCasesBlogs = [GetAllBlogsUseCase, GetTargetBlogUseCase, CreateBlogUseCa
 const useCasesPosts = [GetAllPostsUseCase, GetSinglePostUseCase, GetAllPostsSpecificBlogUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase, CreateCommentForSpecificPostUseCase, GetCommentByPostIdUseCase, LikeDislikeForPostUseCase]
 const useCasesComments = [GetCommentUseCase, DeleteCommentUseCase, UpdateCommentUseCase, LikeDislikeCommentUseCase]
 const useCasesDevices = [GetAllDevicesUseCase, TerminateAllSessionUseCase,TerminateSessionByIdUseCase, FoundUserByDeviceIdUseCase]
-const useCasesByBloggers = [CreateBlogByBloggerUseCase, GetAllBlogsforBloggerUseCase]
+const useCasesByBloggers = [CreateBlogByBloggerUseCase, GetAllBlogsforBloggerUseCase, DeleteBlogForSpecificBloggerUseCase, UpdateBlogByBloggerUseCase, CreatePostByBloggerUseCase, DeletePostByBloggerUseCase]
 const useCasesSuperAdminBlogs = [GetAllBlogsSuperAdminUseCase, BindingBlogSuperAdminUseCase]
-const useCasesSuperAdminUsers = [CreateUserSAUseCase]
+const useCasesSuperAdminUsers = [CreateUserSAUseCase, CheckBanStatusSuperAdminUseCase, GetAllUsersAsSuperAdminUseCase, DeleteUserAsSuperAdminUseCase, BanUserAsSuperAdminUseCase]
 const useCasesUsers = [GetUserByUserIdUseCase]
+const UtilityUseCase = [CheckForbiddenUseCase]
 
 
 const blogsProviders = [BlogsService, ]
@@ -103,7 +110,7 @@ const emailProviders = [EmailService, EmailManager, EmailAdapter,]
 const authProviders = [AuthService,]
 const securityDevicesProviders = [SecurityDeviceService, SecurityDeviceRepository,]
 const blogsSuperAdminProviders = [BlogsSuperAdminRepository,]
-const usersSuperAdminProviders = [SuperAdminUsersRepository, GetAllUsersAsSuperAdminUseCase, DeleteUserAsSuperAdminUseCase, BanUserAsSuperAdminUseCase]
+const usersSuperAdminProviders = [SuperAdminUsersRepository, ]
 
 
 @Module({
@@ -184,7 +191,8 @@ const usersSuperAdminProviders = [SuperAdminUsersRepository, GetAllUsersAsSuperA
     ...useCasesSuperAdminBlogs,
     ...useCasesByBloggers,
     ...useCasesUsers,
-    ...useCasesSuperAdminUsers
+    ...useCasesSuperAdminUsers,
+    ...UtilityUseCase
 ]
 })
 export class AppModule {}
