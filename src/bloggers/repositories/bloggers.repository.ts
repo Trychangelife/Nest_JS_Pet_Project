@@ -32,7 +32,7 @@ export class BlogsByBloggerRepository {
             skip: skip,
         };
         const cursor = await this.blogsModel.find({ "blogOwnerInfo.userId": userId }, modelViewBloggers, options)
-        const totalCount = await this.blogsModel.count({ "blogOwnerInfo.userId": userId })
+        const totalCount = await this.blogsModel.countDocuments({ "blogOwnerInfo.userId": userId })
         const pagesCount = Math.ceil(totalCount / limit)
         const fullData = await this.blogsModel.find({ "blogOwnerInfo.userId": userId }, modelViewBloggers)
 

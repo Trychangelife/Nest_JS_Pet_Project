@@ -35,7 +35,7 @@ export class BlogsSuperAdminRepository {
         };
         if (page !== undefined && limit !== undefined) {
             const cursor = await this.blogsModel.find({}, modelViewBloggers, options)
-            const totalCount = await this.blogsModel.count({})
+            const totalCount = await this.blogsModel.countDocuments({})
             const pagesCount = Math.ceil(totalCount / limit)
             const fullData = await this.blogsModel.find({}, modelViewBloggers)
 

@@ -83,7 +83,7 @@ export class CommentsRepository {
         // WHEN WE HAVE LIKE
         if (foundComment !== null && foundUser !== null && (likeStatus[keys[0]]) === "Like") {
             const checkOnLike = await this.commentsModel.find({$and: [{"likeStorage.userId": userId}, {id: commentId}] } ).lean()
-            const howMuchLikes = await this.commentsModel.find({likeStorage: []}).count()
+            const howMuchLikes = await this.commentsModel.find({likeStorage: []}).countDocuments()
             const checkOnDislike = await this.commentsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: commentId}] } ).lean()
          
             if (checkOnDislike.length > 0) {

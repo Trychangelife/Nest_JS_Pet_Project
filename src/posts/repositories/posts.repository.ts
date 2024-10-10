@@ -42,7 +42,7 @@ export class PostRepository {
 
     }
 async allPosts(skip: number, limit: number, page?: number, userId?: string): Promise<object> {
-    const totalCount = await this.postsModel.count({})
+    const totalCount = await this.postsModel.countDocuments({})
     const pagesCount = Math.ceil(totalCount / limit)
     const cursor = await this.postsModel.find({}, postViewModel).skip(skip).limit(limit)
     const arrayForReturn = []
@@ -111,8 +111,8 @@ async targetPosts(postId: string, userId?: string, description?: string): Promis
 async allPostsSpecificBlogger(blogId: string, skip: number, pageSize?: number, page?: number, userId?: string): Promise<object | undefined> {
 
 
-    const totalCount = await this.postsModel.count({ blogId: blogId })
-    const checkBloggerExist = await this.bloggerModel.count({ id: blogId })
+    const totalCount = await this.postsModel.countDocuments({ blogId: blogId })
+    const checkBloggerExist = await this.bloggerModel.countDocuments({ id: blogId })
     if (checkBloggerExist < 1) { return undefined }
     if (page !== undefined && pageSize !== undefined) {
         const postsBloggerWithPaginator = await this.postsModel.find({ blogId: blogId }, postViewModel).skip(skip).limit(pageSize).lean()
@@ -150,7 +150,7 @@ async allPostsSpecificBlogger(blogId: string, skip: number, pageSize?: number, p
     }
 }
 async releasePost(newPosts: PostsType, blogId: string, bloggerIdUrl?: string): Promise<object | string> {
-    const findBlogger = await this.bloggerModel.count({ id: blogId })
+    const findBlogger = await this.bloggerModel.countDocuments({ id: blogId })
     if (findBlogger < 1) { return "400" }
     await this.postsModel.create(newPosts)
     const result: PostsType | null = await this.postsModel.findOne({ id: newPosts.id }, postViewModel).lean()
@@ -191,7 +191,7 @@ async createCommentForSpecificPost(createdComment: CommentsType): Promise<Commen
 }
 async takeCommentByIdPost (postId: string, skip: number, limit: number, page: number, userId?: string, sortBy?: string, sortDirection?: string): Promise<object | boolean> {
     const findPosts = await this.postsModel.findOne({id: postId}).lean()
-    const totalCount = await this.commentsModel.count({postId: postId})
+    const totalCount = await this.commentsModel.countDocuments({postId: postId})
     const pagesCount = Math.ceil(totalCount / limit)
     let ascOrDesc: any = -1 
     if (sortDirection === 'asc') {ascOrDesc = 1} 
@@ -248,7 +248,7 @@ async like_dislike(postId: string, likeStatus: LIKES, userId: string, login: str
     // WHEN WE HAVE LIKE
     if (foundPost !== null && foundUser !== null && likeStatus === "Like") {
         const checkOnLike = await this.postsModel.find({$and: [{"extendedLikesInfo.newestLikes.userId": userId}, {id: postId}] } ).lean()
-        const howMuchLikes = await this.postsModel.find({"extendedLikesInfo.newestLikes": []}).count()
+        const howMuchLikes = await this.postsModel.find({"extendedLikesInfo.newestLikes": []}).countDocuments()
         const checkOnDislike = await this.postsModel.find({$and: [{"dislikeStorage.userId": userId}, {id: postId}] } ).lean()
         if (checkOnDislike.length > 0) {
             // Проверяем, вдруг уже есть дизлайк, нужно его убрать (одновременно два статуса быть не может)

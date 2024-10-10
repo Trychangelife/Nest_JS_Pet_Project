@@ -31,7 +31,7 @@ export const postSchema = new mongoose.Schema<PostsType>({
     blogId: {type:String, required:true},
     blogName: {type:String, required:true},
     createdAt: {type: String, required: true},
-    authorUserId: {type: String, required: true},
+    authorUserId: {type: String, required: false},
     extendedLikesInfo: {
         likesCount: {type: Number, required:true, default: 0},
         dislikesCount: {type: Number, required:true, default: 0},
@@ -90,7 +90,7 @@ export const commentsSchema = new mongoose.Schema<CommentsType>({
 })
 
 export const usersSchema = new mongoose.Schema<UsersType>({
-    _id: {type: ObjectId, required: true},
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
     id: {type: String, required: true},
     login: {type: String, required: true},
     email: {type: String, required: true},

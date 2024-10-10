@@ -43,35 +43,91 @@ export class UsersRepository {
     ) {
 
     }
-
-    async allUsers(skip: number, limit: number, sortDirection: string, sortingParam: string, page: number,  searchLoginTerm: string, searchEmailTerm: string,): Promise<object> {
-        // Условия поиска для FIND в Mongo DB
-        const query:any = {}
+    async allUsers(
+        skip: number,
+        limit: number,
+        sortDirection: string = 'desc',  // Значение по умолчанию
+        sortingParam: string = 'createdAt',  // Значение по умолчанию
+        page: number,
+        searchLoginTerm: string = '',
+        searchEmailTerm: string = ''
+      ): Promise<object> {
+        // Условия поиска для FIND в MongoDB
+        const query: any = {};
+      
+        // Если указан searchEmailTerm, добавляем условие поиска по email
         if (searchEmailTerm) {
-            const emailQuery = { email: { $regex: searchEmailTerm, $options: 'i' } };
-            query.$or = [{ ...emailQuery }];
-          }
-          if (searchLoginTerm) {
-            const loginQuery = { login: { $regex: searchLoginTerm, $options: 'i' } };
-            query.$or = query.$or ? [...query.$or, loginQuery] : [loginQuery];
-          }
-        // Опции для пагинации (некоторые переменные находятся в [] - особенность mongoose восприятия переменных в данных запросах)
-        const options = { 
-            sort: { [sortingParam]: [sortDirection] },
-            limit: limit,
-            skip: skip,
+          const emailQuery = { email: { $regex: searchEmailTerm, $options: 'i' } };
+          query.$or = [{ ...emailQuery }];
+        }
+      
+        // Если указан searchLoginTerm, добавляем условие поиска по login
+        if (searchLoginTerm) {
+          const loginQuery = { login: { $regex: searchLoginTerm, $options: 'i' } };
+          // Объединяем с существующим условием $or, если оно есть
+          query.$or = query.$or ? [...query.$or, loginQuery] : [loginQuery];
+        }
+      
+        // Преобразуем sortDirection в числовое значение
+        const sortValue = sortDirection === 'asc' ? 1 : -1;
+      
+        // Опции для сортировки и пагинации
+        const options = {
+          sort: { [sortingParam]: sortValue },  // Применение сортировки
+          limit: limit,
+          skip: skip,
         };
+      
+        // Выполняем запрос с учетом поиска, сортировки и лимитов
+        const fullData = await this.usersModel.find(query, userViewModel)
+          .sort({ [sortingParam]: sortValue })
+          .limit(limit)
+          .skip(skip)
+          .exec();
+      
+        // Подсчет общего количества документов с учетом поиска
+        const totalCount = await this.usersModel.countDocuments(query);
+        const pagesCount = Math.ceil(totalCount / limit);
+      
+        // Возвращаем результаты в формате пагинации
+        return {
+          pagesCount: pagesCount,
+          page: page,
+          pageSize: limit,
+          totalCount: totalCount,
+          items: fullData,
+        };
+      }
+      
+
+    // async allUsers(skip: number, limit: number, sortDirection: string, sortingParam: string, page: number,  searchLoginTerm: string, searchEmailTerm: string,): Promise<object> {
+    //     // Условия поиска для FIND в Mongo DB
+    //     const query:any = {}
+    //     if (searchEmailTerm) {
+    //         const emailQuery = { email: { $regex: searchEmailTerm, $options: 'i' } };
+    //         query.$or = [{ ...emailQuery }];
+    //       }
+    //       if (searchLoginTerm) {
+    //         const loginQuery = { login: { $regex: searchLoginTerm, $options: 'i' } };
+    //         query.$or = query.$or ? [...query.$or, loginQuery] : [loginQuery];
+    //       }
+    //     // Опции для пагинации (некоторые переменные находятся в [] - особенность mongoose восприятия переменных в данных запросах)
+    //     const options = { 
+    //         sort: { [sortingParam]: [sortDirection] },
+    //         limit: limit,
+    //         skip: skip,
+    //     };
     
-        const fullData = await this.usersModel.find(query, userViewModel, options)
-        // Передаем в .count query - иначе он будет считать полностью страницу, без условий - что не является корректным
-        const totalCount = await this.usersModel.count(query)
-        const pagesCount = Math.ceil(totalCount / limit)
-        return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: fullData }
-    }
+    //     const fullData = await this.usersModel.find(query, userViewModel, options)
+    //     // Передаем в .count query - иначе он будет считать полностью страницу, без условий - что не является корректным
+    //     const totalCount = await this.usersModel.countDocuments(query)
+    //     const pagesCount = Math.ceil(totalCount / limit)
+    //     return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: fullData }
+    // }
 async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
     await this.usersModel.create(newUser)
-    const checkUniqueLogin = await this.usersModel.count({ login: newUser.login })
-    const checkUniqueEmail = await this.usersModel.count({ email: newUser.email })
+    const checkUniqueLogin = await this.usersModel.countDocuments({ login: newUser.login })
+    const checkUniqueEmail = await this.usersModel.countDocuments({ email: newUser.email })
     if (checkUniqueLogin > 1 || checkUniqueEmail > 1) {
         return false
     }

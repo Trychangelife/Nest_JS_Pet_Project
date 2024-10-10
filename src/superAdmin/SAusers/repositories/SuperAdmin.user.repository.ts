@@ -83,14 +83,14 @@ export class SuperAdminUsersRepository {
         }
         const fullData = await this.usersModel.find(query, userViewModel, options)
         // Передаем в .count query - иначе он будет считать полностью страницу, без условий - что не является корректным
-        const totalCount = await this.usersModel.count(query)
+        const totalCount = await this.usersModel.countDocuments(query)
         const pagesCount = Math.ceil(totalCount / limit)
         return { pagesCount: pagesCount, page: page, pageSize: limit, totalCount: totalCount, items: fullData }
     }
 async createUser(newUser: UsersType): Promise<UsersType | null | boolean> {
     await this.usersModel.create(newUser)
-    const checkUniqueLogin = await this.usersModel.count({ login: newUser.login })
-    const checkUniqueEmail = await this.usersModel.count({ email: newUser.email })
+    const checkUniqueLogin = await this.usersModel.countDocuments({ login: newUser.login })
+    const checkUniqueEmail = await this.usersModel.countDocuments({ email: newUser.email })
     if (checkUniqueLogin > 1 || checkUniqueEmail > 1) {
         return false
     }

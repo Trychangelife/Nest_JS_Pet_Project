@@ -20,35 +20,58 @@ export class BlogsRepository {
     constructor(@InjectModel('Blogs') protected blogsModel: Model<BlogsType>) {
         
     }
-
-    async getAllBlogs(skip: number, limit?: number, searchNameTerm?: string | null, page?: number, sortBy?: string, sortDirection?: string): Promise<object> {
-        const options = { 
-            sort: { [sortBy]: [sortDirection] },
+    async getAllBlogs(
+        skip: number,
+        limit?: number,
+        searchNameTerm?: string | null,
+        page?: number,
+        sortBy: string = 'createdAt', // Значение по умолчанию
+        sortDirection: string = 'desc' // Значение по умолчанию
+    ): Promise<object> {
+        // Преобразуем sortDirection в числовое значение
+        const sortValue = sortDirection === 'asc' ? 1 : -1;
+    
+        // Опции запроса, включая сортировку, лимит и пропуск
+        const options = {
+            sort: { [sortBy]: sortValue }, // Применение сортировки
             limit: limit,
-            skip: skip, 
+            skip: skip,
         };
+    
+        // Если заданы page и limit, то применяем пагинацию
         if (page !== undefined && limit !== undefined) {
-            const cursor = await this.blogsModel.find({}, modelViewBloggers, options)
-            const totalCount = await this.blogsModel.count({})
-            const pagesCount = Math.ceil(totalCount / limit)
-            const fullData = await this.blogsModel.find({}, modelViewBloggers)
-
+            let query = {};
+    
+            // Если есть searchNameTerm, добавляем его в запрос
             if (searchNameTerm !== null) {
-                const cursorWithRegEx = await this.blogsModel.find({ name: { $regex: searchNameTerm, $options: 'i' } }, modelViewBloggers, options)
-                const totalCountWithRegex = cursorWithRegEx.length
-                const pagesCountWithRegex = Math.ceil(totalCountWithRegex / limit)
-                return { pagesCount: pagesCountWithRegex, page: page, pageSize: limit, totalCount: totalCountWithRegex, items: cursorWithRegEx }
+                query = { name: { $regex: searchNameTerm, $options: 'i' } };
             }
-            if (skip > 0 || limit > 0) {
-                return { pagesCount, page: page, pageSize: limit, totalCount, items: cursor }
-            }
-            else return { pagesCount: 0, page: page, pageSize: limit, totalCount, items: fullData }
+    
+            // Выполняем запрос с пагинацией и сортировкой
+            const cursor = await this.blogsModel.find(query, modelViewBloggers)
+                .sort({ [sortBy]: sortValue })
+                .limit(limit)
+                .skip(skip)
+                .exec();
+    
+            // Считаем общее количество документов (с учетом фильтра по searchNameTerm, если он задан)
+            const totalCount = await this.blogsModel.countDocuments(query);
+            const pagesCount = Math.ceil(totalCount / limit);
+    
+            // Возвращаем данные в формате пагинации
+            return {
+                pagesCount,
+                page: page,
+                pageSize: limit,
+                totalCount,
+                items: cursor,
+            };
+        } else {
+            // Если пагинация не нужна, возвращаем все документы
+            return await this.blogsModel.find({}, modelViewBloggers).exec();
         }
-        else {
-            return await this.blogsModel.find({}, modelViewBloggers)
-        }
-
     }
+    
     async targetBloggers(id: string, userId?: string): Promise<object | undefined> {
         if (userId) {
             const fullDateWithOutProject = await this.blogsModel.findOne({"blogOwnerInfo.userId": userId}).lean()
