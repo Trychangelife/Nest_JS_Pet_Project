@@ -23,7 +23,6 @@ export class CreateBlogByBloggerUseCase {
     async execute(command: CreateBlogByBloggerCommand): Promise<BloggersType | null> {
         // Построено на классе
         const newBlogs = new BloggersClass(uuidv4(), command.name, command.description, command.websiteUrl, (new Date()).toISOString(), false, {userId: command.userId, userLogin: command.userLogin})
-        //console.log(newBlogs)
         const createdBlogs = await this.bloggerRepository.createBlogger(newBlogs)
         return createdBlogs
     }

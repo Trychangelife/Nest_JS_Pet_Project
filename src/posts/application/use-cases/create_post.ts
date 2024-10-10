@@ -15,9 +15,9 @@ export class CreatePostCommand {
         public title: string, 
         public content: string, 
         public shortDescription: string,
-        public userId: string, 
-        public bloggerId?: string, 
-        public bloggerIdUrl?: string,) {
+        public userId?: string, 
+        public blogId?: string, 
+        public blogIdUrl?: string,) {
         
     }
 }
@@ -32,30 +32,29 @@ export class CreatePostUseCase {
     async execute(command: CreatePostCommand): Promise<object | string | null> {
         //FOR SQL DATABASE
         if (process.env.USE_DATABASE === "SQL") {
-            const foundBlogger = await this.dataSource.query(`SELECT * FROM "Bloggers" WHERE id = $1`, [command.bloggerId])
-        if (foundBlogger.length >= 1 && command.bloggerId) {
+            const foundBlogger = await this.dataSource.query(`SELECT * FROM "Bloggers" WHERE id = $1`, [command.blogId])
+        if (foundBlogger.length >= 1 && command.blogId) {
             // CREATE ON CLASS
-            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerId, foundBlogger[0].name, (new Date()).toISOString(),foundBlogger.blogOwnerInfo.userId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
-            console.log(newPost)
-            return await this.postsRepository.releasePost(newPost, command.bloggerId, command.bloggerIdUrl)
+            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.blogId, foundBlogger[0].name, (new Date()).toISOString(),foundBlogger.blogOwnerInfo.userId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            return await this.postsRepository.releasePost(newPost, command.blogId, command.blogIdUrl)
         }
         else { return null }
         }
         // FOR MONGO DATABASE
         else {
-        const foundBlogger = await this.bloggerModel.findOne({ id: command.bloggerId }).lean()
-        const foundBloggerW = await this.bloggerModel.findOne({ id: command.bloggerIdUrl }).lean()
-        if (command.bloggerIdUrl && foundBloggerW !== null) {
+        const foundBlogger = await this.bloggerModel.findOne({ id: command.blogId }).lean()
+        const foundBloggerW = await this.bloggerModel.findOne({ id: command.blogIdUrl }).lean()
+        if (command.blogIdUrl && foundBloggerW !== null) {
             // Построено на классе
-            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerIdUrl, foundBloggerW.name, (new Date()).toISOString(), foundBlogger.blogOwnerInfo.userId,{likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.blogIdUrl, foundBloggerW.name, (new Date()).toISOString(), foundBlogger.blogOwnerInfo.userId,{likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
         
-            return await this.postsRepository.releasePost(newPost, command.bloggerIdUrl)
+            return await this.postsRepository.releasePost(newPost, command.blogIdUrl)
         }
-        else if (foundBlogger !== null && command.bloggerId) {
+        else if (foundBlogger !== null && command.blogId) {
             // Построено на классе
-            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.bloggerId, foundBlogger.name,(new Date()).toISOString(), foundBlogger.blogOwnerInfo.userId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
+            const newPost = new PostClass(uuidv4(), command.title, command.content, command.shortDescription, command.blogId, foundBlogger.name,(new Date()).toISOString(), foundBlogger.blogOwnerInfo.userId, {likesCount: 0, dislikesCount: 0, myStatus: LIKES.NONE})
     
-            return await this.postsRepository.releasePost(newPost, command.bloggerId, command.bloggerIdUrl)
+            return await this.postsRepository.releasePost(newPost, command.blogId, command.blogIdUrl)
         }
         else { return null }
     }

@@ -102,7 +102,6 @@ async targetPosts(postId: string, userId?: string, description?: string): Promis
             //return targetPostWithAggregation[0]
             return {...targetPostWithAggregation[0], extendedLikesInfo: {...targetPostWithAggregation[0].extendedLikesInfo, newestLikes: targetPostWithAggregation[0].extendedLikesInfo.newestLikes.reverse().slice(0,3)}}; 
         } catch {
-            console.log(targetPostWithAggregation[0], "Try Catch сработал в target post")
             return targetPostWithAggregation[0]
         }
         
@@ -172,14 +171,20 @@ async changePost(postId: string, title: string, shortDescription: string, conten
         return "404"
     }
 }
-async deletePost(blogId: string, postId?: string): Promise<boolean> {
-    if (postId) {
-        const result = await this.postsModel.deleteOne({ id: postId, blogId: blogId  })
-        return result.deletedCount === 1
+async deletePost(postId: string, blogId?: string): Promise<boolean> {
+    if (blogId || postId) {
+        const byPostId = await this.postsModel.deleteOne({ id: postId})
+        const byBlogId = await this.postsModel.deleteOne({blogId: blogId})
+        if (byBlogId.deletedCount === 1 || byPostId.deletedCount === 1) {
+            return true
+        }
+    }
+    else {
+        return false
     }
     // Тут изменил ранее поиск был по BlogID - но вроде некорректно
-    const result = await this.postsModel.deleteOne({ id: postId })
-    return result.deletedCount === 1
+    // const result = await this.postsModel.deleteOne({ id: postId })
+    // return result.deletedCount === 1
 }
 async createCommentForSpecificPost(createdComment: CommentsType): Promise<CommentsType | boolean> {
 

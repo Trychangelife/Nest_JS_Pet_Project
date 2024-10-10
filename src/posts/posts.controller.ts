@@ -53,7 +53,8 @@ export class PostController {
             const userId = await this.jwtServiceClass.getUserByAccessToken(token)
             const takePost: PostsType | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id, userId))
             const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(null, takePost?.blogId))
-            if (takePost !== undefined && checkBan !== true && checkBan !== null) {
+            if (takePost !== undefined) { 
+            //if (takePost !== undefined && checkBan !== true && checkBan !== null) { - раскомментирую когда дойду до банов
                 return takePost
             }
             else {
@@ -62,7 +63,8 @@ export class PostController {
         } catch (error) {
             const takePost: PostsType | undefined = await this.commandBus.execute(new GetSinglePostCommand(params.id))
             const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(null, takePost?.blogId))
-            if (takePost !== undefined && checkBan !== true && checkBan !== null) {
+            if (takePost !== undefined) {
+            //if (takePost !== undefined && checkBan !== true && checkBan !== null) {
                 
                 return takePost
             }
@@ -76,7 +78,7 @@ export class PostController {
     @UseFilters(new HttpExceptionFilter())
     @Post()
     async createPost(@Body() post: PostTypeValidatorForCreate, @Res() res) {
-        const createdPost: string | object | null = await this.commandBus.execute(new CreatePostCommand(post.title, post.content, post.shortDescription, post.blogId));
+        const createdPost: string | object | null = await this.commandBus.execute(new CreatePostCommand(post.title, post.content, post.shortDescription, post.userId, post.blogId));
         if (createdPost == null) {
             throw new HttpException('Something wrong, check input data', HttpStatus.BAD_REQUEST)
             // res.status(400).json({ errorsMessages: [{ message: "blogger not found", field: "blogId" }], resultCode: 1 });

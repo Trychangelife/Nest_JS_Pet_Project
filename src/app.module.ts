@@ -120,8 +120,8 @@ const usersSuperAdminProviders = [SuperAdminUsersRepository, ]
     useFactory: async (config: ConfigService) => ({
       transport: {
         host: config.get('EMAIL_HOST'),
-        secure: true, 
-        port: 465,
+        secure: false, 
+        port: 587,
         auth: {
                user: config.get('EMAIL_USER'),
                pass: config.get('PASSWORD_GMAIL')

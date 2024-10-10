@@ -18,6 +18,7 @@ export class PostTypeValidator {
     @Transform(({ value }: TransformFnParams) => value?.trim())
     @Matches(nameRegex)
     content: string;
+    userId: string;
     blogId: string;
 
 }

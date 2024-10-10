@@ -32,7 +32,8 @@ export class CommentsController {
         const userId = await this.jwtServiceClass.getUserByAccessToken(token)
         const result = await this.commandBus.execute(new GetCommentCommand(params.id, userId));
         const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(result?.commentatorInfo.userId, null))
-        if (result !== null && checkBan !== true && checkBan !== null) {
+        //if (result !== null && checkBan !== true && checkBan !== null) {
+        if (result !== null) {
             return result
         }
         else {
@@ -40,8 +41,10 @@ export class CommentsController {
         }
     } catch (error) {
         const result: CommentsType | null = await this.commandBus.execute(new GetCommentCommand(params.id))
-        const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(result?.commentatorInfo.userId, null))
-        if (result !== null && checkBan !== true && checkBan !== null) {
+        //Восстановить когда потребуется фунционал бана
+        //const checkBan = await this.commandBus.execute(new CheckBanStatusSuperAdminCommand(result?.commentatorInfo.userId, null))
+        //if (result !== null && checkBan !== true && checkBan !== null) {
+        if (result !== null && result !== undefined) {
             return result
         }
         else {

@@ -181,7 +181,6 @@ export class AuthController {
     async newPassword(@Req() req, @Body() newPasswordEntity: NewPassword) {
         // Регистрируем обращение на наш эндпоинт 
         await this.authService.informationAboutNewPassword(req.ip, newPasswordEntity.recoveryCode);
-        console.log("Есть вход в new-password")
         // Проверяем наличие 5 и более обращений за последних 10 секунд (для 429 ошибки)
         const checkAttemptNewPassword = await this.authService.counterAttemptNewPassword(req.ip, newPasswordEntity.recoveryCode);
         // True возвращается - значит все хорошо, пользователь нам не спамит
