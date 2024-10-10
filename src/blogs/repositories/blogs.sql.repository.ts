@@ -55,7 +55,7 @@ export class BlogsRepositorySql {
     }
     async createBlogger(newBlogger: BlogsType): Promise<BlogsType | null> {
         const bloggerAfterCreate = await this.dataSource.query(`
-        INSERT INTO "Bloggers" (name, "websiteUrl")
+        INSERT INTO "bloggers" (name, "website_url")
         VALUES ($1, $2)
         RETURNING *
         `, [newBlogger.name, newBlogger.websiteUrl])
